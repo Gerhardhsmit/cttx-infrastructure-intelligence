@@ -1,0 +1,58 @@
+{
+  "query": "SHOW COLUMNS FROM audits LIKE 'tci%'; SHOW COLUMNS FROM audits LIKE 'cis%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2jAyjJtimGfebHK.root --database baLZUhFjyWHEmXFh9Hh7Zt --execute SHOW COLUMNS FROM audits LIKE 'tci%'; SHOW COLUMNS FROM audits LIKE 'cis%';",
+  "rows": [
+    {
+      "Field": "tciScore",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "tciObstructionZones",
+      "Type": "json",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "tciProfileSamples",
+      "Type": "json",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "Field",
+      "Type": "Type",
+      "Null": "Null",
+      "Key": "Key",
+      "Default": "Default",
+      "Extra": "Extra"
+    },
+    {
+      "Field": "cisScore",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "cisSubMetrics",
+      "Type": "json",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\ntciScore\tint\tYES\t\t0\t\ntciObstructionZones\tjson\tYES\t\tNULL\t\ntciProfileSamples\tjson\tYES\t\tNULL\t\nField\tType\tNull\tKey\tDefault\tExtra\ncisScore\tint\tYES\t\t0\t\ncisSubMetrics\tjson\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 677
+}

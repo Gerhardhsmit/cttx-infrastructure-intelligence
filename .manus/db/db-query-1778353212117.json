@@ -1,0 +1,14 @@
+{
+  "query": "SELECT `id`, `tciProfileSamples` FROM `audits` LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2jAyjJtimGfebHK.root --database baLZUhFjyWHEmXFh9Hh7Zt --execute SELECT `id`, `tciProfileSamples` FROM `audits` LIMIT 1;",
+  "rows": [
+    {
+      "id": "1",
+      "tciProfileSamples": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttciProfileSamples\n1\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 567
+}

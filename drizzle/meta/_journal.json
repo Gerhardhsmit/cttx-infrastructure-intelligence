@@ -1,0 +1,62 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1778344999067,
+      "tag": "0000_fast_devos",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1778345192709,
+      "tag": "0001_elite_felicia_hardy",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1778352843890,
+      "tag": "0002_luxuriant_mojo",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1778353070185,
+      "tag": "0003_quiet_wild_pack",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1778369471174,
+      "tag": "0004_famous_mariko_yashida",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1778370071199,
+      "tag": "0005_aberrant_catseye",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1778412726501,
+      "tag": "0006_abnormal_jocasta",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1778487487675,
+      "tag": "0007_tidy_zarda",
+      "breakpoints": true
+    }
+  ]
+}

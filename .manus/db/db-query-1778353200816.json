@@ -1,0 +1,30 @@
+{
+  "query": "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'audits' AND COLUMN_NAME LIKE '%ci%' OR COLUMN_NAME LIKE '%Profile%' OR COLUMN_NAME LIKE '%Sub%' OR COLUMN_NAME LIKE '%Obstruction%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2jAyjJtimGfebHK.root --database baLZUhFjyWHEmXFh9Hh7Zt --execute SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'audits' AND COLUMN_NAME LIKE '%ci%' OR COLUMN_NAME LIKE '%Profile%' OR COLUMN_NAME LIKE '%Sub%' OR COLUMN_NAME LIKE '%Obstruction%';",
+  "rows": [
+    {
+      "COLUMN_NAME": "cisScore",
+      "DATA_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "tciScore",
+      "DATA_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "cisSubMetrics",
+      "DATA_TYPE": "json"
+    },
+    {
+      "COLUMN_NAME": "tciObstructionZones",
+      "DATA_TYPE": "json"
+    },
+    {
+      "COLUMN_NAME": "tciProfileSamples",
+      "DATA_TYPE": "json"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tDATA_TYPE\ncisScore\tint\ntciScore\tint\ncisSubMetrics\tjson\ntciObstructionZones\tjson\ntciProfileSamples\tjson\n",
+  "stderr": "",
+  "execution_time_ms": 588
+}

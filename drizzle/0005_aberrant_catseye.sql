@@ -1,0 +1,1 @@
+ALTER TABLE `operationalCriticalLocations` ADD `photoUrl` text;
