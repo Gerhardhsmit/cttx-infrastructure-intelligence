@@ -1,0 +1,79 @@
+name: CTTX Web App Delivery Gate
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: cttx-delivery-gate-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  delivery-checklist:
+    name: Enforce cttx-webapp-delivery checklist
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Write PR body to file
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          mkdir -p .github/tmp
+          printf '%s' "$PR_BODY" > .github/tmp/pr-body.md
+
+      - name: Run cttx-webapp-delivery PR gate
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+          HEAD_REF: HEAD
+          PR_BODY_FILE: .github/tmp/pr-body.md
+        run: |
+          chmod +x .github/scripts/cttx-delivery-gate.sh
+          .github/scripts/cttx-delivery-gate.sh
+
+  validate:
+    name: TypeScript, Vitest, and build validation
+    runs-on: ubuntu-latest
+    needs: [delivery-checklist]
+    if: always() && (github.event_name == 'push' || needs.delivery-checklist.result == 'success')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: TypeScript check
+        run: pnpm check
+
+      - name: Run Vitest regression suite
+        run: pnpm test
+
+      - name: Build application
+        run: pnpm build

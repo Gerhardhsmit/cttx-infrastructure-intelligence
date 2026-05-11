@@ -1,0 +1,13 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `infrastructureAssets` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `externalRef` varchar(128) NOT NULL,\n  `label` varchar(255) NOT NULL,\n  `assetType` enum('Tower','Fibre Route','PoP') NOT NULL,\n  `provider` varchar(255),\n  `latitude` decimal(10,8) NOT NULL,\n  `longitude` decimal(11,8) NOT NULL,\n  `endLatitude` decimal(10,8),\n  `endLongitude` decimal(11,8),\n  `description` text,\n  `confidence` int NOT NULL DEFAULT 60,\n  `verificationStatus` enum('Known','Candidate','Field Verified') NOT NULL DEFAULT 'Candidate',\n  `region` varchar(255),\n  `source` varchar(255) NOT NULL DEFAULT 'CTTX infrastructure intelligence',\n  `active` int NOT NULL DEFAULT 1,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `infrastructureAssets_id` PRIMARY KEY(`id`),\n  CONSTRAINT `infrastructureAssets_externalRef_unique` UNIQUE(`externalRef`)\n);\nSHOW TABLES LIKE 'infrastructureAssets';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2jAyjJtimGfebHK.root --database baLZUhFjyWHEmXFh9Hh7Zt --execute CREATE TABLE IF NOT EXISTS `infrastructureAssets` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `externalRef` varchar(128) NOT NULL,\n  `label` varchar(255) NOT NULL,\n  `assetType` enum('Tower','Fibre Route','PoP') NOT NULL,\n  `provider` varchar(255),\n  `latitude` decimal(10,8) NOT NULL,\n  `longitude` decimal(11,8) NOT NULL,\n  `endLatitude` decimal(10,8),\n  `endLongitude` decimal(11,8),\n  `description` text,\n  `confidence` int NOT NULL DEFAULT 60,\n  `verificationStatus` enum('Known','Candidate','Field Verified') NOT NULL DEFAULT 'Candidate',\n  `region` varchar(255),\n  `source` varchar(255) NOT NULL DEFAULT 'CTTX infrastructure intelligence',\n  `active` int NOT NULL DEFAULT 1,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `infrastructureAssets_id` PRIMARY KEY(`id`),\n  CONSTRAINT `infrastructureAssets_externalRef_unique` UNIQUE(`externalRef`)\n);\nSHOW TABLES LIKE 'infrastructureAssets';",
+  "rows": [
+    {
+      "Tables_in_baLZUhFjyWHEmXFh9Hh7Zt (infrastructureAssets)": "infrastructureAssets"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_baLZUhFjyWHEmXFh9Hh7Zt (infrastructureAssets)\ninfrastructureAssets\n",
+  "stderr": "",
+  "execution_time_ms": 604
+}

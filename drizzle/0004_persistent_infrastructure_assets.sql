@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS `infrastructureAssets` (
+  `id` int AUTO_INCREMENT NOT NULL,
+  `externalRef` varchar(128) NOT NULL,
+  `label` varchar(255) NOT NULL,
+  `assetType` enum('Tower','Fibre Route','PoP') NOT NULL,
+  `provider` varchar(255),
+  `latitude` decimal(10,8) NOT NULL,
+  `longitude` decimal(11,8) NOT NULL,
+  `endLatitude` decimal(10,8),
+  `endLongitude` decimal(11,8),
+  `description` text,
+  `confidence` int NOT NULL DEFAULT 60,
+  `verificationStatus` enum('Known','Candidate','Field Verified') NOT NULL DEFAULT 'Candidate',
+  `region` varchar(255),
+  `source` varchar(255) NOT NULL DEFAULT 'CTTX infrastructure intelligence',
+  `active` int NOT NULL DEFAULT 1,
+  `createdAt` timestamp NOT NULL DEFAULT (now()),
+  `updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT `infrastructureAssets_id` PRIMARY KEY(`id`),
+  CONSTRAINT `infrastructureAssets_externalRef_unique` UNIQUE(`externalRef`)
+);
