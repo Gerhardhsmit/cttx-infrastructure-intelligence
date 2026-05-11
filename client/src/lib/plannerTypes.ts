@@ -1,5 +1,5 @@
 import { RESERVE_SITE_TYPES, type ReserveSiteTypeId } from "@shared/reserveFramework";
-import type { GisAutoScanResult, GisClearSegment, GisPotentialHighSite, GisProviderMast, GisCoordinate } from "./gisAutoScan";
+import type { GisAutoScanResult, GisClearSegment, GisPotentialHighSite, GisProviderMast, GisCoordinate, GisDetectedFacility, GisLosStatus } from "./gisAutoScan";
 
 export type PlannerCoordinate = GisCoordinate;
 
@@ -14,13 +14,14 @@ export type PlannerLayerKey =
   | "unknown"
   | "uplink"
   | "backbone"
+  | "distribution"
   | "live"
   | "facilities";
 
 export type HighSiteSource = "open-meteo-elevation" | "srtm" | "osm" | "manual";
 export type HighSiteCategory = "inside" | "nearby" | "remote";
 export type MastProvider = "vodacom" | "mtn" | "cellc" | "telkom" | "unknown";
-export type NetworkLinkType = "uplink" | "backbone";
+export type NetworkLinkType = "uplink" | "backbone" | "distribution";
 
 export const FACILITY_TYPES = {
   relay: { label: "Relay Candidate", icon: "📡", color: "#22c55e", reserveSiteType: "high_site" },
@@ -71,6 +72,9 @@ export type NetworkLink = {
   path: [PlannerCoordinate, PlannerCoordinate];
   justification: string;
   viable: boolean;
+  losStatus: GisLosStatus;
+  terrainMarginMeters?: number;
+  elevationProfile?: number[];
 };
 
 export type Facility = PlannerCoordinate & {
@@ -104,6 +108,7 @@ export const DEFAULT_PLANNER_LAYER_VISIBILITY: Record<PlannerLayerKey, boolean> 
   unknown: false,
   uplink: true,
   backbone: true,
+  distribution: true,
   live: true,
   facilities: true,
 };
@@ -126,6 +131,7 @@ export function mapHighSiteCategory(siteClass: GisPotentialHighSite["siteClass"]
 export function mapHighSiteSource(source: GisPotentialHighSite["source"]): HighSiteSource {
   if (source === "open-meteo-elevation") return "open-meteo-elevation";
   if (source === "srtm-sampled" || source === "deterministic-terrain-model" || source === "google-elevation-sampled") return "srtm";
+  if (source === "osm-overpass") return "osm";
   return "srtm";
 }
 
@@ -173,10 +179,18 @@ export function convertGisMast(mast: GisProviderMast, selected: boolean): Mast {
   };
 }
 
+export function convertGisFacility(facility: GisDetectedFacility): Facility {
+  return {
+    id: facility.id,
+    lat: facility.lat,
+    lng: facility.lng,
+    type: facility.type,
+    name: facility.label,
+  };
+}
+
 export function convertGisLink(segment: GisClearSegment): NetworkLink | null {
-  if (!segment.viable) return null;
-  if (segment.role !== "uplink" && segment.role !== "backbone") return null;
-  if (segment.distanceKm > 15) return null;
+  if (segment.role !== "uplink" && segment.role !== "backbone" && segment.role !== "distribution") return null;
   return {
     id: segment.id,
     fromId: segment.sourceId,
@@ -188,7 +202,10 @@ export function convertGisLink(segment: GisClearSegment): NetworkLink | null {
     distKm: segment.distanceKm,
     path: segment.path,
     justification: segment.justification,
-    viable: true,
+    viable: segment.viable,
+    losStatus: segment.losStatus ?? (segment.viable ? "confirmed" : "blocked"),
+    terrainMarginMeters: segment.terrainMarginMeters,
+    elevationProfile: segment.elevationProfile,
   };
 }
 
@@ -198,15 +215,21 @@ export function buildPlannerStateFromGisScan(input: {
   selectedMastId?: string;
   previous?: Partial<Pick<PlannerState, "facilities" | "layerVis">>;
 }): PlannerState {
-  const selectedMastId = input.selectedMastId ?? input.scan.minimumHighSitePlan.clearSegments.find((segment) => segment.role === "uplink")?.sourceId ?? input.scan.providerMasts[0]?.id;
+  const selectedMastId = input.selectedMastId ?? input.scan.minimumHighSitePlan.clearSegments.find((segment) => segment.role === "uplink")?.targetId ?? input.scan.providerMasts[0]?.id;
   const selectedMastIndex = input.scan.providerMasts.findIndex((mast) => mast.id === selectedMastId);
   const highSites = input.scan.potentialHighSites.map(convertGisHighSite);
   const masts = input.scan.providerMasts.map((mast) => convertGisMast(mast, mast.id === selectedMastId));
   const links = input.scan.minimumHighSitePlan.clearSegments.map(convertGisLink).filter((link): link is NetworkLink => Boolean(link));
+  const detectedFacilities = input.scan.detectedFacilities.map(convertGisFacility);
+  const previousFacilities = input.previous?.facilities ?? [];
+  const facilityById = new Map<string, Facility>();
+  detectedFacilities.forEach((facility) => facilityById.set(facility.id, facility));
+  previousFacilities.forEach((facility) => facilityById.set(facility.id, facility));
   const uplink = links.find((link) => link.type === "uplink");
   const backboneCount = links.filter((link) => link.type === "backbone").length;
+  const distributionCount = links.filter((link) => link.type === "distribution").length;
   const selectedMast = masts.find((mast) => mast.selected) ?? masts[0];
-  const recommendationSummary = `Minimum viable topology: ${input.scan.minimumHighSitePlan.recommendedHighSiteCount} high-site(s), one earned uplink${uplink && selectedMast ? ` from ${selectedMast.name}` : ""}, and ${backboneCount} nearest-neighbour backbone segment(s). The Link Planner mirrors the audit-map rules: only clear LOS links under the 15 km viability ceiling are shown, with Cambium Networks radios, cnMaestro visibility, Victron Energy power architecture, and Hubble Lithium storage considered during field validation.`;
+  const recommendationSummary = `API-backed topology: ${input.scan.minimumHighSitePlan.recommendedHighSiteCount} high-site(s), ${distributionCount} facility-to-high-site path(s), ${backboneCount} backbone segment(s), and ${uplink && selectedMast ? `a carrier mast uplink via ${selectedMast.name}` : "carrier mast uplink diagnostics"}. Green links are confirmed LOS, amber links are marginal, and red links are blocked diagnostics requiring field validation.`;
 
   return {
     propertyName: input.propertyName,
@@ -217,7 +240,7 @@ export function buildPlannerStateFromGisScan(input: {
     masts,
     selectedMastIndex: selectedMastIndex >= 0 ? selectedMastIndex : masts.length > 0 ? 0 : null,
     links,
-    facilities: input.previous?.facilities ?? [],
+    facilities: Array.from(facilityById.values()),
     layerVis: { ...DEFAULT_PLANNER_LAYER_VISIBILITY, ...(input.previous?.layerVis ?? {}) },
     recommendationSummary,
   };
