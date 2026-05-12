@@ -46,6 +46,7 @@ export type HighSite = PlannerCoordinate & {
   distToBoundary: number;
   distToCentre: number;
   category: HighSiteCategory;
+  antennaHeightM?: number;
 };
 
 export type Mast = PlannerCoordinate & {
@@ -58,6 +59,7 @@ export type Mast = PlannerCoordinate & {
   selected: boolean;
   closestForProvider: boolean;
   hiddenByDefault: boolean;
+  antennaHeightM?: number;
 };
 
 export type NetworkLink = {
@@ -147,7 +149,10 @@ export function estimateBoundaryAreaHa(polygon: PlannerCoordinate[] | null | und
   return Number((Math.abs(shoelace) / 2 / 10_000).toFixed(1));
 }
 
-export function convertGisHighSite(site: GisPotentialHighSite): HighSite {
+export const DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M = 30;
+export const DEFAULT_CARRIER_MAST_HEIGHT_M = 45;
+
+export function convertGisHighSite(site: GisPotentialHighSite, previous?: HighSite): HighSite {
   const category = mapHighSiteCategory(site.siteClass);
   return {
     id: site.id,
@@ -160,10 +165,11 @@ export function convertGisHighSite(site: GisPotentialHighSite): HighSite {
     distToBoundary: category === "inside" ? 0 : Number(Math.max(0, site.distanceFromPropertyCenterKm - 1.4).toFixed(2)),
     distToCentre: site.distanceFromPropertyCenterKm,
     category,
+    antennaHeightM: previous?.antennaHeightM ?? DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M,
   };
 }
 
-export function convertGisMast(mast: GisProviderMast, selected: boolean): Mast {
+export function convertGisMast(mast: GisProviderMast, selected: boolean, previous?: Mast): Mast {
   return {
     id: mast.id,
     lat: mast.lat,
@@ -176,6 +182,7 @@ export function convertGisMast(mast: GisProviderMast, selected: boolean): Mast {
     selected,
     closestForProvider: Boolean(mast.isClosestForProvider),
     hiddenByDefault: Boolean(mast.hiddenByDefault),
+    antennaHeightM: previous?.antennaHeightM ?? DEFAULT_CARRIER_MAST_HEIGHT_M,
   };
 }
 
@@ -213,12 +220,14 @@ export function buildPlannerStateFromGisScan(input: {
   propertyName: string;
   scan: GisAutoScanResult;
   selectedMastId?: string;
-  previous?: Partial<Pick<PlannerState, "facilities" | "layerVis">>;
+  previous?: Partial<Pick<PlannerState, "facilities" | "layerVis" | "highSites" | "masts">>;
 }): PlannerState {
   const selectedMastId = input.selectedMastId ?? input.scan.minimumHighSitePlan.clearSegments.find((segment) => segment.role === "uplink")?.targetId ?? input.scan.providerMasts[0]?.id;
   const selectedMastIndex = input.scan.providerMasts.findIndex((mast) => mast.id === selectedMastId);
-  const highSites = input.scan.potentialHighSites.map(convertGisHighSite);
-  const masts = input.scan.providerMasts.map((mast) => convertGisMast(mast, mast.id === selectedMastId));
+  const previousHighSiteById = new Map((input.previous?.highSites ?? []).map((site) => [site.id, site]));
+  const previousMastById = new Map((input.previous?.masts ?? []).map((mast) => [mast.id, mast]));
+  const highSites = input.scan.potentialHighSites.map((site) => convertGisHighSite(site, previousHighSiteById.get(site.id)));
+  const masts = input.scan.providerMasts.map((mast) => convertGisMast(mast, mast.id === selectedMastId, previousMastById.get(mast.id)));
   const links = input.scan.minimumHighSitePlan.clearSegments.map(convertGisLink).filter((link): link is NetworkLink => Boolean(link));
   const detectedFacilities = input.scan.detectedFacilities.map(convertGisFacility);
   const previousFacilities = input.previous?.facilities ?? [];

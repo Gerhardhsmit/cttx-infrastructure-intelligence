@@ -2,6 +2,8 @@ import { MapView } from "@/components/Map";
 import { Button } from "@/components/ui/button";
 import { buildGisAutoScanWithApis, calculateBearingDeg, isValidGisCoordinate, sanitizePath, type GisCoordinate } from "@/lib/gisAutoScan";
 import {
+  DEFAULT_CARRIER_MAST_HEIGHT_M,
+  DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M,
   DEFAULT_PLANNER_LAYER_VISIBILITY,
   FACILITY_TYPES,
   PLANNER_FACILITY_OPTIONS,
@@ -21,6 +23,12 @@ import { toast } from "sonner";
 
 const DEFAULT_CENTER = { lat: -33.482, lng: 26.633 };
 const DEFAULT_PROPERTY_NAME = "Kwandwe Ridge Trial Property";
+const DEFAULT_FACILITY_ANTENNA_HEIGHT_M = 10;
+const LOS_CONFIRMED_CLEARANCE_M = 10;
+const HIGH_SITE_HEIGHT_OPTIONS = [15, 20, 25, 30, 35, 40, 45, 50, 60];
+const CARRIER_MAST_HEIGHT_OPTIONS = [25, 30, 35, 40, 45, 50, 60];
+
+type HeightSelection = { type: "highSite" | "mast"; id: string } | null;
 
 type LinkBudget = {
   bearingDeg: number;
@@ -79,7 +87,7 @@ function createEmptyPlannerState(propertyName = DEFAULT_PROPERTY_NAME, centre: G
   };
 }
 
-export async function createContinuousPlannerState(propertyName: string, centre: GisCoordinate, selectedMastId?: string, previous?: Partial<Pick<PlannerState, "facilities" | "layerVis">>) {
+export async function createContinuousPlannerState(propertyName: string, centre: GisCoordinate, selectedMastId?: string, previous?: Partial<Pick<PlannerState, "facilities" | "layerVis" | "highSites" | "masts">>) {
   if (!isValidGisCoordinate(centre)) throw new Error("Invalid planning coordinate");
   const scan = await buildGisAutoScanWithApis(centre, { propertyName });
   if (!scan) throw new Error("Unable to build planner state from the selected coordinate");
@@ -191,6 +199,74 @@ function losLabel(link: NetworkLink) {
   return "LOS pending";
 }
 
+function linkStatusToken(link: NetworkLink) {
+  if (link.losStatus === "confirmed") return "confirmed";
+  if (link.losStatus === "marginal") return "marginal";
+  if (link.losStatus === "blocked") return "blocked";
+  return "pending";
+}
+
+function clearanceLabel(value: number | undefined) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "clr —";
+  const rounded = Number.isInteger(value) ? value.toFixed(0) : value.toFixed(1);
+  return `${rounded}m clr`;
+}
+
+function linkMapLabel(link: NetworkLink) {
+  return `${link.type === "uplink" ? "Uplink" : link.type === "backbone" ? "Backbone" : "Facility"} · ${link.distKm.toFixed(1)} km · ${linkStatusToken(link)} · ${clearanceLabel(link.terrainMarginMeters)}`;
+}
+
+function pathMidpoint(path: NetworkLink["path"]) {
+  return { lat: Number(((path[0].lat + path[1].lat) / 2).toFixed(6)), lng: Number(((path[0].lng + path[1].lng) / 2).toFixed(6)) };
+}
+
+function endpointHeightForLink(plannerState: PlannerState, endpointId: string, fallback: number) {
+  const highSite = plannerState.highSites.find((site) => site.id === endpointId);
+  if (highSite) return highSite.antennaHeightM ?? DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M;
+  const mast = plannerState.masts.find((candidate) => candidate.id === endpointId);
+  if (mast) return mast.antennaHeightM ?? DEFAULT_CARRIER_MAST_HEIGHT_M;
+  return fallback;
+}
+
+function recalculateLinkForEndpointHeights(link: NetworkLink, plannerState: PlannerState): NetworkLink {
+  const elevation = link.elevationProfile;
+  if (!Array.isArray(elevation) || elevation.length < 2 || elevation.some((value) => typeof value !== "number" || !Number.isFinite(value))) return link;
+
+  const startHeight = endpointHeightForLink(plannerState, link.fromId, link.type === "distribution" ? DEFAULT_FACILITY_ANTENNA_HEIGHT_M : DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M);
+  const endHeight = endpointHeightForLink(plannerState, link.toId, link.type === "uplink" ? DEFAULT_CARRIER_MAST_HEIGHT_M : DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M);
+  const startElev = elevation[0] + startHeight;
+  const endElev = elevation[elevation.length - 1] + endHeight;
+  let hasLineOfSight = true;
+  let worstClearance = Infinity;
+
+  for (let index = 0; index < elevation.length; index += 1) {
+    const t = elevation.length === 1 ? 0 : index / (elevation.length - 1);
+    const signalHeight = startElev + t * (endElev - startElev);
+    const clearance = signalHeight - elevation[index];
+    if (index > 0 && index < elevation.length - 1) {
+      if (clearance < 0) hasLineOfSight = false;
+      if (clearance < worstClearance) worstClearance = clearance;
+    }
+  }
+
+  if (!Number.isFinite(worstClearance)) worstClearance = Math.min(startHeight, endHeight);
+  const losStatus = !hasLineOfSight ? "blocked" : worstClearance < LOS_CONFIRMED_CLEARANCE_M ? "marginal" : "confirmed";
+  const terrainMarginMeters = Number(worstClearance.toFixed(1));
+  const baseJustification = link.justification.replace(/ · -?\d+(?:\.\d+)? m terrain clearance$/, "");
+
+  return {
+    ...link,
+    viable: losStatus === "confirmed" || losStatus === "marginal",
+    losStatus,
+    terrainMarginMeters,
+    justification: `${baseJustification} · ${terrainMarginMeters.toFixed(1)} m terrain clearance`,
+  };
+}
+
+export function recalculatePlannerLinks(plannerState: PlannerState): PlannerState {
+  return { ...plannerState, links: plannerState.links.map((link) => recalculateLinkForEndpointHeights(link, plannerState)) };
+}
+
 function layerCounts(plannerState: PlannerState): Record<PlannerLayerKey, number> {
   return {
     inside: plannerState.highSites.filter((site) => site.category === "inside").length,
@@ -217,6 +293,7 @@ export default function LinkPlanner() {
   const [selectedMastId, setSelectedMastId] = useState<string | undefined>();
   const [pendingFacilityType, setPendingFacilityType] = useState<FacilityType | null>(null);
   const [propertyPinClickMode, setPropertyPinClickMode] = useState(false);
+  const [heightSelection, setHeightSelection] = useState<HeightSelection>(null);
   const [plannerState, setPlannerState] = useState<PlannerState>(() => createEmptyPlannerState(DEFAULT_PROPERTY_NAME, DEFAULT_CENTER));
   const [scanStatus, setScanStatus] = useState<ScanStatus>({ loading: true, phase: "Preparing real API-backed scan", issues: [] });
   const [lastSavedId, setLastSavedId] = useState<number | null>(null);
@@ -253,6 +330,7 @@ export default function LinkPlanner() {
   const budgets = useMemo(() => new Map(plannerState.links.map((link) => [link.id, calculateLinkBudget(link)])), [plannerState.links]);
   const counts = useMemo(() => layerCounts(plannerState), [plannerState]);
   const selectedMast = plannerState.selectedMastIndex === null ? null : plannerState.masts[plannerState.selectedMastIndex] ?? null;
+  const selectedHeightEndpoint = heightSelection?.type === "highSite" ? plannerState.highSites.find((site) => site.id === heightSelection.id) ?? null : heightSelection?.type === "mast" ? plannerState.masts.find((mast) => mast.id === heightSelection.id) ?? null : null;
   const routeDecisionExplanation = useMemo(() => buildRouteDecisionExplanation(plannerState), [plannerState]);
   const totals = useMemo(() => {
     const totalDistanceKm = plannerState.links.reduce((total, link) => total + link.distKm, 0);
@@ -272,9 +350,9 @@ export default function LinkPlanner() {
     }
     setScanStatus({ loading: true, phase: "Loading Nominatim boundary, Open-Meteo SRTM grid, Overpass masts, and facilities", issues: [] });
     try {
-      const next = await createContinuousPlannerState(propertyName.trim() || DEFAULT_PROPERTY_NAME, scanCentre, nextSelectedMastId, keepFacilities ? { facilities: plannerState.facilities, layerVis: plannerState.layerVis } : { layerVis: plannerState.layerVis });
+      const next = await createContinuousPlannerState(propertyName.trim() || DEFAULT_PROPERTY_NAME, scanCentre, nextSelectedMastId, keepFacilities ? { facilities: plannerState.facilities, layerVis: plannerState.layerVis, highSites: plannerState.highSites, masts: plannerState.masts } : { layerVis: plannerState.layerVis, highSites: plannerState.highSites, masts: plannerState.masts });
       if (scanRequestIdRef.current !== requestId) return;
-      setPlannerState(next);
+      setPlannerState(recalculatePlannerLinks(next));
       const resolvedMastId = nextSelectedMastId ?? next.masts[next.selectedMastIndex ?? 0]?.id;
       setSelectedMastId(resolvedMastId);
       setScanStatus({ loading: false, phase: "Real API-backed topology ready", issues: [] });
@@ -286,7 +364,7 @@ export default function LinkPlanner() {
       setScanStatus({ loading: false, phase: "Scan incomplete", issues: [message] });
       toast.error(message);
     }
-  }, [center, plannerState.facilities, plannerState.layerVis, propertyName]);
+  }, [center, plannerState.facilities, plannerState.highSites, plannerState.layerVis, plannerState.masts, propertyName]);
 
   useEffect(() => {
     const signature = `${propertyName.trim()}|${center.lat.toFixed(6)}|${center.lng.toFixed(6)}|${selectedMastId ?? "auto"}`;
@@ -311,6 +389,22 @@ export default function LinkPlanner() {
 
   const toggleLinkLive = (linkId: string) => {
     setPlannerState((current) => ({ ...current, links: current.links.map((link) => (link.id === linkId ? { ...link, live: !link.live } : link)) }));
+  };
+
+  const updateHighSiteHeight = (siteId: string, height: number) => {
+    setPlannerState((current) => {
+      const next = { ...current, highSites: current.highSites.map((site) => (site.id === siteId ? { ...site, antennaHeightM: height } : site)) };
+      return recalculatePlannerLinks(next);
+    });
+    toast.success(`High-site mast height set to ${height} m; connected links recalculated`);
+  };
+
+  const updateCarrierMastHeight = (mastId: string, height: number) => {
+    setPlannerState((current) => {
+      const next = { ...current, masts: current.masts.map((mast) => (mast.id === mastId ? { ...mast, antennaHeightM: height } : mast)) };
+      return recalculatePlannerLinks(next);
+    });
+    toast.success(`Carrier mast height set to ${height} m; connected uplinks recalculated`);
   };
 
   const removeFacility = (facilityId: string) => {
@@ -372,10 +466,19 @@ export default function LinkPlanner() {
         strokeColor: linkStrokeColor(link),
         strokeOpacity: link.losStatus === "blocked" ? 0.8 : 0.96,
         strokeWeight: link.live ? 4 : link.losStatus === "blocked" ? 2 : 3,
-        icons: link.losStatus === "blocked" || link.losStatus === "marginal" ? [{ icon: { path: "M 0,-1 0,1", strokeOpacity: 1, scale: 3 }, offset: "0", repeat: link.losStatus === "blocked" ? "12px" : "20px" }] : undefined,
+        icons: link.losStatus === "blocked" ? [{ icon: { path: "M 0,0 m -1,0 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0", fillColor: linkStrokeColor(link), fillOpacity: 1, strokeOpacity: 0, scale: 2 }, offset: "0", repeat: "14px" }] : link.losStatus === "marginal" ? [{ icon: { path: "M 0,-1 0,1", strokeOpacity: 1, scale: 3 }, offset: "0", repeat: "20px" }] : undefined,
         map,
       });
       overlayRefs.current.push(polyline);
+
+      const label = new window.google.maps.Marker({
+        map,
+        position: pathMidpoint(link.path),
+        title: linkMapLabel(link),
+        label: { text: linkMapLabel(link), color: linkStrokeColor(link), fontWeight: "800", fontSize: "11px" },
+        icon: { path: window.google.maps.SymbolPath.CIRCLE, scale: 0 },
+      });
+      overlayRefs.current.push(label);
     });
 
     plannerState.highSites.filter((site) => plannerState.layerVis[site.category] && isValidGisCoordinate(site)).forEach((site) => {
@@ -383,10 +486,11 @@ export default function LinkPlanner() {
       const marker = new window.google.maps.Marker({
         map,
         position: { lat: site.lat, lng: site.lng },
-        title: `${site.name} · ${site.elevation ?? "Unknown"} m`,
+        title: `${site.name} · ${site.elevation ?? "Unknown"} m ASL · ${site.antennaHeightM ?? DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M} m mast`,
         label: { text: "▲", color, fontWeight: "900", fontSize: site.category === "remote" ? "14px" : "20px" },
         icon: { path: window.google.maps.SymbolPath.CIRCLE, scale: 0 },
       });
+      marker.addListener("click", () => setHeightSelection({ type: "highSite", id: site.id }));
       overlayRefs.current.push(marker);
     });
 
@@ -394,8 +498,13 @@ export default function LinkPlanner() {
       const marker = new window.google.maps.Marker({
         map,
         position: { lat: mast.lat, lng: mast.lng },
-        title: `${mast.name} · ${mast.distFromNearestRelay.toFixed(1)} km from relay`,
+        title: `${mast.name} · ${mast.distFromNearestRelay.toFixed(1)} km from relay · ${mast.antennaHeightM ?? DEFAULT_CARRIER_MAST_HEIGHT_M} m mast`,
         label: { text: mast.closestForProvider ? "★" : "M", color: mast.selected ? "#facc15" : "#020617", fontWeight: "900" },
+      });
+      marker.addListener("click", () => {
+        setSelectedMastId(mast.id);
+        setPlannerState((current) => recalculatePlannerLinks({ ...current, selectedMastIndex: current.masts.findIndex((candidate) => candidate.id === mast.id), masts: current.masts.map((candidate) => ({ ...candidate, selected: candidate.id === mast.id })) }));
+        setHeightSelection({ type: "mast", id: mast.id });
       });
       overlayRefs.current.push(marker);
     });
@@ -519,14 +628,21 @@ export default function LinkPlanner() {
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2"><Button type="button" size="sm" variant="outline" onClick={() => setAllLayers(true)} className="h-8 border-white/15 bg-white/10 text-xs text-white hover:bg-white/20">All on</Button><Button type="button" size="sm" variant="outline" onClick={() => setAllLayers(false)} className="h-8 border-white/15 bg-slate-900 text-xs text-slate-200 hover:bg-white/10">All off</Button></div>
             </div>
+            {selectedHeightEndpoint && heightSelection && <div className="absolute left-4 bottom-4 z-20 w-80 rounded-2xl border border-cyan-300/25 bg-slate-950/90 p-4 text-xs text-slate-100 shadow-2xl backdrop-blur">
+              <div className="flex items-start justify-between gap-3"><div><div className="font-semibold text-white">{heightSelection.type === "mast" ? "Carrier mast height" : "High-site mast height"}</div><div className="mt-1 leading-5 text-slate-300">{selectedHeightEndpoint.name} · current {selectedHeightEndpoint.antennaHeightM ?? (heightSelection.type === "mast" ? DEFAULT_CARRIER_MAST_HEIGHT_M : DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M)} m</div></div><button type="button" onClick={() => setHeightSelection(null)} className="rounded-full border border-white/10 px-2 py-1 text-[10px] text-slate-300 hover:bg-white/10">Close</button></div>
+              <div className="mt-3 grid grid-cols-4 gap-2">
+                {(heightSelection.type === "mast" ? CARRIER_MAST_HEIGHT_OPTIONS : HIGH_SITE_HEIGHT_OPTIONS).map((height) => <button key={height} type="button" onClick={() => heightSelection.type === "mast" ? updateCarrierMastHeight(selectedHeightEndpoint.id, height) : updateHighSiteHeight(selectedHeightEndpoint.id, height)} className={`rounded-xl border px-2 py-2 font-semibold transition ${(selectedHeightEndpoint.antennaHeightM ?? (heightSelection.type === "mast" ? DEFAULT_CARRIER_MAST_HEIGHT_M : DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M)) === height ? "border-emerald-300 bg-emerald-300/20 text-emerald-50" : "border-white/10 bg-slate-900 text-slate-200 hover:border-cyan-300/50 hover:bg-cyan-300/10"}`}>{height}m</button>)}
+              </div>
+              <div className="mt-3 rounded-xl border border-emerald-300/20 bg-emerald-300/10 p-2 leading-5 text-emerald-50">Changing either endpoint recalculates clearance immediately while keeping every connected link visible.</div>
+            </div>}
             {scanStatus.loading && <div className="absolute left-4 top-4 z-10 rounded-2xl border border-amber-300/30 bg-slate-950/90 px-4 py-3 text-sm text-amber-100 shadow-xl"><RefreshCw className="mr-2 inline h-4 w-4 animate-spin" /> {scanStatus.phase}</div>}
             {pendingFacilityType && <div className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-full border border-cyan-300/40 bg-slate-950/90 px-4 py-2 text-sm text-cyan-100 shadow-xl">Click the map to place {FACILITY_TYPES[pendingFacilityType].label}. Press another facility button to change type.</div>}
             {propertyPinClickMode && <div className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-full border border-emerald-300/40 bg-slate-950/90 px-4 py-2 text-sm text-emerald-100 shadow-xl">Click the property centre or reserve entrance. The planner will start the real-data scan immediately.</div>}
           </div>
 
           <div className="grid gap-4 lg:grid-cols-3">
-            <Panel title="High-site candidates" icon={<Mountain className="h-4 w-4 text-cyan-300" />}><div className="space-y-3">{plannerState.highSites.map((site) => <div key={site.id} className="rounded-2xl border border-white/10 bg-slate-950/70 p-3"><div className="font-medium text-white">{site.name}</div><div className="mt-1 text-xs text-slate-400">{site.category} · {site.elevation ?? "unknown"} m · {formatCoord(site.lat)}, {formatCoord(site.lng)}</div></div>)}{!plannerState.highSites.length && <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">Awaiting Open-Meteo elevation grid results.</p>}</div></Panel>
-            <Panel title="Carrier mast candidates" icon={<Antenna className="h-4 w-4 text-amber-300" />}><div className="space-y-3">{plannerState.masts.map((mast) => <button key={mast.id} type="button" onClick={() => { setSelectedMastId(mast.id); void rebuildPlan(mast.id); }} className={`w-full rounded-2xl border p-3 text-left ${mast.selected ? "border-amber-300/60 bg-amber-300/10" : "border-white/10 bg-slate-950/70"}`}><div className="font-medium text-white">{mast.closestForProvider ? "★ " : ""}{mast.name}</div><div className="mt-1 text-xs text-slate-400">{mast.provider.toUpperCase()} · {mast.distFromNearestRelay.toFixed(1)} km from relay · {mast.distFromCentre.toFixed(1)} km from centre</div></button>)}{!plannerState.masts.length && <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">Awaiting 30 km Overpass mast discovery.</p>}</div></Panel>
+            <Panel title="High-site candidates" icon={<Mountain className="h-4 w-4 text-cyan-300" />}><div className="space-y-3">{plannerState.highSites.map((site) => <button key={site.id} type="button" onClick={() => setHeightSelection({ type: "highSite", id: site.id })} className={`w-full rounded-2xl border p-3 text-left hover:border-cyan-300/50 ${heightSelection?.type === "highSite" && heightSelection.id === site.id ? "border-cyan-300/60 bg-cyan-300/10" : "border-white/10 bg-slate-950/70"}`}><div className="font-medium text-white">{site.name}</div><div className="mt-1 text-xs text-slate-400">{site.category} · {site.elevation ?? "unknown"} m ASL · mast {site.antennaHeightM ?? DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M} m · {formatCoord(site.lat)}, {formatCoord(site.lng)}</div></button>)}{!plannerState.highSites.length && <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">Awaiting Open-Meteo elevation grid results.</p>}</div></Panel>
+            <Panel title="Carrier mast candidates" icon={<Antenna className="h-4 w-4 text-amber-300" />}><div className="space-y-3">{plannerState.masts.map((mast) => <button key={mast.id} type="button" onClick={() => { setSelectedMastId(mast.id); setHeightSelection({ type: "mast", id: mast.id }); void rebuildPlan(mast.id); }} className={`w-full rounded-2xl border p-3 text-left ${mast.selected || (heightSelection?.type === "mast" && heightSelection.id === mast.id) ? "border-amber-300/60 bg-amber-300/10" : "border-white/10 bg-slate-950/70"}`}><div className="font-medium text-white">{mast.closestForProvider ? "★ " : ""}{mast.name}</div><div className="mt-1 text-xs text-slate-400">{mast.provider.toUpperCase()} · mast {mast.antennaHeightM ?? DEFAULT_CARRIER_MAST_HEIGHT_M} m · {mast.distFromNearestRelay.toFixed(1)} km from relay · {mast.distFromCentre.toFixed(1)} km from centre</div></button>)}{!plannerState.masts.length && <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">Awaiting 30 km Overpass mast discovery.</p>}</div></Panel>
             <Panel title="Saved plans" icon={<ShieldCheck className="h-4 w-4 text-emerald-300" />}><div className="space-y-3">{(savedPlans.data ?? []).map((plan) => <button key={plan.id} type="button" onClick={() => setLastSavedId(plan.id)} className="w-full rounded-2xl border border-white/10 bg-slate-950/70 p-3 text-left hover:border-cyan-300/50"><div className="font-medium text-white">{plan.planName}</div><div className="mt-1 text-xs text-slate-400">{plan.propertyName} · {plan.status}</div></button>)}{!savedPlans.data?.length && <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">No saved link plans yet. Save the current field-validation draft to start the operational record.</p>}</div></Panel>
           </div>
 

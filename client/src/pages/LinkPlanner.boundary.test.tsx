@@ -2,7 +2,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_PLANNER_LAYER_VISIBILITY, FACILITY_TYPES, PLANNER_FACILITY_OPTIONS, type PlannerState } from "@/lib/plannerTypes";
-import { buildRouteDecisionExplanation, createContinuousPlannerState, createFacilityFromMapClick, fitPlannerMapToState, getBoundaryFirstViewportPoints } from "./LinkPlanner";
+import { buildRouteDecisionExplanation, createContinuousPlannerState, createFacilityFromMapClick, fitPlannerMapToState, getBoundaryFirstViewportPoints, recalculatePlannerLinks } from "./LinkPlanner";
 
 vi.mock("@/lib/gisAutoScan", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/gisAutoScan")>();
@@ -141,6 +141,35 @@ describe("LinkPlanner continuous boundary-first workflow helpers", () => {
     expect(points.context).toContainEqual({ lat: -33.16, lng: 26.16 });
     expect(points.context).not.toContainEqual({ lat: -34.2, lng: 27.2 });
     expect(points.context).not.toContainEqual({ lat: -35.19, lng: 28.24 });
+  });
+
+  it("recalculates endpoint-height LOS in place and keeps the connected link visible", () => {
+    const state = makePlannerState();
+    const marginalUplink = {
+      ...state.links[0],
+      id: "height-sensitive-uplink",
+      fromId: "inside-1",
+      toId: "mast-selected",
+      fromName: "Inside ridge",
+      toName: "Selected Vodacom",
+      path: [{ lat: -33.15, lng: 26.15 }, { lat: -33.18, lng: 26.25 }] as [{ lat: number; lng: number }, { lat: number; lng: number }],
+      elevationProfile: [100, 135, 100],
+      losStatus: "marginal" as const,
+      terrainMarginMeters: 2.5,
+    };
+    const marginalState = recalculatePlannerLinks({ ...state, links: [marginalUplink] });
+    const confirmedState = recalculatePlannerLinks({
+      ...marginalState,
+      masts: marginalState.masts.map((mast) => (mast.id === "mast-selected" ? { ...mast, antennaHeightM: 60 } : mast)),
+    });
+
+    expect(marginalState.links).toHaveLength(1);
+    expect(marginalState.links[0].losStatus).toBe("marginal");
+    expect(marginalState.links[0].terrainMarginMeters).toBe(2.5);
+    expect(confirmedState.links).toHaveLength(1);
+    expect(confirmedState.links[0].id).toBe("height-sensitive-uplink");
+    expect(confirmedState.links[0].losStatus).toBe("confirmed");
+    expect(confirmedState.links[0].terrainMarginMeters).toBe(10);
   });
 
   it("exposes the exact nine facility-placement types required by the Link Planner handover", () => {
