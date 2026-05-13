@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `operationalCriticalLocations` ADD `reserveSiteType` varchar(64);\nALTER TABLE `operationalCriticalLocations` ADD `topologyRole` text;\nALTER TABLE `operationalCriticalLocations` ADD `businessDrivers` json;\nALTER TABLE `operationalPainPoints` ADD `businessDrivers` json;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2jAyjJtimGfebHK.root --database baLZUhFjyWHEmXFh9Hh7Zt --execute ALTER TABLE `operationalCriticalLocations` ADD `reserveSiteType` varchar(64);\nALTER TABLE `operationalCriticalLocations` ADD `topologyRole` text;\nALTER TABLE `operationalCriticalLocations` ADD `businessDrivers` json;\nALTER TABLE `operationalPainPoints` ADD `businessDrivers` json;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2345
+}
