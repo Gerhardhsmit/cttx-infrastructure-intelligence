@@ -1,658 +1,977 @@
-import { MapView } from "@/components/Map";
-import { Button } from "@/components/ui/button";
-import { buildGisAutoScanWithApis, calculateBearingDeg, isValidGisCoordinate, sanitizePath, type GisCoordinate } from "@/lib/gisAutoScan";
+/*
+ * CTTX Link Planner command-board philosophy:
+ * Swiss operational typography, dark navy infrastructure intelligence, precise semantic colours,
+ * fixed planning surfaces, and restrained engineering language. This route coordinates the full
+ * planning sequence without step gates: boundary confirmation, parallel property evidence,
+ * high-site backbone construction, facility distribution, uplink rendering, and map display.
+ */
+
+import { useCallback, useMemo, useRef, useState } from "react";
+import "@/styles/link-planner.css";
+import PlannerLegend from "@/components/PlannerLegend";
+import PlannerMap, { LayerKey, LayerState } from "@/components/PlannerMap";
+import PlannerSidebar from "@/components/PlannerSidebar";
 import {
-  DEFAULT_CARRIER_MAST_HEIGHT_M,
-  DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M,
-  DEFAULT_PLANNER_LAYER_VISIBILITY,
+  BackboneLink,
+  BoundarySelection,
+  CARRIER_MAST_HEIGHT_M,
+  CARRIER_MAST_HEIGHT_OPTIONS,
+  FACILITY_HEIGHT_OPTIONS,
   FACILITY_TYPES,
-  PLANNER_FACILITY_OPTIONS,
+  HIGH_SITE_ANTENNA_HEIGHT_M,
+  HIGH_SITE_MAST_HEIGHT_OPTIONS,
+  MANUAL_LINK_HEIGHT_OPTIONS,
+  Facility,
+  FacilityTypeKey,
+  HighSite,
+  LatLng,
+  Mast,
+  ManualFacilityLink,
+  ManualPointLink,
+  Relay,
+  RidgeCandidate,
+  RoadFeature,
+  buildLosTopology,
+  calculateManualFacilityLink,
+  calculateManualPointLink,
+  facilityKey,
+  formatKm,
+  highSiteKey,
+  findFacilities,
+  findHighSites,
+  findMasts,
+  findRidgeCandidates,
+  makeManualHighSite,
+  makeRelay,
+  rebaseMastsToRelay,
+  mastKey,
+  mastProviderLabel,
+} from "@/lib/linkPlanner";
+import { buildGisAutoScanWithApis } from "@/lib/gisAutoScan";
+import {
+  DEFAULT_CARRIER_MAST_HEIGHT_M as LEGACY_DEFAULT_CARRIER_MAST_HEIGHT_M,
+  DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M as LEGACY_DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M,
   buildPlannerStateFromGisScan,
-  type Facility,
-  type FacilityType,
-  type Mast,
-  type NetworkLink,
-  type PlannerLayerKey,
-  type PlannerState,
+  type Facility as LegacyFacility,
+  type FacilityType as LegacyFacilityType,
+  type NetworkLink as LegacyNetworkLink,
+  type PlannerCoordinate,
+  type PlannerState as LegacyPlannerState,
 } from "@/lib/plannerTypes";
-import { trpc } from "@/lib/trpc";
-import { Activity, Antenna, CheckCircle2, CloudCog, Layers3, MapPin, Mountain, RadioTower, RefreshCw, Save, ShieldCheck, Zap } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ReactNode } from "react";
-import { toast } from "sonner";
 
-const DEFAULT_CENTER = { lat: -33.482, lng: 26.633 };
-const DEFAULT_PROPERTY_NAME = "Kwandwe Ridge Trial Property";
-const DEFAULT_FACILITY_ANTENNA_HEIGHT_M = 10;
-const LOS_CONFIRMED_CLEARANCE_M = 10;
-const HIGH_SITE_HEIGHT_OPTIONS = [15, 20, 25, 30, 35, 40, 45, 50, 60];
-const CARRIER_MAST_HEIGHT_OPTIONS = [25, 30, 35, 40, 45, 50, 60];
-
-type HeightSelection = { type: "highSite" | "mast"; id: string } | null;
-
-type LinkBudget = {
-  bearingDeg: number;
-  fadeMarginDb: number;
-  rslDbm: number;
-  fresnelM: number;
-  throughputMbps: number;
-  targetBer: string;
-};
-
-type ScanStatus = {
-  loading: boolean;
-  phase: string;
-  issues: string[];
-};
-
-const layerLabels: Record<PlannerLayerKey, string> = {
-  inside: "On-property high sites",
-  nearby: "Nearby high sites",
-  remote: "Remote high sites",
-  vodacom: "Vodacom masts",
-  mtn: "MTN masts",
-  cellc: "Cell C masts",
-  telkom: "Telkom masts",
-  unknown: "Unknown masts",
-  uplink: "Carrier uplinks",
-  backbone: "Backbone links",
-  distribution: "Facility links",
-  live: "Field-confirmed links",
-  facilities: "Facilities",
-};
-
-function formatCoord(value: number) {
-  return Number.isFinite(value) ? value.toFixed(6) : "—";
+export function getBoundaryFirstViewportPoints(state: LegacyPlannerState): { boundary: PlannerCoordinate[] | null; context: PlannerCoordinate[] } {
+  const context: PlannerCoordinate[] = [];
+  if (state.boundaryPolygon?.length) context.push(...state.boundaryPolygon);
+  state.highSites.forEach(site => {
+    if (state.layerVis[site.category]) context.push({ lat: site.lat, lng: site.lng });
+  });
+  state.masts.forEach(mast => {
+    if (!mast.hiddenByDefault && state.layerVis[mast.provider]) context.push({ lat: mast.lat, lng: mast.lng });
+  });
+  if (state.layerVis.facilities) {
+    state.facilities.forEach(facility => context.push({ lat: facility.lat, lng: facility.lng }));
+  }
+  return { boundary: state.boundaryPolygon, context };
 }
 
-function metricClass(value: number) {
-  if (value >= 20) return "text-emerald-300";
-  if (value >= 10) return "text-amber-300";
-  return "text-red-300";
-}
-
-function createEmptyPlannerState(propertyName = DEFAULT_PROPERTY_NAME, centre: GisCoordinate = DEFAULT_CENTER): PlannerState {
-  return {
-    propertyName,
-    propertyCentre: centre,
-    boundaryPolygon: null,
-    boundaryAreaHa: 0,
-    highSites: [],
-    masts: [],
-    selectedMastIndex: null,
-    links: [],
-    facilities: [],
-    layerVis: DEFAULT_PLANNER_LAYER_VISIBILITY,
-    recommendationSummary: "Awaiting real boundary, elevation, mast, facility, and LOS responses.",
-  };
-}
-
-export async function createContinuousPlannerState(propertyName: string, centre: GisCoordinate, selectedMastId?: string, previous?: Partial<Pick<PlannerState, "facilities" | "layerVis" | "highSites" | "masts">>) {
-  if (!isValidGisCoordinate(centre)) throw new Error("Invalid planning coordinate");
-  const scan = await buildGisAutoScanWithApis(centre, { propertyName });
-  if (!scan) throw new Error("Unable to build planner state from the selected coordinate");
-  return buildPlannerStateFromGisScan({ propertyName, scan, selectedMastId, previous });
-}
-
-export function getBoundaryFirstViewportPoints(plannerState: PlannerState) {
-  const boundary = sanitizePath(plannerState.boundaryPolygon ?? []);
-  const context: GisCoordinate[] = [...boundary];
-  const addPoint = (point: GisCoordinate) => {
-    if (isValidGisCoordinate(point)) context.push({ lat: point.lat, lng: point.lng });
-  };
-
-  plannerState.highSites
-    .filter((site) => plannerState.layerVis[site.category] && site.category !== "remote")
-    .forEach(addPoint);
-  plannerState.masts
-    .filter((mast) => isMastVisible(mast, plannerState.layerVis) && (mast.selected || mast.closestForProvider || mast.distFromNearestRelay <= 15))
-    .forEach(addPoint);
-  plannerState.links
-    .filter((link) => isLinkVisible(link, plannerState.layerVis))
-    .forEach((link) => link.path.forEach(addPoint));
-  if (plannerState.layerVis.facilities) plannerState.facilities.forEach(addPoint);
-  if (context.length === 0 && plannerState.propertyCentre) addPoint(plannerState.propertyCentre);
-
-  return { boundary, context };
-}
-
-export function fitPlannerMapToState(map: google.maps.Map | null, plannerState: PlannerState, padding = 56) {
-  if (!map || !window.google?.maps?.LatLngBounds || typeof map.fitBounds !== "function") return false;
-  const { context } = getBoundaryFirstViewportPoints(plannerState);
-  if (context.length === 0) return false;
+export function fitPlannerMapToState(map: google.maps.Map | null | undefined, state: LegacyPlannerState, padding = 72): boolean {
+  if (!map || typeof window === "undefined" || !window.google?.maps?.LatLngBounds) return false;
+  const points = getBoundaryFirstViewportPoints(state).context;
+  if (!points.length) return false;
   const bounds = new window.google.maps.LatLngBounds();
-  context.filter(isValidGisCoordinate).forEach((point) => bounds.extend(point));
+  points.forEach(point => bounds.extend(point));
   map.fitBounds(bounds, padding);
   return true;
 }
 
-export function createFacilityFromMapClick(input: { type: FacilityType; name: string; coordinate: GisCoordinate; existingCount: number; timestamp?: number }): Facility {
+export function createFacilityFromMapClick(input: {
+  type: LegacyFacilityType;
+  name: string;
+  coordinate: PlannerCoordinate;
+  existingCount: number;
+  timestamp?: number;
+}): LegacyFacility {
+  const timestamp = input.timestamp ?? Date.now();
+  const name = input.name.trim() || `${input.type} ${input.existingCount + 1}`;
   return {
-    id: `facility-${input.timestamp ?? Date.now()}-${input.existingCount + 1}`,
+    id: `facility-${timestamp}-${input.existingCount + 1}`,
     type: input.type,
-    name: input.name.trim() || `${FACILITY_TYPES[input.type].label} ${input.existingCount + 1}`,
+    name,
     lat: Number(input.coordinate.lat.toFixed(6)),
     lng: Number(input.coordinate.lng.toFixed(6)),
   };
 }
 
-export function buildRouteDecisionExplanation(plannerState: PlannerState, viableLinkThresholdKm = 15): string {
-  const selectedMast = plannerState.selectedMastIndex === null ? null : plannerState.masts[plannerState.selectedMastIndex] ?? null;
-  const uplink = plannerState.links.find((link) => link.type === "uplink");
-  const backboneLinks = plannerState.links.filter((link) => link.type === "backbone");
-  const distributionLinks = plannerState.links.filter((link) => link.type === "distribution");
-  const blockedLinks = plannerState.links.filter((link) => link.losStatus === "blocked");
-  const overThresholdLinks = plannerState.links.filter((link) => link.distKm > viableLinkThresholdKm);
-  const terminus = uplink?.fromName ?? plannerState.highSites.find((site) => site.category === "inside")?.name ?? plannerState.highSites[0]?.name ?? "the highest on-property relay candidate";
-  const mastSentence = selectedMast
-    ? `The planner evaluated ${selectedMast.name} as a carrier mast candidate and selected the best LOS-qualified uplink path near ${selectedMast.nearestRelayName ?? terminus}.`
-    : "The planner has not found a carrier mast candidate yet, so the uplink remains a diagnostic pending Overpass results.";
-  const relaySentence = `The first relay terminus is ${terminus}, keeping the design anchored to the property boundary before extending through ${backboneLinks.length} backbone segment${backboneLinks.length === 1 ? "" : "s"} and ${distributionLinks.length} facility path${distributionLinks.length === 1 ? "" : "s"}.`;
-  const topologySentence = `Every rendered link is backed by a 20-point Open-Meteo elevation profile: green is confirmed LOS, amber is marginal, and red is blocked terrain diagnostics.`;
-  const rangeSentence = overThresholdLinks.length > 0
-    ? `${overThresholdLinks.length} link${overThresholdLinks.length === 1 ? " is" : "s are"} above the ${viableLinkThresholdKm} km field-validation threshold and should be treated as amber survey risk before quoting or construction.`
-    : `No rendered link is currently above the ${viableLinkThresholdKm} km field-validation threshold, so the displayed topology is a planning candidate rather than construction approval.`;
-  const surveySentence = blockedLinks.length > 0 ? `${blockedLinks.length} blocked path${blockedLinks.length === 1 ? " is" : "s are"} retained in red so the field team can see why alternate high sites or mast paths were preferred.` : `A field survey must still confirm Fresnel clearance, tower height, power autonomy, and final radio choice before CTTX treats the route as build-ready.`;
-  return [mastSentence, relaySentence, topologySentence, rangeSentence, surveySentence].join(" ");
+export function recalculatePlannerLinks(state: LegacyPlannerState): LegacyPlannerState {
+  const highSites = new Map(state.highSites.map(site => [site.id, site]));
+  const masts = new Map(state.masts.map(mast => [mast.id, mast]));
+  const facilities = new Map(state.facilities.map(facility => [facility.id, facility]));
+  const links: LegacyNetworkLink[] = state.links.map(link => {
+    const fromHigh = highSites.get(link.fromId);
+    const toHigh = highSites.get(link.toId);
+    const fromMast = masts.get(link.fromId);
+    const toMast = masts.get(link.toId);
+    const fromFacility = facilities.get(link.fromId);
+    const toFacility = facilities.get(link.toId);
+    const highHeight = fromHigh?.antennaHeightM ?? toHigh?.antennaHeightM ?? LEGACY_DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M;
+    const carrierHeight = fromMast?.antennaHeightM ?? toMast?.antennaHeightM ?? LEGACY_DEFAULT_CARRIER_MAST_HEIGHT_M;
+    const facilityHeight = (fromFacility || toFacility) ? 5 : 0;
+    const hasCustomHeight = highHeight !== LEGACY_DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M || carrierHeight !== LEGACY_DEFAULT_CARRIER_MAST_HEIGHT_M || facilityHeight > 5;
+    if (!hasCustomHeight || !link.elevationProfile?.length || typeof link.terrainMarginMeters !== "number") return link;
+    const extraHeight = Math.max(0, highHeight - LEGACY_DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M) + Math.max(0, carrierHeight - LEGACY_DEFAULT_CARRIER_MAST_HEIGHT_M) + Math.max(0, facilityHeight - 5);
+    const terrainMarginMeters = Number(Math.min(120, Math.max(-80, link.terrainMarginMeters + extraHeight * 0.5)).toFixed(1));
+    const losStatus: LegacyNetworkLink["losStatus"] = terrainMarginMeters >= 8 ? "confirmed" : terrainMarginMeters >= 0 ? "marginal" : "blocked";
+    return {
+      ...link,
+      terrainMarginMeters,
+      losStatus,
+      viable: terrainMarginMeters >= 0,
+    };
+  });
+  return { ...state, links };
 }
 
-function calculateLinkBudget(link: NetworkLink): LinkBudget {
-  const frequencyGhz = link.type === "uplink" ? 5.8 : 5.4;
-  const antennaGainDbi = link.type === "distribution" ? 23 : 30;
-  const txPowerDbm = 24;
-  const pathLoss = 92.45 + 20 * Math.log10(Math.max(link.distKm, 0.1)) + 20 * Math.log10(frequencyGhz);
-  const rsl = txPowerDbm + antennaGainDbi * 2 - pathLoss;
-  return {
-    bearingDeg: Number(calculateBearingDeg(link.path[0], link.path[1]).toFixed(0)),
-    fadeMarginDb: Number((rsl + 76).toFixed(1)),
-    rslDbm: Number(rsl.toFixed(1)),
-    fresnelM: Number((17.32 * Math.sqrt(link.distKm / (4 * frequencyGhz))).toFixed(1)),
-    throughputMbps: link.type === "uplink" ? 280 : link.type === "distribution" ? 160 : 220,
-    targetBer: "≤ 10⁻⁶ before handover",
-  };
+export function buildRouteDecisionExplanation(state: LegacyPlannerState, thresholdKm: number): string {
+  const selectedMast = state.selectedMastIndex === null ? null : state.masts[state.selectedMastIndex] ?? state.masts.find(mast => mast.selected) ?? null;
+  const uplink = state.links.find(link => link.type === "uplink");
+  const relayName = uplink?.fromName === selectedMast?.name ? uplink?.toName : uplink?.fromName ?? state.highSites.find(site => site.category === "inside")?.name ?? "the selected high point";
+  const mastName = selectedMast?.name ?? uplink?.toName ?? "the selected carrier mast";
+  return `${mastName} is prioritised because it is the closest selected provider structure with a viable path to ${relayName}. ${relayName} remains the relay terminus because the topology keeps facilities on one confirmed distribution path before extending the high-site backbone. The route policy uses one carrier uplink, a minimal high-site backbone, and one facility link per operating point to reduce tower count while preserving redundancy. Every candidate span is checked with a 20-point Open-Meteo elevation profile and compared with the ${thresholdKm} km field-validation threshold. Any marginal or blocked segment should be confirmed by field survey before procurement or mast installation.`;
 }
 
-function mastLayerKey(mast: Mast): PlannerLayerKey {
-  return mast.provider;
+export async function createContinuousPlannerState(propertyName: string, propertyCentre: PlannerCoordinate): Promise<LegacyPlannerState> {
+  const scan = await buildGisAutoScanWithApis(propertyCentre, { propertyName });
+  if (!scan) throw new Error("Unable to create a GIS auto-scan from the supplied planning centre.");
+  return recalculatePlannerLinks(buildPlannerStateFromGisScan({ propertyName, scan }));
 }
 
-function isMastVisible(mast: Mast, layerVis: PlannerState["layerVis"]) {
-  return layerVis[mastLayerKey(mast)] && (!mast.hiddenByDefault || layerVis.unknown || mast.selected || mast.closestForProvider);
-}
-
-function isLinkVisible(link: NetworkLink, layerVis: PlannerState["layerVis"]) {
-  if (link.live && !layerVis.live) return false;
-  return layerVis[link.type];
-}
-
-function linkStrokeColor(link: NetworkLink) {
-  if (link.losStatus === "confirmed") return "#22c55e";
-  if (link.losStatus === "marginal") return "#f59e0b";
-  if (link.losStatus === "blocked") return "#ef4444";
-  return link.type === "uplink" ? "#3b82f6" : "#ffffff";
-}
-
-function losLabel(link: NetworkLink) {
-  if (link.losStatus === "confirmed") return "Confirmed LOS";
-  if (link.losStatus === "marginal") return "Marginal LOS";
-  if (link.losStatus === "blocked") return "Blocked";
-  return "LOS pending";
-}
-
-function linkStatusToken(link: NetworkLink) {
-  if (link.losStatus === "confirmed") return "confirmed";
-  if (link.losStatus === "marginal") return "marginal";
-  if (link.losStatus === "blocked") return "blocked";
-  return "pending";
-}
-
-function clearanceLabel(value: number | undefined) {
-  if (typeof value !== "number" || !Number.isFinite(value)) return "clr —";
-  const rounded = Number.isInteger(value) ? value.toFixed(0) : value.toFixed(1);
-  return `${rounded}m clr`;
-}
-
-function linkMapLabel(link: NetworkLink) {
-  return `${link.type === "uplink" ? "Uplink" : link.type === "backbone" ? "Backbone" : "Facility"} · ${link.distKm.toFixed(1)} km · ${linkStatusToken(link)} · ${clearanceLabel(link.terrainMarginMeters)}`;
-}
-
-function pathMidpoint(path: NetworkLink["path"]) {
-  return { lat: Number(((path[0].lat + path[1].lat) / 2).toFixed(6)), lng: Number(((path[0].lng + path[1].lng) / 2).toFixed(6)) };
-}
-
-function endpointHeightForLink(plannerState: PlannerState, endpointId: string, fallback: number) {
-  const highSite = plannerState.highSites.find((site) => site.id === endpointId);
-  if (highSite) return highSite.antennaHeightM ?? DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M;
-  const mast = plannerState.masts.find((candidate) => candidate.id === endpointId);
-  if (mast) return mast.antennaHeightM ?? DEFAULT_CARRIER_MAST_HEIGHT_M;
-  return fallback;
-}
-
-function recalculateLinkForEndpointHeights(link: NetworkLink, plannerState: PlannerState): NetworkLink {
-  const elevation = link.elevationProfile;
-  if (!Array.isArray(elevation) || elevation.length < 2 || elevation.some((value) => typeof value !== "number" || !Number.isFinite(value))) return link;
-
-  const startHeight = endpointHeightForLink(plannerState, link.fromId, link.type === "distribution" ? DEFAULT_FACILITY_ANTENNA_HEIGHT_M : DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M);
-  const endHeight = endpointHeightForLink(plannerState, link.toId, link.type === "uplink" ? DEFAULT_CARRIER_MAST_HEIGHT_M : DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M);
-  const startElev = elevation[0] + startHeight;
-  const endElev = elevation[elevation.length - 1] + endHeight;
-  let hasLineOfSight = true;
-  let worstClearance = Infinity;
-
-  for (let index = 0; index < elevation.length; index += 1) {
-    const t = elevation.length === 1 ? 0 : index / (elevation.length - 1);
-    const signalHeight = startElev + t * (endElev - startElev);
-    const clearance = signalHeight - elevation[index];
-    if (index > 0 && index < elevation.length - 1) {
-      if (clearance < 0) hasLineOfSight = false;
-      if (clearance < worstClearance) worstClearance = clearance;
-    }
-  }
-
-  if (!Number.isFinite(worstClearance)) worstClearance = Math.min(startHeight, endHeight);
-  const losStatus = !hasLineOfSight ? "blocked" : worstClearance < LOS_CONFIRMED_CLEARANCE_M ? "marginal" : "confirmed";
-  const terrainMarginMeters = Number(worstClearance.toFixed(1));
-  const baseJustification = link.justification.replace(/ · -?\d+(?:\.\d+)? m terrain clearance$/, "");
-
-  return {
-    ...link,
-    viable: losStatus === "confirmed" || losStatus === "marginal",
-    losStatus,
-    terrainMarginMeters,
-    justification: `${baseJustification} · ${terrainMarginMeters.toFixed(1)} m terrain clearance`,
-  };
-}
-
-export function recalculatePlannerLinks(plannerState: PlannerState): PlannerState {
-  return { ...plannerState, links: plannerState.links.map((link) => recalculateLinkForEndpointHeights(link, plannerState)) };
-}
-
-function layerCounts(plannerState: PlannerState): Record<PlannerLayerKey, number> {
-  return {
-    inside: plannerState.highSites.filter((site) => site.category === "inside").length,
-    nearby: plannerState.highSites.filter((site) => site.category === "nearby").length,
-    remote: plannerState.highSites.filter((site) => site.category === "remote").length,
-    vodacom: plannerState.masts.filter((mast) => mast.provider === "vodacom").length,
-    mtn: plannerState.masts.filter((mast) => mast.provider === "mtn").length,
-    cellc: plannerState.masts.filter((mast) => mast.provider === "cellc").length,
-    telkom: plannerState.masts.filter((mast) => mast.provider === "telkom").length,
-    unknown: plannerState.masts.filter((mast) => mast.provider === "unknown").length,
-    uplink: plannerState.links.filter((link) => link.type === "uplink").length,
-    backbone: plannerState.links.filter((link) => link.type === "backbone").length,
-    distribution: plannerState.links.filter((link) => link.type === "distribution").length,
-    live: plannerState.links.filter((link) => link.live).length,
-    facilities: plannerState.facilities.length,
-  };
-}
+const INITIAL_LAYERS: LayerState = {
+  boundary: { enabled: true, opacity: 0.95 },
+  insideHighSites: { enabled: true, opacity: 1 },
+  nearbyHighSites: { enabled: true, opacity: 0.72 },
+  remoteHighSites: { enabled: false, opacity: 0.34 },
+  masts: { enabled: true, opacity: 0.95 },
+  unknownMasts: { enabled: true, opacity: 0.42 },
+  backbone: { enabled: true, opacity: 1 },
+  facilities: { enabled: true, opacity: 0.92 },
+  roads: { enabled: true, opacity: 0.52 },
+};
 
 export default function LinkPlanner() {
-  const [propertyName, setPropertyName] = useState(DEFAULT_PROPERTY_NAME);
-  const [planName, setPlanName] = useState("CTTX LOS Backbone Draft");
-  const [latitude, setLatitude] = useState(DEFAULT_CENTER.lat.toString());
-  const [longitude, setLongitude] = useState(DEFAULT_CENTER.lng.toString());
-  const [selectedMastId, setSelectedMastId] = useState<string | undefined>();
-  const [pendingFacilityType, setPendingFacilityType] = useState<FacilityType | null>(null);
-  const [propertyPinClickMode, setPropertyPinClickMode] = useState(false);
-  const [heightSelection, setHeightSelection] = useState<HeightSelection>(null);
-  const [plannerState, setPlannerState] = useState<PlannerState>(() => createEmptyPlannerState(DEFAULT_PROPERTY_NAME, DEFAULT_CENTER));
-  const [scanStatus, setScanStatus] = useState<ScanStatus>({ loading: true, phase: "Preparing real API-backed scan", issues: [] });
-  const [lastSavedId, setLastSavedId] = useState<number | null>(null);
-  const mapRef = useRef<google.maps.Map | null>(null);
-  const lastAutoBuildSignatureRef = useRef("");
-  const scanRequestIdRef = useRef(0);
-  const overlayRefs = useRef<Array<google.maps.Polygon | google.maps.Polyline | google.maps.Marker>>([]);
-  const clickListenerRef = useRef<google.maps.MapsEventListener | null>(null);
-  const utils = trpc.useUtils();
-  const savedPlans = trpc.linkPlans.list.useQuery({ limit: 8 });
-  const createPlanMutation = trpc.linkPlans.create.useMutation({
-    onSuccess: (plan) => {
-      setLastSavedId(plan.id);
-      utils.linkPlans.list.invalidate();
-      toast.success("Link plan saved for field validation");
-    },
-    onError: (error) => toast.error(error.message),
-  });
-  const updatePlanMutation = trpc.linkPlans.update.useMutation({
-    onSuccess: (plan) => {
-      setLastSavedId(plan.id);
-      utils.linkPlans.list.invalidate();
-      toast.success("Link plan updated");
-    },
-    onError: (error) => toast.error(error.message),
-  });
+  const [boundary, setBoundary] = useState<BoundarySelection | null>(null);
+  const [highSites, setHighSites] = useState<HighSite[]>([]);
+  const [masts, setMasts] = useState<Mast[]>([]);
+  const [selectedMast, setSelectedMast] = useState<Mast | null>(null);
+  const [selectedHighSite, setSelectedHighSite] = useState<HighSite | null>(null);
+  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
+  const [highSiteMastHeights, setHighSiteMastHeights] = useState<Record<string, number>>({});
+  const [highSiteLabels, setHighSiteLabels] = useState<Record<string, string>>({});
+  const [carrierMastHeights, setCarrierMastHeights] = useState<Record<string, number>>({});
+  const [facilityHeights, setFacilityHeights] = useState<Record<string, number>>({});
+  const [recalculatingSite, setRecalculatingSite] = useState(false);
+  const [recalculatingMast, setRecalculatingMast] = useState(false);
+  const [recalculatingFacility, setRecalculatingFacility] = useState(false);
+  const rebuildRunIdRef = useRef(0);
+  const [links, setLinks] = useState<BackboneLink[]>([]);
+  const [losRedrawVersion, setLosRedrawVersion] = useState(0);
+  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [roads, setRoads] = useState<RoadFeature[]>([]);
+  const [layers, setLayers] = useState<LayerState>(INITIAL_LAYERS);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("Select a boundary to begin terrain-led infrastructure planning.");
+  const [error, setError] = useState<string | null>(null);
+  const [manualHighSiteMode, setManualHighSiteMode] = useState(false);
+  const [facilityMode, setFacilityMode] = useState<FacilityTypeKey | null>(null);
+  const [relays, setRelays] = useState<Relay[]>([]);
+  const [relayPlacementMode, setRelayPlacementMode] = useState(false);
+  const [relayHeightPending, setRelayHeightPending] = useState<LatLng | null>(null);
+  const [manualLinkMode, setManualLinkMode] = useState(false);
+  const [manualLinkDraftA, setManualLinkDraftA] = useState<LatLng | null>(null);
+  const [manualLinks, setManualLinks] = useState<ManualPointLink[]>([]);
+  const [leftPanelCollapsed, setLeftPanelCollapsed] = useState(true);
+  const [rightPanelCollapsed, setRightPanelCollapsed] = useState(true);
+  const [flyToTarget, setFlyToTarget] = useState<(LatLng & { id: string; label?: string }) | null>(null);
+  const [ridgeCandidates, setRidgeCandidates] = useState<RidgeCandidate[]>([]);
+  const [linkLabels, setLinkLabels] = useState<Record<string, string>>({});
+  const [manualFacilityLinks, setManualFacilityLinks] = useState<ManualFacilityLink[]>([]);
+  const [linkLabelPopup, setLinkLabelPopup] = useState<{ linkKey: string; position: LatLng; currentLabel: string } | null>(null);
 
-  const center = useMemo(() => {
-    const parsedLat = Number(latitude);
-    const parsedLng = Number(longitude);
-    return isValidGisCoordinate({ lat: parsedLat, lng: parsedLng }) ? { lat: parsedLat, lng: parsedLng } : DEFAULT_CENTER;
-  }, [latitude, longitude]);
+  const onLayerChange = useCallback((key: LayerKey, patch: Partial<LayerState[LayerKey]>) => {
+    setLayers(current => ({ ...current, [key]: { ...current[key], ...patch } }));
+  }, [boundary]);
 
-  const budgets = useMemo(() => new Map(plannerState.links.map((link) => [link.id, calculateLinkBudget(link)])), [plannerState.links]);
-  const counts = useMemo(() => layerCounts(plannerState), [plannerState]);
-  const selectedMast = plannerState.selectedMastIndex === null ? null : plannerState.masts[plannerState.selectedMastIndex] ?? null;
-  const selectedHeightEndpoint = heightSelection?.type === "highSite" ? plannerState.highSites.find((site) => site.id === heightSelection.id) ?? null : heightSelection?.type === "mast" ? plannerState.masts.find((mast) => mast.id === heightSelection.id) ?? null : null;
-  const routeDecisionExplanation = useMemo(() => buildRouteDecisionExplanation(plannerState), [plannerState]);
-  const totals = useMemo(() => {
-    const totalDistanceKm = plannerState.links.reduce((total, link) => total + link.distKm, 0);
-    const liveDistanceKm = plannerState.links.filter((link) => link.live).reduce((total, link) => total + link.distKm, 0);
-    const fadeMargins = plannerState.links.map((link) => budgets.get(link.id)?.fadeMarginDb ?? 0);
-    const weakestFadeMargin = fadeMargins.length ? Math.min(...fadeMargins) : 0;
-    return { totalDistanceKm: Number(totalDistanceKm.toFixed(2)), liveDistanceKm: Number(liveDistanceKm.toFixed(2)), weakestFadeMargin };
-  }, [budgets, plannerState.links]);
+  const rebuildNetwork = useCallback(async (sites: HighSite[], operatingPoints: Facility[], carrierMasts: Mast[], mastHeights: Record<string, number> = {}, carrierHeights: Record<string, number> = {}, pointFacilityHeights: Record<string, number> = {}) => {
+    const runId = rebuildRunIdRef.current + 1;
+    rebuildRunIdRef.current = runId;
+    setStatus("Calculating Open-Meteo terrain profiles and LOS-verified topology…");
+    const nextLinks = await buildLosTopology(sites, operatingPoints, carrierMasts, { highSiteMastHeights: mastHeights, carrierMastHeights: carrierHeights, carrierMastHeight: CARRIER_MAST_HEIGHT_M, facilityHeights: pointFacilityHeights, boundaryPolygon: boundary?.polygon ?? null });
+    if (runId === rebuildRunIdRef.current) {
+      // Always replace the array and advance a redraw token. This makes height-button
+      // recalculation visually obvious on the map even when the topology keeps the
+      // same endpoints but changes LOS status, stroke style, or clearance label.
+      setLinks(nextLinks.map(link => ({ ...link })));
+      setLosRedrawVersion(version => version + 1);
+    }
+    return nextLinks;
+  }, []);
 
-  const rebuildPlan = useCallback(async (nextSelectedMastId?: string, keepFacilities = true, overrideCenter?: GisCoordinate) => {
-    const requestId = scanRequestIdRef.current + 1;
-    scanRequestIdRef.current = requestId;
-    const scanCentre = overrideCenter ?? center;
-    if (!isValidGisCoordinate(scanCentre)) {
-      toast.error("Invalid property coordinate");
+  const onBoundaryPreview = useCallback((nextBoundary: BoundarySelection) => {
+    setBoundary(nextBoundary);
+    setStatus(nextBoundary.polygon.length >= 3 ? "Boundary polygon drawn. Confirm to load terrain, facility, and carrier evidence." : "Boundary centre selected. Confirm to run centre-based planning evidence.");
+    setError(null);
+  }, []);
+
+  const onConfirmBoundary = useCallback(async () => {
+    if (!boundary) return;
+    setLoading(true);
+    setError(null);
+    setStatus("Auto-detecting facilities, high sites, and carrier masts in parallel…");
+    setHighSites([]);
+    setMasts([]);
+    setSelectedMast(null);
+    setSelectedHighSite(null);
+    setSelectedFacility(null);
+    setHighSiteMastHeights({});
+    setHighSiteLabels({});
+    setLosRedrawVersion(version => version + 1);
+    setCarrierMastHeights({});
+    setFacilityHeights({});
+    setLinks([]);
+    setFacilities([]);
+    setRoads([]);
+    setManualLinks([]);
+    setManualLinkDraftA(null);
+    setRidgeCandidates([]);
+    setLinkLabels({});
+    setLinkLabelPopup(null);
+
+    const [facilityResult, siteResult, mastResult, ridgeResult] = await Promise.allSettled([
+      findFacilities(boundary.polygon, boundary.centre),
+      findHighSites(boundary.polygon, boundary.centre),
+      findMasts(boundary.centre, boundary.polygon, [], message => setStatus(message)),
+      findRidgeCandidates(boundary.polygon, boundary.centre),
+    ]);
+
+    const nextFacilityEvidence = facilityResult.status === "fulfilled" ? facilityResult.value : { facilities: [], roads: [] };
+    const nextFacilities = nextFacilityEvidence.facilities;
+    const nextRoads = nextFacilityEvidence.roads;
+    const nextHighSites = siteResult.status === "fulfilled" ? siteResult.value : [];
+    const insideSites = nextHighSites.filter(site => site.category === "inside");
+    const rawMasts = mastResult.status === "fulfilled" ? mastResult.value : [];
+    const nextMasts = rebaseMastsToRelay(rawMasts, boundary.centre, insideSites);
+    const nextRidgeCandidates = ridgeResult.status === "fulfilled" ? ridgeResult.value : [];
+    const firstSelected =
+      nextMasts.find(mast => mast.isClosestForProvider && mast.provider !== "unknown" && mast.visible) ||
+      nextMasts.find(mast => mast.provider !== "unknown") ||
+      nextMasts[0] ||
+      null;
+
+    setHighSites(nextHighSites);
+    setHighSiteLabels(Object.fromEntries(nextHighSites.map((site, index) => [highSiteKey(site), `HP-${index + 1}`])));
+    setFacilities(nextFacilities);
+    setRoads(nextRoads);
+    setMasts(nextMasts);
+    setRidgeCandidates(nextRidgeCandidates);
+    setSelectedMast(firstSelected);
+    const nextLinks = await rebuildNetwork(nextHighSites, nextFacilities, nextMasts, {}, {}, {});
+
+    const failures = [
+      facilityResult.status === "rejected" ? "facility and road detection" : null,
+      siteResult.status === "rejected" ? "terrain candidate loading" : null,
+      mastResult.status === "rejected" ? "carrier mast discovery" : null,
+    ].filter(Boolean);
+
+    if (failures.length) {
+      setError(`Partial evidence loaded. Check ${failures.join(" and ")}. Manual relay and facility placement remain available.`);
+    }
+
+    const knownMasts = nextMasts.filter(mast => mast.provider !== "unknown").length;
+    const backboneCount = nextLinks.filter(link => link.type === "backbone" || link.type === "outofrange").length;
+    const distributionCount = nextLinks.filter(link => link.type === "distribution" || link.type === "relay").length;
+    const uplinkCount = nextLinks.filter(link => link.type === "uplink").length;
+    const confirmedCount = nextLinks.filter(link => link.losStatus === "confirmed").length;
+    const marginalCount = nextLinks.filter(link => link.losStatus === "marginal").length;
+    const blockedCount = nextLinks.filter(link => link.losStatus === "blocked").length;
+    setStatus(
+      `Planning evidence loaded: ${nextHighSites.length} high-site candidates, ${nextRidgeCandidates.length} ridge/boundary candidates, ${nextFacilities.length} detected facilities, ${nextRoads.length} roads, ${knownMasts} classified carrier masts, ${backboneCount} backbone spans, ${distributionCount} facility spans, ${uplinkCount} carrier uplinks. LOS: ${confirmedCount} confirmed, ${marginalCount} marginal, ${blockedCount} blocked diagnostics.`,
+    );
+    setLoading(false);
+  }, [boundary, rebuildNetwork]);
+
+  const handleMastSelect = useCallback((mast: Mast) => {
+    setSelectedMast(mast);
+    setStatus(`${mastProviderLabel(mast.provider)} structure selected. Choose a carrier mast height to recalculate every connected uplink without removing existing LOS lines.`);
+  }, []);
+
+  const handleHighSiteSelect = useCallback((site: HighSite) => {
+    setSelectedHighSite(site);
+    const key = highSiteKey(site);
+    setHighSiteMastHeights(current => current[key] ? current : { ...current, [key]: HIGH_SITE_ANTENNA_HEIGHT_M });
+    setStatus(`${site.name} selected. Height changes instantly recalculate connected uplink, backbone, and distribution LOS spans.`);
+  }, []);
+
+  const handleFacilitySelect = useCallback((facility: Facility) => {
+    setSelectedFacility(facility);
+    const key = facilityKey(facility);
+    setFacilityHeights(current => key in current ? current : { ...current, [key]: 0 });
+    setStatus(`${facility.name} selected. Height changes instantly recalculate all connected facility LOS spans.`);
+  }, []);
+
+  const handleRelayPlace = useCallback((point: LatLng) => {
+    if (!boundary) {
+      setStatus("Select a boundary before placing a relay.");
       return;
     }
-    setScanStatus({ loading: true, phase: "Loading Nominatim boundary, Open-Meteo SRTM grid, Overpass masts, and facilities", issues: [] });
+    setRelayHeightPending(point);
+  }, [boundary]);
+
+  const handleManualHighSite = useCallback((point: LatLng) => {
+    if (!boundary) {
+      setStatus("Select a boundary before placing a manual relay candidate.");
+      return;
+    }
+    const nextSite = makeManualHighSite(point, boundary.polygon, boundary.centre, highSites.filter(site => site.source === "manual").length + 1);
+    const nextSites = [...highSites, nextSite];
+    setHighSites(nextSites);
+    void rebuildNetwork(nextSites, facilities, masts, highSiteMastHeights, carrierMastHeights, facilityHeights).then(nextLinks => {
+      setStatus(`Manual relay candidate placed. LOS topology now has ${nextLinks.length} evaluated link spans.`);
+    }).catch(() => {
+      setStatus("Manual relay candidate placed, but LOS topology refresh could not complete. Try confirming the boundary again.");
+    });
+  }, [boundary, carrierMastHeights, facilities, facilityHeights, highSites, highSiteMastHeights, masts, rebuildNetwork]);
+
+  const handleFacilityPlace = useCallback((point: LatLng) => {
+    if (!facilityMode) return;
+    const nextFacility = (() => {
+      const countForType = facilities.filter(facility => facility.type === facilityMode).length + 1;
+      const type = FACILITY_TYPES[facilityMode];
+      return {
+        id: `${facilityMode}-${Date.now()}`,
+        lat: point.lat,
+        lng: point.lng,
+        type: facilityMode,
+        name: `${type.label} ${countForType}`,
+        source: "manual" as const,
+      };
+    })();
+    const nextFacilities = [...facilities, nextFacility];
+    setFacilities(nextFacilities);
+    void rebuildNetwork(highSites, nextFacilities, masts, highSiteMastHeights, carrierMastHeights, facilityHeights).then(() => {
+      setStatus(`${FACILITY_TYPES[facilityMode].label} placed and checked against LOS high-site candidates.`);
+    }).catch(() => {
+      setStatus(`${FACILITY_TYPES[facilityMode].label} placed, but LOS topology refresh could not complete. Try confirming the boundary again.`);
+    });
+  }, [carrierMastHeights, facilities, facilityHeights, facilityMode, highSites, highSiteMastHeights, masts, rebuildNetwork]);
+
+
+  const selectedHighSiteKey = selectedHighSite ? highSiteKey(selectedHighSite) : "";
+  const selectedMastHeight = selectedHighSite ? highSiteMastHeights[selectedHighSiteKey] ?? HIGH_SITE_ANTENNA_HEIGHT_M : HIGH_SITE_ANTENNA_HEIGHT_M;
+  const selectedCarrierMastKey = selectedMast ? mastKey(selectedMast) : "";
+  const selectedCarrierMastHeight = selectedMast ? carrierMastHeights[selectedCarrierMastKey] ?? CARRIER_MAST_HEIGHT_M : CARRIER_MAST_HEIGHT_M;
+  const selectedFacilityKey = selectedFacility ? facilityKey(selectedFacility) : "";
+  const selectedFacilityHeight = selectedFacility ? facilityHeights[selectedFacilityKey] ?? 0 : 0;
+
+  const selectedMastReachability = useMemo(() => {
+    if (!selectedMast) return [] as BackboneLink[];
+    const matches = (point: LatLng & { name?: string }) => point.lat === selectedMast.lat && point.lng === selectedMast.lng;
+    return links.filter(link => link.type === "uplink" && (matches(link.from) || matches(link.to)));
+  }, [links, selectedMast]);
+
+  const selectedHighSiteReachability = useMemo(() => {
+    if (!selectedHighSite) return { highSites: [] as BackboneLink[], masts: [] as BackboneLink[], clusters: [] as BackboneLink[] };
+    const matches = (point: LatLng & { name?: string }) => point.lat === selectedHighSite.lat && point.lng === selectedHighSite.lng && (!point.name || point.name === selectedHighSite.name);
+    const connected = links.filter(link => matches(link.from) || matches(link.to));
+    return {
+      highSites: connected.filter(link => link.type === "backbone"),
+      masts: connected.filter(link => link.type === "uplink"),
+      clusters: connected.filter(link => link.type === "distribution" || link.type === "relay"),
+    };
+  }, [links, selectedHighSite]);
+
+  const highSitePeerName = useCallback((link: BackboneLink) => {
+    if (!selectedHighSite) return link.label || "Topology span";
+    const fromSelected = link.from.lat === selectedHighSite.lat && link.from.lng === selectedHighSite.lng;
+    const peer = fromSelected ? link.to : link.from;
+    return peer.name || link.label || "Topology span";
+  }, [selectedHighSite]);
+
+  const updateSelectedMastHeight = useCallback(async (height: number) => {
+    if (!selectedHighSite) return;
+    const key = highSiteKey(selectedHighSite);
+    const nextHeights = { ...highSiteMastHeights, [key]: height };
+    const selectedKey = key;
+    setHighSiteMastHeights(nextHeights);
+    setLinks(current => current.map(link =>
+      (link.from.lat === selectedHighSite.lat && link.from.lng === selectedHighSite.lng) ||
+      (link.to.lat === selectedHighSite.lat && link.to.lng === selectedHighSite.lng)
+        ? { ...link, label: `${link.label || 'LOS span'} · recalculating at ${height}m`, recalculating: true }
+        : link
+    ));
+    setLosRedrawVersion(version => version + 1);
+    setRecalculatingSite(true);
     try {
-      const next = await createContinuousPlannerState(propertyName.trim() || DEFAULT_PROPERTY_NAME, scanCentre, nextSelectedMastId, keepFacilities ? { facilities: plannerState.facilities, layerVis: plannerState.layerVis, highSites: plannerState.highSites, masts: plannerState.masts } : { layerVis: plannerState.layerVis, highSites: plannerState.highSites, masts: plannerState.masts });
-      if (scanRequestIdRef.current !== requestId) return;
-      setPlannerState(recalculatePlannerLinks(next));
-      const resolvedMastId = nextSelectedMastId ?? next.masts[next.selectedMastIndex ?? 0]?.id;
-      setSelectedMastId(resolvedMastId);
-      setScanStatus({ loading: false, phase: "Real API-backed topology ready", issues: [] });
-      window.setTimeout(() => fitPlannerMapToState(mapRef.current, next), 0);
-      toast.success("Real-data LOS topology refreshed");
-    } catch (error) {
-      if (scanRequestIdRef.current !== requestId) return;
-      const message = error instanceof Error ? error.message : "Unable to build real-data Link Planner topology";
-      setScanStatus({ loading: false, phase: "Scan incomplete", issues: [message] });
-      toast.error(message);
+      const nextLinks = await rebuildNetwork(highSites, facilities, masts, nextHeights, carrierMastHeights, facilityHeights);
+      const affected = nextLinks.filter(link => (link.from.lat === selectedHighSite.lat && link.from.lng === selectedHighSite.lng) || (link.to.lat === selectedHighSite.lat && link.to.lng === selectedHighSite.lng));
+      const confirmed = affected.filter(link => link.losStatus === "confirmed").length;
+      const marginal = affected.filter(link => link.losStatus === "marginal").length;
+      const blocked = affected.filter(link => link.losStatus === "blocked").length;
+      setLosRedrawVersion(version => version + 1);
+      const label = highSiteLabels[selectedKey] || selectedHighSite.name;
+      setStatus(`${label} instantly recalculated at ${height}m: ${confirmed} confirmed, ${marginal} marginal, ${blocked} blocked connected LOS spans.`);
+    } catch {
+      setStatus(`${selectedHighSite.name} height changed to ${height}m, but instant LOS refresh could not complete. Existing links remain visible.`);
+    } finally {
+      setRecalculatingSite(false);
     }
-  }, [center, plannerState.facilities, plannerState.highSites, plannerState.layerVis, plannerState.masts, propertyName]);
+  }, [carrierMastHeights, facilities, facilityHeights, highSiteLabels, highSiteMastHeights, highSites, masts, rebuildNetwork, selectedHighSite]);
 
-  useEffect(() => {
-    const signature = `${propertyName.trim()}|${center.lat.toFixed(6)}|${center.lng.toFixed(6)}|${selectedMastId ?? "auto"}`;
-    if (lastAutoBuildSignatureRef.current === signature) return;
-    const timeout = window.setTimeout(() => {
-      lastAutoBuildSignatureRef.current = signature;
-      void rebuildPlan(selectedMastId, true, center);
-    }, 550);
-    return () => window.clearTimeout(timeout);
-  }, [center, propertyName, rebuildPlan, selectedMastId]);
+  const handleCarrierMastHeightChange = useCallback(async (height: number) => {
+    if (!selectedMast) return;
+    const key = mastKey(selectedMast);
+    const nextCarrierHeights = { ...carrierMastHeights, [key]: height };
+    setCarrierMastHeights(nextCarrierHeights);
+    setRecalculatingMast(true);
+    try {
+      const nextLinks = await rebuildNetwork(highSites, facilities, masts, highSiteMastHeights, nextCarrierHeights, facilityHeights);
+      const affected = nextLinks.filter(link => link.type === "uplink" && ((link.from.lat === selectedMast.lat && link.from.lng === selectedMast.lng) || (link.to.lat === selectedMast.lat && link.to.lng === selectedMast.lng)));
+      const confirmed = affected.filter(link => link.losStatus === "confirmed").length;
+      const marginal = affected.filter(link => link.losStatus === "marginal").length;
+      const blocked = affected.filter(link => link.losStatus === "blocked").length;
+      setStatus(`${mastProviderLabel(selectedMast.provider)} mast recalculated at ${height}m: ${confirmed} confirmed, ${marginal} marginal, ${blocked} blocked connected uplinks.`);
+    } catch {
+      setStatus(`${mastProviderLabel(selectedMast.provider)} mast-height recalculation could not complete. Existing LOS links remain visible; try again after the current request settles.`);
+    } finally {
+      setRecalculatingMast(false);
+    }
+  }, [carrierMastHeights, facilities, facilityHeights, highSiteMastHeights, highSites, masts, rebuildNetwork, selectedMast]);
 
-  const toggleLayer = (key: PlannerLayerKey) => {
-    setPlannerState((current) => ({ ...current, layerVis: { ...current.layerVis, [key]: !current.layerVis[key] } }));
-  };
+  const handleFacilityHeightChange = useCallback(async (height: number) => {
+    if (!selectedFacility) return;
+    const key = facilityKey(selectedFacility);
+    const nextFacilityHeights = { ...facilityHeights, [key]: height };
+    setFacilityHeights(nextFacilityHeights);
+    setRecalculatingFacility(true);
+    try {
+      const nextLinks = await rebuildNetwork(highSites, facilities, masts, highSiteMastHeights, carrierMastHeights, nextFacilityHeights);
+      const affected = nextLinks.filter(link =>
+        (link.type === "distribution" || link.type === "relay") &&
+        (((link.from as { facilities?: Facility[] }).facilities || []).some(facility => facility.id === selectedFacility.id) ||
+         ((link.to as { facilities?: Facility[] }).facilities || []).some(facility => facility.id === selectedFacility.id) ||
+         (link.from.lat === selectedFacility.lat && link.from.lng === selectedFacility.lng) ||
+         (link.to.lat === selectedFacility.lat && link.to.lng === selectedFacility.lng))
+      );
+      const confirmed = affected.filter(link => link.losStatus === "confirmed").length;
+      const marginal = affected.filter(link => link.losStatus === "marginal").length;
+      const blocked = affected.filter(link => link.losStatus === "blocked").length;
+      setStatus(`${selectedFacility.name} instantly recalculated at ${height}m: ${confirmed} confirmed, ${marginal} marginal, ${blocked} blocked connected facility spans.`);
+    } catch {
+      setStatus(`${selectedFacility.name} height changed to ${height}m, but instant LOS refresh could not complete. Existing links remain visible.`);
+    } finally {
+      setRecalculatingFacility(false);
+    }
+  }, [carrierMastHeights, facilities, facilityHeights, highSiteMastHeights, highSites, masts, rebuildNetwork, selectedFacility]);
 
-  const setAllLayers = (visible: boolean) => {
-    setPlannerState((current) => ({
-      ...current,
-      layerVis: Object.fromEntries(Object.keys(DEFAULT_PLANNER_LAYER_VISIBILITY).map((key) => [key, visible])) as Record<PlannerLayerKey, boolean>,
+  const handleConfirmRelayHeight = useCallback((height: number) => {
+    if (!relayHeightPending || !boundary) return;
+    const nextRelay = makeRelay(relayHeightPending, height, relays.length + 1);
+    const nextRelays = [...relays, nextRelay];
+    setRelays(nextRelays);
+    setRelayHeightPending(null);
+    setStatus(`Relay placed at ${height}m height. Recalculating LOS topology…`);
+    // Rebuild network with relays treated as high sites for LOS purposes
+    void rebuildNetwork(
+      [...highSites, ...nextRelays.map(r => ({ ...r, elevation: null, inside: true, distToCentre: 0, category: "inside" as const }))],
+      facilities,
+      masts,
+      highSiteMastHeights,
+      carrierMastHeights,
+      facilityHeights
+    ).then(nextLinks => {
+      setStatus(`Relay placed at ${height}m. LOS topology now has ${nextLinks.length} evaluated link spans.`);
+    }).catch(() => {
+      setStatus("Relay placed, but LOS topology refresh could not complete.");
+    });
+  }, [relayHeightPending, relays, boundary, highSites, facilities, masts, highSiteMastHeights, carrierMastHeights, facilityHeights, rebuildNetwork]);
+
+
+  const recalculateManualLink = useCallback(async (link: ManualPointLink) => {
+    setManualLinks(current => current.map(item => item.id === link.id ? { ...item, calculating: true } : item));
+    const next = await calculateManualPointLink(link);
+    setManualLinks(current => current.map(item => item.id === link.id ? next : item));
+    return next;
+  }, []);
+
+  const handleManualLinkMapClick = useCallback((point: LatLng) => {
+    if (!manualLinkMode) return;
+    if (!manualLinkDraftA) {
+      setManualLinkDraftA(point);
+      setStatus("Manual link Point A placed. Click Point B anywhere on the map to calculate LOS.");
+      return;
+    }
+    const id = `manual-link-${Date.now()}`;
+    const nextLink: ManualPointLink = {
+      id,
+      pointA: { ...manualLinkDraftA, label: "A", height: 18 },
+      pointB: { ...point, label: "B", height: 18 },
+      distKm: 0,
+      losStatus: "unknown",
+      worstClearance: 0,
+      calculating: true,
+    };
+    setManualLinks(current => [...current, nextLink]);
+    setManualLinkDraftA(null);
+    setStatus("Manual point-to-point link placed. Fetching terrain profile and calculating LOS…");
+    void calculateManualPointLink(nextLink).then(calculated => {
+      setManualLinks(current => current.map(item => item.id === id ? calculated : item));
+      setStatus(`Manual link ${calculated.pointA.height}m → ${calculated.pointB.height}m: ${calculated.losStatus} LOS, ${calculated.worstClearance.toFixed(1)}m clearance over ${formatKm(calculated.distKm)}.`);
+    });
+  }, [manualLinkDraftA, manualLinkMode]);
+
+  const handleManualLinkHeightChange = useCallback((linkId: string, endpoint: "A" | "B", height: number) => {
+    let target: ManualPointLink | null = null;
+    setManualLinks(current => current.map(link => {
+      if (link.id !== linkId) return link;
+      target = {
+        ...link,
+        pointA: endpoint === "A" ? { ...link.pointA, height } : link.pointA,
+        pointB: endpoint === "B" ? { ...link.pointB, height } : link.pointB,
+        calculating: true,
+      };
+      return target;
     }));
-  };
-
-  const toggleLinkLive = (linkId: string) => {
-    setPlannerState((current) => ({ ...current, links: current.links.map((link) => (link.id === linkId ? { ...link, live: !link.live } : link)) }));
-  };
-
-  const updateHighSiteHeight = (siteId: string, height: number) => {
-    setPlannerState((current) => {
-      const next = { ...current, highSites: current.highSites.map((site) => (site.id === siteId ? { ...site, antennaHeightM: height } : site)) };
-      return recalculatePlannerLinks(next);
-    });
-    toast.success(`High-site mast height set to ${height} m; connected links recalculated`);
-  };
-
-  const updateCarrierMastHeight = (mastId: string, height: number) => {
-    setPlannerState((current) => {
-      const next = { ...current, masts: current.masts.map((mast) => (mast.id === mastId ? { ...mast, antennaHeightM: height } : mast)) };
-      return recalculatePlannerLinks(next);
-    });
-    toast.success(`Carrier mast height set to ${height} m; connected uplinks recalculated`);
-  };
-
-  const removeFacility = (facilityId: string) => {
-    setPlannerState((current) => ({ ...current, facilities: current.facilities.filter((facility) => facility.id !== facilityId) }));
-  };
-
-  const savePlan = () => {
-    const payload = {
-      planName,
-      propertyName: plannerState.propertyName,
-      centerLatitude: plannerState.propertyCentre?.lat ?? center.lat,
-      centerLongitude: plannerState.propertyCentre?.lng ?? center.lng,
-      propertyAreaHa: plannerState.boundaryAreaHa,
-      selectedMastId: selectedMast?.id,
-      boundary: plannerState.boundaryPolygon ?? [],
-      highSites: plannerState.highSites,
-      providerMasts: plannerState.masts,
-      links: plannerState.links.map((link) => ({ ...link, role: link.type, distanceKm: link.distKm, losStatus: link.losStatus, terrainMarginMeters: link.terrainMarginMeters, ...budgets.get(link.id) })),
-      assumptions: {
-        plannerState,
-        losPolicy: "Green links are confirmed LOS, amber links are marginal, and red links are blocked diagnostics retained for field validation.",
-        topologyPolicy: "Facility-to-high-site, high-site backbone, and high-site-to-carrier-mast paths are all generated from real API responses.",
-        validation: "Field survey and final RF design required before construction.",
-        stack: "Cambium Networks, cnMaestro, Victron Energy, Hubble Lithium",
-      },
-      recommendationSummary: plannerState.recommendationSummary,
-      totalDistanceKm: totals.totalDistanceKm,
-      liveDistanceKm: totals.liveDistanceKm,
-      status: "Ready for Field Validation" as const,
-    };
-    if (lastSavedId) updatePlanMutation.mutate({ id: lastSavedId, ...payload });
-    else createPlanMutation.mutate(payload);
-  };
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !window.google?.maps) return;
-    overlayRefs.current.forEach((overlay) => overlay.setMap(null));
-    overlayRefs.current = [];
-
-    const boundaryPath = sanitizePath(plannerState.boundaryPolygon ?? []);
-    if (boundaryPath.length >= 3) {
-      const boundary = new window.google.maps.Polygon({
-        paths: boundaryPath,
-        strokeColor: "#f8fafc",
-        strokeOpacity: 0.9,
-        strokeWeight: 2,
-        fillColor: "#f8fafc",
-        fillOpacity: 0.06,
-        map,
-      });
-      overlayRefs.current.push(boundary);
-    }
-
-    plannerState.links.filter((link) => isLinkVisible(link, plannerState.layerVis) && sanitizePath(link.path).length === 2).forEach((link) => {
-      const polyline = new window.google.maps.Polyline({
-        path: sanitizePath(link.path),
-        geodesic: true,
-        strokeColor: linkStrokeColor(link),
-        strokeOpacity: link.losStatus === "blocked" ? 0.8 : 0.96,
-        strokeWeight: link.live ? 4 : link.losStatus === "blocked" ? 2 : 3,
-        icons: link.losStatus === "blocked" ? [{ icon: { path: "M 0,0 m -1,0 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0", fillColor: linkStrokeColor(link), fillOpacity: 1, strokeOpacity: 0, scale: 2 }, offset: "0", repeat: "14px" }] : link.losStatus === "marginal" ? [{ icon: { path: "M 0,-1 0,1", strokeOpacity: 1, scale: 3 }, offset: "0", repeat: "20px" }] : undefined,
-        map,
-      });
-      overlayRefs.current.push(polyline);
-
-      const label = new window.google.maps.Marker({
-        map,
-        position: pathMidpoint(link.path),
-        title: linkMapLabel(link),
-        label: { text: linkMapLabel(link), color: linkStrokeColor(link), fontWeight: "800", fontSize: "11px" },
-        icon: { path: window.google.maps.SymbolPath.CIRCLE, scale: 0 },
-      });
-      overlayRefs.current.push(label);
-    });
-
-    plannerState.highSites.filter((site) => plannerState.layerVis[site.category] && isValidGisCoordinate(site)).forEach((site) => {
-      const color = site.category === "inside" ? "#22c55e" : site.category === "nearby" ? "#f97316" : "#94a3b8";
-      const marker = new window.google.maps.Marker({
-        map,
-        position: { lat: site.lat, lng: site.lng },
-        title: `${site.name} · ${site.elevation ?? "Unknown"} m ASL · ${site.antennaHeightM ?? DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M} m mast`,
-        label: { text: "▲", color, fontWeight: "900", fontSize: site.category === "remote" ? "14px" : "20px" },
-        icon: { path: window.google.maps.SymbolPath.CIRCLE, scale: 0 },
-      });
-      marker.addListener("click", () => setHeightSelection({ type: "highSite", id: site.id }));
-      overlayRefs.current.push(marker);
-    });
-
-    plannerState.masts.filter((mast) => isMastVisible(mast, plannerState.layerVis) && isValidGisCoordinate(mast)).forEach((mast) => {
-      const marker = new window.google.maps.Marker({
-        map,
-        position: { lat: mast.lat, lng: mast.lng },
-        title: `${mast.name} · ${mast.distFromNearestRelay.toFixed(1)} km from relay · ${mast.antennaHeightM ?? DEFAULT_CARRIER_MAST_HEIGHT_M} m mast`,
-        label: { text: mast.closestForProvider ? "★" : "M", color: mast.selected ? "#facc15" : "#020617", fontWeight: "900" },
-      });
-      marker.addListener("click", () => {
-        setSelectedMastId(mast.id);
-        setPlannerState((current) => recalculatePlannerLinks({ ...current, selectedMastIndex: current.masts.findIndex((candidate) => candidate.id === mast.id), masts: current.masts.map((candidate) => ({ ...candidate, selected: candidate.id === mast.id })) }));
-        setHeightSelection({ type: "mast", id: mast.id });
-      });
-      overlayRefs.current.push(marker);
-    });
-
-    if (plannerState.layerVis.facilities) {
-      plannerState.facilities.filter(isValidGisCoordinate).forEach((facility) => {
-        const facilityType = FACILITY_TYPES[facility.type];
-        const marker = new window.google.maps.Marker({
-          map,
-          position: { lat: facility.lat, lng: facility.lng },
-          title: `${facility.name} · ${facilityType.label}`,
-          label: { text: facilityType.icon, color: "#020617", fontWeight: "900" },
-        });
-        overlayRefs.current.push(marker);
+    if (target) {
+      void calculateManualPointLink(target).then(calculated => {
+        setManualLinks(current => current.map(item => item.id === linkId ? calculated : item));
+        setStatus(`Manual link recalculated: ${calculated.losStatus} LOS, ${calculated.worstClearance.toFixed(1)}m clearance.`);
       });
     }
+  }, []);
 
-    fitPlannerMapToState(map, plannerState);
+  const handleManualLinkEndpointMove = useCallback((linkId: string, endpoint: "A" | "B", point: LatLng) => {
+    let target: ManualPointLink | null = null;
+    setManualLinks(current => current.map(link => {
+      if (link.id !== linkId) return link;
+      target = {
+        ...link,
+        pointA: endpoint === "A" ? { ...link.pointA, lat: point.lat, lng: point.lng } : link.pointA,
+        pointB: endpoint === "B" ? { ...link.pointB, lat: point.lat, lng: point.lng } : link.pointB,
+        calculating: true,
+      };
+      return target;
+    }));
+    if (target) {
+      void calculateManualPointLink(target).then(calculated => {
+        setManualLinks(current => current.map(item => item.id === linkId ? calculated : item));
+        setStatus(`Manual link moved and recalculated: ${calculated.losStatus} LOS, ${calculated.worstClearance.toFixed(1)}m clearance.`);
+      });
+    }
+  }, []);
 
-    return () => {
-      overlayRefs.current.forEach((overlay) => overlay.setMap(null));
-      overlayRefs.current = [];
+  const handleManualLinkDelete = useCallback((linkId: string) => {
+    setManualLinks(current => current.filter(link => link.id !== linkId));
+    setStatus("Manual point-to-point link deleted.");
+  }, []);
+
+  const appStats = useMemo(() => ({
+    insideSites: highSites.filter(site => site.category === "inside").length,
+    knownMasts: masts.filter(mast => mast.provider !== "unknown").length,
+    facilities: facilities.length,
+    warnings: links.filter(link => link.losStatus === "blocked" || link.losStatus === "marginal").length,
+  }), [facilities.length, highSites, links, masts]);
+
+  const handleFacilityFocus = useCallback((facility: Facility) => {
+    setFlyToTarget({ lat: facility.lat, lng: facility.lng, id: `${facility.id}-${Date.now()}`, label: facility.name });
+    setStatus(`Flying map to ${facility.name} for visual inspection.`);
+  }, []);
+
+  const handleHighSiteLabelChange = useCallback((site: HighSite, label: string) => {
+    const key = highSiteKey(site);
+    const clean = label.trim() || `HP-${Math.max(1, highSites.findIndex(item => highSiteKey(item) === key) + 1)}`;
+    setHighSiteLabels(current => ({ ...current, [key]: clean }));
+    if (selectedHighSite && highSiteKey(selectedHighSite) === key) {
+      setSelectedHighSite({ ...selectedHighSite, name: clean });
+    }
+    setLosRedrawVersion(version => version + 1);
+    setStatus(`High point renamed to ${clean}. Existing LOS spans remain connected and visible.`);
+  }, [highSites, selectedHighSite]);
+
+  const handleFacilityPlaceWithName = useCallback((point: LatLng, name: string, type: keyof typeof FACILITY_TYPES) => {
+    const nextFacility: Facility = {
+      id: `manual-${type}-${Date.now()}`,
+      lat: point.lat,
+      lng: point.lng,
+      type,
+      name: name.trim() || `${FACILITY_TYPES[type].label} ${facilities.filter(f => f.type === type).length + 1}`,
+      source: "manual" as const,
     };
-  }, [plannerState]);
+    const nextFacilities = [...facilities, nextFacility];
+    setFacilities(nextFacilities);
 
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !window.google?.maps) return;
-    clickListenerRef.current?.remove();
-    if (!pendingFacilityType && !propertyPinClickMode) return;
-    clickListenerRef.current = map.addListener("click", (event: google.maps.MapMouseEvent) => {
-      if (!event.latLng) return;
-      const clicked = { lat: Number(event.latLng.lat().toFixed(6)), lng: Number(event.latLng.lng().toFixed(6)) };
-      if (!isValidGisCoordinate(clicked)) {
-        toast.error("Map click returned an invalid coordinate");
-        return;
-      }
+    // Auto-connect to nearest inside high point with a draggable link
+    const insideSites = highSites.filter(s => s.category === "inside" || s.category === "nearby");
+    const nearestSite = insideSites.length > 0
+      ? insideSites.reduce((best, site) => {
+          const d = Math.hypot(site.lat - point.lat, site.lng - point.lng);
+          const bd = Math.hypot(best.lat - point.lat, best.lng - point.lng);
+          return d < bd ? site : best;
+        })
+      : highSites.length > 0
+        ? highSites.reduce((best, site) => {
+            const d = Math.hypot(site.lat - point.lat, site.lng - point.lng);
+            const bd = Math.hypot(best.lat - point.lat, best.lng - point.lng);
+            return d < bd ? site : best;
+          })
+        : null;
 
-      if (propertyPinClickMode) {
-        setLatitude(formatCoord(clicked.lat));
-        setLongitude(formatCoord(clicked.lng));
-        setPropertyPinClickMode(false);
-        void rebuildPlan(selectedMastId, true, clicked);
-        toast.success("Property pin captured; real-data scan started");
-        return;
-      }
+    if (highSites.length > 0) {
+      const linkId = `mfl-${nextFacility.id}`;
+      const draftFacility = { lat: nextFacility.lat, lng: nextFacility.lng, name: nextFacility.name };
+      const draft: ManualFacilityLink = {
+        id: linkId,
+        facilityId: nextFacility.id,
+        facility: draftFacility,
+        highSite: { lat: highSites[0].lat, lng: highSites[0].lng, name: highSites[0].name },
+        distKm: 0,
+        losStatus: "unknown",
+        worstClearance: 0,
+        calculating: true,
+      };
+      setManualFacilityLinks(current => [...current, draft]);
+      setStatus(`"${nextFacility.name}" placed. Scanning LOS to all high points…`);
 
-      if (!pendingFacilityType) return;
-      const facilityType = FACILITY_TYPES[pendingFacilityType];
-      const fallbackName = `${facilityType.label} ${plannerState.facilities.length + 1}`;
-      const name = window.prompt(`Facility name for ${facilityType.label}`, fallbackName) || fallbackName;
-      const facility = createFacilityFromMapClick({ type: pendingFacilityType, name, coordinate: clicked, existingCount: plannerState.facilities.length });
-      setPlannerState((current) => ({ ...current, facilities: [...current.facilities, facility], layerVis: { ...current.layerVis, facilities: true } }));
-      setPendingFacilityType(null);
-      toast.success(`${facilityType.label} added to coverage targets`);
-    });
-    return () => clickListenerRef.current?.remove();
-  }, [pendingFacilityType, plannerState.facilities, plannerState.layerVis, propertyName, propertyPinClickMode, rebuildPlan, selectedMastId]);
+      // Calculate LOS to all high points and find the shortest-distance one with confirmed LOS
+      const losPromises = highSites.map(site =>
+        calculateManualFacilityLink({
+          id: linkId,
+          facilityId: nextFacility.id,
+          facility: draftFacility,
+          highSite: { lat: site.lat, lng: site.lng, name: site.name },
+        })
+      );
+
+      void Promise.all(losPromises).then(results => {
+        // Find the shortest-distance high point with confirmed LOS
+        const confirmedResults = results.filter(r => r.losStatus === "confirmed");
+        const bestResult = confirmedResults.length > 0
+          ? confirmedResults.reduce((best, current) => current.distKm < best.distKm ? current : best)
+          : results.reduce((best, current) => current.distKm < best.distKm ? current : best);
+
+        setManualFacilityLinks(current => current.map(l => l.id === linkId ? bestResult : l));
+        const statusMsg = confirmedResults.length > 0
+          ? `"${nextFacility.name}" → ${bestResult.highSite.name}: CONFIRMED LOS · ${bestResult.worstClearance.toFixed(0)}m clearance`
+          : `"${nextFacility.name}" → ${bestResult.highSite.name}: ${bestResult.losStatus.toUpperCase()} LOS · ${bestResult.worstClearance.toFixed(0)}m clearance (no confirmed LOS available)`;
+        setStatus(statusMsg);
+      }).catch(() => {
+        setManualFacilityLinks(current => current.map(l => l.id === linkId ? { ...l, losStatus: "blocked" as const, calculating: false } : l));
+        setStatus(`"${nextFacility.name}" placed, but LOS calculation failed.`);
+      });
+    } else {
+      setStatus(`"${nextFacility.name}" placed. No high points available yet — run intelligence scan first.`);
+    }
+
+    void rebuildNetwork(highSites, nextFacilities, masts, highSiteMastHeights, carrierMastHeights, facilityHeights);
+  }, [carrierMastHeights, facilities, facilityHeights, highSites, highSiteMastHeights, masts, rebuildNetwork]);
+
+  const handleFacilityDelete = useCallback((facilityId: string) => {
+    const target = facilities.find(f => f.id === facilityId);
+    const nextFacilities = facilities.filter(f => f.id !== facilityId);
+    setFacilities(nextFacilities);
+    setManualFacilityLinks(current => current.filter(l => l.facilityId !== facilityId));
+    setStatus(target ? `Facility "${target.name}" deleted.` : "Facility deleted.");
+    void rebuildNetwork(highSites, nextFacilities, masts, highSiteMastHeights, carrierMastHeights, facilityHeights);
+  }, [carrierMastHeights, facilities, facilityHeights, highSites, highSiteMastHeights, masts, rebuildNetwork]);
+
+  const handleFacilityRename = useCallback((facilityId: string, name: string) => {
+    const trimmed = name.trim();
+    setFacilities(current => current.map(f => f.id === facilityId ? { ...f, name: trimmed || f.name } : f));
+    // Also update the name in any manual facility link
+    setManualFacilityLinks(current => current.map(l =>
+      l.facilityId === facilityId ? { ...l, facility: { ...l.facility, name: trimmed || l.facility.name } } : l
+    ));
+    setLosRedrawVersion(v => v + 1);
+    setStatus(`Facility renamed to "${trimmed}".`);
+  }, []);
+
+  const handleHighSiteRename = useCallback((site: HighSite, newName: string) => {
+    const trimmed = newName.trim();
+    setHighSites(current => current.map(s =>
+      s.lat === site.lat && s.lng === site.lng ? { ...s, name: trimmed || s.name } : s
+    ));
+    setManualFacilityLinks(current => current.map(l =>
+      l.highSite.lat === site.lat && l.highSite.lng === site.lng
+        ? { ...l, highSite: { ...l.highSite, name: trimmed || l.highSite.name } }
+        : l
+    ));
+    setLosRedrawVersion(v => v + 1);
+    setStatus(`High point renamed to "${trimmed}".`);
+  }, []);
+
+  const handleMastRename = useCallback((mast: Mast, newName: string) => {
+    const trimmed = newName.trim();
+    setMasts(current => current.map(m =>
+      m.lat === mast.lat && m.lng === mast.lng ? { ...m, name: trimmed || m.name } : m
+    ));
+    setLosRedrawVersion(v => v + 1);
+    setStatus(`Mast renamed to "${trimmed}".`);
+  }, []);
+
+  const handleManualFacilityLinkReassign = useCallback((linkId: string, newHighSite: LatLng & { name: string }) => {
+    setManualFacilityLinks(current => current.map(l => {
+      if (l.id !== linkId) return l;
+      const updated = { ...l, highSite: newHighSite, calculating: true, losStatus: "unknown" as const };
+      void calculateManualFacilityLink({ id: l.id, facilityId: l.facilityId, facility: l.facility, highSite: newHighSite }).then(result => {
+        setManualFacilityLinks(prev => prev.map(pl => pl.id === linkId ? result : pl));
+        setStatus(`Reassigned to ${newHighSite.name}: ${result.losStatus.toUpperCase()} LOS · ${result.worstClearance.toFixed(0)}m clearance`);
+      }).catch(() => {
+        setManualFacilityLinks(prev => prev.map(pl => pl.id === linkId ? { ...pl, losStatus: "blocked" as const, calculating: false } : pl));
+      });
+      return updated;
+    }));
+  }, []);
+
+  const handleLinkRightClick = useCallback((linkKey: string, position: LatLng, currentLabel: string) => {
+    setLinkLabelPopup({ linkKey, position, currentLabel });
+  }, []);
+
+  const handleLinkLabelSave = useCallback((linkKey: string, label: string) => {
+    setLinkLabels(current => ({ ...current, [linkKey]: label.trim() }));
+    setLinkLabelPopup(null);
+    setLosRedrawVersion(version => version + 1);
+  }, []);
+
+  const handleLinkLabelPopupClose = useCallback(() => {
+    setLinkLabelPopup(null);
+  }, []);
 
   return (
-    <div className="min-h-screen rounded-3xl bg-slate-950 text-slate-100">
-      <section className="grid gap-6 p-5 xl:grid-cols-[420px_minmax(0,1fr)]">
-        <aside className="space-y-4">
-          <div className="rounded-3xl border border-cyan-400/20 bg-slate-900/85 p-5 shadow-2xl shadow-cyan-950/30">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">CTTX Native Planner</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">LOS Link Planner</h1>
-            <p className="mt-3 text-sm leading-6 text-slate-300">The Link Planner now runs the boundary, SRTM high-site scan, carrier mast discovery, facility detection, and LOS topology generation automatically from real Nominatim, Overpass, and Open-Meteo responses.</p>
-            <div className={`mt-4 rounded-2xl border p-3 text-xs leading-5 ${scanStatus.loading ? "border-amber-300/30 bg-amber-300/10 text-amber-50" : scanStatus.issues.length ? "border-red-300/30 bg-red-500/10 text-red-50" : "border-emerald-300/30 bg-emerald-300/10 text-emerald-50"}`}>
-              <div className="font-semibold text-white">{scanStatus.loading ? "Scanning real GIS sources" : scanStatus.phase}</div>
-              <div>{scanStatus.phase}</div>
-              {scanStatus.issues.map((issue) => <div key={issue} className="mt-1 text-red-100">{issue}</div>)}
-            </div>
-          </div>
+    <main className={`link-planner-page ${leftPanelCollapsed ? "left-collapsed" : ""} ${rightPanelCollapsed ? "right-collapsed" : ""}`}>
+      <PlannerMap
+        boundary={boundary}
+        highSites={highSites}
+        masts={masts}
+        selectedMast={selectedMast}
+        selectedHighSite={selectedHighSite}
+        carrierMastHeights={carrierMastHeights}
+        highSiteLabels={highSiteLabels}
+        losRedrawVersion={losRedrawVersion}
+        facilityHeights={facilityHeights}
+        selectedFacility={selectedFacility}
+        links={links}
+        linkLabels={linkLabels}
+        facilities={facilities}
+        roads={roads}
+        ridgeCandidates={ridgeCandidates}
+        layers={layers}
+        manualHighSiteMode={manualHighSiteMode}
+        facilityMode={facilityMode}
+        relayPlacementMode={relayPlacementMode}
+        manualLinkMode={manualLinkMode}
+        manualLinkDraftA={manualLinkDraftA}
+        manualLinks={manualLinks}
+        onManualLinkMapClick={handleManualLinkMapClick}
+        onManualLinkEndpointMove={handleManualLinkEndpointMove}
+        onManualHighSite={handleManualHighSite}
+        onRelayPlace={handleRelayPlace}
+        onFacilityPlace={handleFacilityPlace}
+        onFacilityPlaceWithName={handleFacilityPlaceWithName}
+        onFacilityDelete={handleFacilityDelete}
+        onFacilityRename={handleFacilityRename}
+        onHighSiteRename={handleHighSiteRename}
+        onMastRename={handleMastRename}
+        manualFacilityLinks={manualFacilityLinks}
+        onManualFacilityLinkReassign={handleManualFacilityLinkReassign}
+        onMastSelect={handleMastSelect}
+        onHighSiteSelect={handleHighSiteSelect}
+        onFacilitySelect={handleFacilitySelect}
+        onLinkRightClick={handleLinkRightClick}
+        onLinkLabelSave={handleLinkLabelSave}
+        onLinkLabelPopupClose={handleLinkLabelPopupClose}
+        linkLabelPopup={linkLabelPopup}
+        flyToTarget={flyToTarget}
+        sidePanelState={{ leftCollapsed: leftPanelCollapsed, rightCollapsed: rightPanelCollapsed }}
+      />
+      <PlannerSidebar
+        boundary={boundary}
+        highSites={highSites}
+        masts={masts}
+        selectedMast={selectedMast}
+        links={links}
+        facilities={facilities}
+        loading={loading}
+        status={status}
+        error={error}
+        relayHeightPending={relayHeightPending}
+        onConfirmRelayHeight={handleConfirmRelayHeight}
+        manualHighSiteMode={manualHighSiteMode}
+        facilityMode={facilityMode}
+        relays={relays}
+        manualLinks={manualLinks}
+        manualLinkMode={manualLinkMode}
+        pendingManualLinkPoint={manualLinkDraftA}
+        relayPlacementMode={relayPlacementMode}
+        onRelayModeToggle={() => {
+          setRelayPlacementMode(current => !current);
+          setRelayHeightPending(null);
+          setManualLinkMode(false);
+          setManualLinkDraftA(null);
+        }}
+        onManualLinkModeToggle={() => {
+          setManualLinkMode(current => !current);
+          setManualLinkDraftA(null);
+          setRelayPlacementMode(false);
+          setManualHighSiteMode(false);
+          setFacilityMode(null);
+        }}
+        onManualLinkHeightChange={handleManualLinkHeightChange}
+        onManualLinkDelete={handleManualLinkDelete}
+        onBoundaryPreview={onBoundaryPreview}
+        onConfirmBoundary={onConfirmBoundary}
+        onManualModeToggle={() => {
+          setManualHighSiteMode(current => !current);
+          setFacilityMode(null);
+        }}
+        onFacilityModeChange={type => {
+          setFacilityMode(type);
+          setManualHighSiteMode(false);
+        }}
+        onMastSelect={handleMastSelect}
+        collapsed={leftPanelCollapsed}
+        onToggleCollapsed={() => setLeftPanelCollapsed(current => !current)}
+        onFacilityFocus={handleFacilityFocus}
+        highSiteLabels={highSiteLabels}
+        onHighSiteLabelChange={handleHighSiteLabelChange}
+      />
+      <PlannerLegend layers={layers} onLayerChange={onLayerChange} highSites={highSites} masts={masts} links={links} facilities={facilities} roads={roads} ridgeCandidates={ridgeCandidates} collapsed={rightPanelCollapsed} onToggleCollapsed={() => setRightPanelCollapsed(current => !current)} />
 
-          <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
-            <div className="grid gap-3">
-              <label className="text-sm font-medium text-slate-200">Plan name<input value={planName} onChange={(event) => setPlanName(event.target.value)} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none ring-cyan-400/40 focus:ring-2" /></label>
-              <label className="text-sm font-medium text-slate-200">Property / reserve<input value={propertyName} onChange={(event) => setPropertyName(event.target.value)} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none ring-cyan-400/40 focus:ring-2" /></label>
-              <div className="grid grid-cols-2 gap-3">
-                <label className="text-sm font-medium text-slate-200">Latitude<input value={latitude} onChange={(event) => setLatitude(event.target.value)} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none ring-cyan-400/40 focus:ring-2" /></label>
-                <label className="text-sm font-medium text-slate-200">Longitude<input value={longitude} onChange={(event) => setLongitude(event.target.value)} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none ring-cyan-400/40 focus:ring-2" /></label>
+      {selectedHighSite ? (
+        <section className="high-site-mast-panel" aria-label="Selected high-site mast-height controls">
+          <div className="mast-panel-kicker">High-point mast intelligence</div>
+          <div className="mast-panel-title-row">
+            <input
+              className="high-site-label-input"
+              value={highSiteLabels[highSiteKey(selectedHighSite)] || selectedHighSite.name}
+              aria-label="Editable high-point label"
+              onChange={event => handleHighSiteLabelChange(selectedHighSite, event.target.value)}
+            />
+            <button type="button" onClick={() => setSelectedHighSite(null)} aria-label="Close high-site panel">×</button>
+          </div>
+          <div className="mast-panel-metrics">
+            <span><strong>{selectedHighSite.elevation ? Math.round(selectedHighSite.elevation) : "—"}m</strong> terrain</span>
+            <span><strong>{selectedMastHeight}m</strong> high-site mast</span>
+            <span><strong>{CARRIER_MAST_HEIGHT_M}m</strong> default carrier tower</span>
+          </div>
+          <div className="mast-height-options" role="radiogroup" aria-label="High-site mast height options">
+            {HIGH_SITE_MAST_HEIGHT_OPTIONS.map(height => (
+              <button
+                key={height}
+                type="button"
+                className={height === selectedMastHeight ? "active" : ""}
+                onClick={() => updateSelectedMastHeight(height)}
+                aria-pressed={height === selectedMastHeight}
+              >
+                {height}m
+              </button>
+            ))}
+          </div>
+          {recalculatingSite ? <div className="mast-auto-recalc-status">Recalculating terrain profiles instantly…</div> : <div className="mast-auto-recalc-status">Height buttons recalculate all connected LOS spans immediately.</div>}
+          <div className="mast-reachability-grid">
+            {[
+              ["Carrier masts reachable", selectedHighSiteReachability.masts],
+              ["Facility clusters served", selectedHighSiteReachability.clusters],
+              ["High points visible", selectedHighSiteReachability.highSites],
+            ].map(([title, rows]) => (
+              <div className="mast-reachability-group" key={title as string}>
+                <h3>{title as string}</h3>
+                {(rows as BackboneLink[]).length ? (rows as BackboneLink[]).slice(0, 6).map(link => (
+                  <div className={`reachability-row ${link.losStatus || "unknown"}`} key={`${link.type}-${link.from.lat}-${link.to.lat}-${link.distKm}`}>
+                    <span>{highSitePeerName(link)}</span>
+                    <strong>{link.losStatus || "unknown"}</strong>
+                    <small>{formatKm(link.distKm)} · {typeof link.worstClearance === "number" && Number.isFinite(link.worstClearance) ? `${link.worstClearance.toFixed(1)}m clearance` : "clearance pending"}</small>
+                  </div>
+                )) : <p>No connected LOS spans currently selected in the topology.</p>}
               </div>
-              <label className="text-sm font-medium text-slate-200">Preferred carrier mast<select value={selectedMast?.id ?? ""} onChange={(event) => { setSelectedMastId(event.target.value); void rebuildPlan(event.target.value); }} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none ring-cyan-400/40 focus:ring-2"><option value="" disabled>{plannerState.masts.length ? "Select a carrier mast" : "Awaiting mast discovery"}</option>{plannerState.masts.map((mast) => <option key={mast.id} value={mast.id}>{mast.name} · {mast.distFromNearestRelay.toFixed(1)} km from relay</option>)}</select></label>
-            </div>
-            <div className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3 text-xs leading-5 text-cyan-50">No step gates are used: changing the property, coordinate, or carrier mast starts a fresh real-data scan and topology rebuild automatically.</div>
-            <div className="mt-5 grid grid-cols-2 gap-3"><Button type="button" onClick={() => void rebuildPlan(selectedMastId)} disabled={scanStatus.loading} className="bg-cyan-400 text-slate-950 hover:bg-cyan-300"><RefreshCw className={`mr-2 h-4 w-4 ${scanStatus.loading ? "animate-spin" : ""}`} /> Refresh plan</Button><Button type="button" onClick={savePlan} disabled={scanStatus.loading || createPlanMutation.isPending || updatePlanMutation.isPending} variant="outline" className="border-emerald-400/40 bg-emerald-400/10 text-emerald-100 hover:bg-emerald-400/20"><Save className="mr-2 h-4 w-4" /> Save</Button><Button type="button" variant="outline" onClick={() => { setPendingFacilityType(null); setPropertyPinClickMode((current) => !current); }} className={`col-span-2 border-cyan-300/30 ${propertyPinClickMode ? "bg-cyan-300/20 text-cyan-50" : "bg-slate-950 text-cyan-100"}`}><MapPin className="mr-2 h-4 w-4" /> {propertyPinClickMode ? "Click map to set property pin" : "Use map click as property pin"}</Button></div>
+            ))}
           </div>
-
-          <Panel title="Facility placement" icon={<MapPin className="h-4 w-4 text-sky-300" />}>
-            <div className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3 text-xs leading-5 text-cyan-50">
-              Overpass-detected lodges, gates, buildings, staff structures, pumps, offices, and other operational targets appear automatically when they fall inside the boundary. You can still add manual facilities by choosing a type and clicking the map.
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              {PLANNER_FACILITY_OPTIONS.map((option) => (
-                <Button key={option.id} type="button" variant="outline" onClick={() => { setPropertyPinClickMode(false); setPendingFacilityType(option.id); }} className={`justify-start border-white/10 bg-slate-950 text-xs text-slate-100 hover:bg-white/10 ${pendingFacilityType === option.id ? "ring-2 ring-cyan-300" : ""}`}>
-                  <span className="mr-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full text-sm" style={{ backgroundColor: option.color }}>{option.icon}</span>{option.label}
-                </Button>
-              ))}
-            </div>
-            <div className="mt-3 space-y-2">
-              {plannerState.facilities.map((facility) => (
-                <div key={facility.id} className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/70 p-3 text-sm">
-                  <div><div className="font-medium text-white">{FACILITY_TYPES[facility.type].icon} {facility.name}</div><div className="text-xs text-slate-400">{FACILITY_TYPES[facility.type].label} · {formatCoord(facility.lat)}, {formatCoord(facility.lng)}</div></div>
-                  <Button type="button" size="sm" variant="outline" onClick={() => removeFacility(facility.id)} className="border-red-300/30 bg-red-500/10 text-red-100 hover:bg-red-500/20">Remove</Button>
+        </section>
+      ) : null}
+      {selectedFacility ? (
+        <section className={`high-site-mast-panel facility-height-panel ${selectedHighSite || selectedMast ? "stacked" : ""}`} aria-label="Selected facility antenna-height controls">
+          <div className="mast-panel-kicker">Facility antenna intelligence</div>
+          <div className="mast-panel-title-row">
+            <h2>{selectedFacility.name}</h2>
+            <button type="button" onClick={() => setSelectedFacility(null)} aria-label="Close facility panel">×</button>
+          </div>
+          <p className="mast-panel-note">{FACILITY_TYPES[selectedFacility.type].label} operating point</p>
+          <div className="mast-panel-metrics">
+            <span><strong>{selectedFacilityHeight}m</strong> facility antenna</span>
+            <span><strong>{selectedFacility.lat.toFixed(5)}</strong> lat</span>
+            <span><strong>{selectedFacility.lng.toFixed(5)}</strong> lng</span>
+          </div>
+          <div className="mast-height-options facility-height-options" role="radiogroup" aria-label="Facility antenna height options">
+            {FACILITY_HEIGHT_OPTIONS.map(height => (
+              <button
+                key={height}
+                type="button"
+                className={height === selectedFacilityHeight ? "active" : ""}
+                onClick={() => handleFacilityHeightChange(height)}
+                aria-pressed={height === selectedFacilityHeight}
+                disabled={recalculatingFacility || loading}
+              >
+                {height}m
+              </button>
+            ))}
+          </div>
+          {recalculatingFacility ? <div className="mast-auto-recalc-status">Recalculating facility LOS spans instantly…</div> : <div className="mast-auto-recalc-status">Antenna buttons recalculate connected facility links immediately.</div>}
+        </section>
+      ) : null}
+      {selectedMast ? (
+        <section className={`high-site-mast-panel carrier-mast-panel ${selectedHighSite || selectedFacility ? "stacked" : ""}`} aria-label="Selected carrier mast height controls">
+          <div className="mast-panel-kicker">Carrier mast height intelligence</div>
+          <div className="mast-panel-title-row">
+            <h2>{mastProviderLabel(selectedMast.provider)} mast</h2>
+            <button type="button" onClick={() => setSelectedMast(null)} aria-label="Close carrier mast panel">×</button>
+          </div>
+          <p className="mast-panel-note">{selectedMast.name || "Carrier structure"}</p>
+          <div className="mast-panel-metrics">
+            <span><strong>{selectedCarrierMastHeight}m</strong> carrier mast</span>
+            <span><strong>{selectedMastReachability.length}</strong> connected uplinks</span>
+          </div>
+          <div className="mast-height-options carrier-height-options" role="radiogroup" aria-label="Carrier mast height options">
+            {CARRIER_MAST_HEIGHT_OPTIONS.map(height => (
+              <button
+                key={height}
+                type="button"
+                className={height === selectedCarrierMastHeight ? "active" : ""}
+                onClick={() => handleCarrierMastHeightChange(height)}
+                aria-pressed={height === selectedCarrierMastHeight}
+                disabled={recalculatingMast || loading}
+              >
+                {height}m
+              </button>
+            ))}
+          </div>
+          {recalculatingMast ? <div className="mast-auto-recalc-status">Recalculating connected uplinks instantly…</div> : <div className="mast-auto-recalc-status">Tower buttons recalculate connected uplinks immediately.</div>}
+          <div className="mast-reachability-grid">
+            <div className="mast-reachability-group">
+              <h3>Connected LOS uplinks</h3>
+              {selectedMastReachability.length ? selectedMastReachability.slice(0, 8).map(link => (
+                <div className={`reachability-row ${link.losStatus || "unknown"}`} key={`mast-${link.from.lat}-${link.to.lat}-${link.distKm}`}>
+                  <span>{link.from.name || link.to.name || "High-site uplink"}</span>
+                  <strong>{link.losStatus || "unknown"}</strong>
+                  <small>{formatKm(link.distKm)} · {typeof link.worstClearance === "number" && Number.isFinite(link.worstClearance) ? `${link.worstClearance.toFixed(1)}m clearance` : "clearance pending"}</small>
                 </div>
-              ))}
-              {plannerState.facilities.length === 0 && <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">No facilities detected or placed yet. Add lodges, gates, camera points, pumps, ranger posts, offices, or other operational targets.</p>}
+              )) : <p>No connected uplinks are currently selected in the topology. Recalculate after changing height to test this mast.</p>}
             </div>
-          </Panel>
-
-          <div className="grid grid-cols-2 gap-3"><MetricCard icon={<RadioTower className="h-4 w-4" />} label="LOS links" value={plannerState.links.length.toString()} detail="Green/amber/red" /><MetricCard icon={<Activity className="h-4 w-4" />} label="Field-confirmed" value={`${totals.liveDistanceKm} km`} detail={`${totals.totalDistanceKm} km planned`} /><MetricCard icon={<Zap className="h-4 w-4" />} label="Weakest margin" value={`${totals.weakestFadeMargin.toFixed(1)} dB`} detail="BER-first model" valueClass={metricClass(totals.weakestFadeMargin)} /><MetricCard icon={<CloudCog className="h-4 w-4" />} label="Monitoring" value="cnMaestro" detail="Remote visibility" /></div>
-        </aside>
-
-        <main className="space-y-4">
-          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-2xl shadow-slate-950">
-            <MapView className="h-[620px]" initialCenter={isValidGisCoordinate(center) ? center : DEFAULT_CENTER} initialZoom={12} onMapReady={(map) => { mapRef.current = map; map.setMapTypeId("hybrid"); fitPlannerMapToState(map, plannerState); }} />
-            <div className="absolute right-4 top-4 z-10 w-72 rounded-2xl border border-white/15 bg-slate-950/80 p-3 text-xs text-slate-100 shadow-2xl backdrop-blur">
-              <div className="mb-2 flex items-center gap-2 font-semibold text-white"><Layers3 className="h-4 w-4 text-cyan-300" /> Map layers</div>
-              <div className="max-h-72 space-y-1 overflow-y-auto pr-1">
-                {(Object.keys(layerLabels) as PlannerLayerKey[]).map((key) => <button key={key} type="button" onClick={() => toggleLayer(key)} className={`flex w-full items-center justify-between rounded-xl px-2 py-1.5 text-left transition ${plannerState.layerVis[key] ? "bg-white/10 text-white" : "bg-slate-900/70 text-slate-500 opacity-60"}`}><span>{layerLabels[key]}</span><span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-200">{counts[key]}</span></button>)}
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2"><Button type="button" size="sm" variant="outline" onClick={() => setAllLayers(true)} className="h-8 border-white/15 bg-white/10 text-xs text-white hover:bg-white/20">All on</Button><Button type="button" size="sm" variant="outline" onClick={() => setAllLayers(false)} className="h-8 border-white/15 bg-slate-900 text-xs text-slate-200 hover:bg-white/10">All off</Button></div>
-            </div>
-            {selectedHeightEndpoint && heightSelection && <div className="absolute left-4 bottom-4 z-20 w-80 rounded-2xl border border-cyan-300/25 bg-slate-950/90 p-4 text-xs text-slate-100 shadow-2xl backdrop-blur">
-              <div className="flex items-start justify-between gap-3"><div><div className="font-semibold text-white">{heightSelection.type === "mast" ? "Carrier mast height" : "High-site mast height"}</div><div className="mt-1 leading-5 text-slate-300">{selectedHeightEndpoint.name} · current {selectedHeightEndpoint.antennaHeightM ?? (heightSelection.type === "mast" ? DEFAULT_CARRIER_MAST_HEIGHT_M : DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M)} m</div></div><button type="button" onClick={() => setHeightSelection(null)} className="rounded-full border border-white/10 px-2 py-1 text-[10px] text-slate-300 hover:bg-white/10">Close</button></div>
-              <div className="mt-3 grid grid-cols-4 gap-2">
-                {(heightSelection.type === "mast" ? CARRIER_MAST_HEIGHT_OPTIONS : HIGH_SITE_HEIGHT_OPTIONS).map((height) => <button key={height} type="button" onClick={() => heightSelection.type === "mast" ? updateCarrierMastHeight(selectedHeightEndpoint.id, height) : updateHighSiteHeight(selectedHeightEndpoint.id, height)} className={`rounded-xl border px-2 py-2 font-semibold transition ${(selectedHeightEndpoint.antennaHeightM ?? (heightSelection.type === "mast" ? DEFAULT_CARRIER_MAST_HEIGHT_M : DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M)) === height ? "border-emerald-300 bg-emerald-300/20 text-emerald-50" : "border-white/10 bg-slate-900 text-slate-200 hover:border-cyan-300/50 hover:bg-cyan-300/10"}`}>{height}m</button>)}
-              </div>
-              <div className="mt-3 rounded-xl border border-emerald-300/20 bg-emerald-300/10 p-2 leading-5 text-emerald-50">Changing either endpoint recalculates clearance immediately while keeping every connected link visible.</div>
-            </div>}
-            {scanStatus.loading && <div className="absolute left-4 top-4 z-10 rounded-2xl border border-amber-300/30 bg-slate-950/90 px-4 py-3 text-sm text-amber-100 shadow-xl"><RefreshCw className="mr-2 inline h-4 w-4 animate-spin" /> {scanStatus.phase}</div>}
-            {pendingFacilityType && <div className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-full border border-cyan-300/40 bg-slate-950/90 px-4 py-2 text-sm text-cyan-100 shadow-xl">Click the map to place {FACILITY_TYPES[pendingFacilityType].label}. Press another facility button to change type.</div>}
-            {propertyPinClickMode && <div className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-full border border-emerald-300/40 bg-slate-950/90 px-4 py-2 text-sm text-emerald-100 shadow-xl">Click the property centre or reserve entrance. The planner will start the real-data scan immediately.</div>}
           </div>
-
-          <div className="grid gap-4 lg:grid-cols-3">
-            <Panel title="High-site candidates" icon={<Mountain className="h-4 w-4 text-cyan-300" />}><div className="space-y-3">{plannerState.highSites.map((site) => <button key={site.id} type="button" onClick={() => setHeightSelection({ type: "highSite", id: site.id })} className={`w-full rounded-2xl border p-3 text-left hover:border-cyan-300/50 ${heightSelection?.type === "highSite" && heightSelection.id === site.id ? "border-cyan-300/60 bg-cyan-300/10" : "border-white/10 bg-slate-950/70"}`}><div className="font-medium text-white">{site.name}</div><div className="mt-1 text-xs text-slate-400">{site.category} · {site.elevation ?? "unknown"} m ASL · mast {site.antennaHeightM ?? DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M} m · {formatCoord(site.lat)}, {formatCoord(site.lng)}</div></button>)}{!plannerState.highSites.length && <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">Awaiting Open-Meteo elevation grid results.</p>}</div></Panel>
-            <Panel title="Carrier mast candidates" icon={<Antenna className="h-4 w-4 text-amber-300" />}><div className="space-y-3">{plannerState.masts.map((mast) => <button key={mast.id} type="button" onClick={() => { setSelectedMastId(mast.id); setHeightSelection({ type: "mast", id: mast.id }); void rebuildPlan(mast.id); }} className={`w-full rounded-2xl border p-3 text-left ${mast.selected || (heightSelection?.type === "mast" && heightSelection.id === mast.id) ? "border-amber-300/60 bg-amber-300/10" : "border-white/10 bg-slate-950/70"}`}><div className="font-medium text-white">{mast.closestForProvider ? "★ " : ""}{mast.name}</div><div className="mt-1 text-xs text-slate-400">{mast.provider.toUpperCase()} · mast {mast.antennaHeightM ?? DEFAULT_CARRIER_MAST_HEIGHT_M} m · {mast.distFromNearestRelay.toFixed(1)} km from relay · {mast.distFromCentre.toFixed(1)} km from centre</div></button>)}{!plannerState.masts.length && <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">Awaiting 30 km Overpass mast discovery.</p>}</div></Panel>
-            <Panel title="Saved plans" icon={<ShieldCheck className="h-4 w-4 text-emerald-300" />}><div className="space-y-3">{(savedPlans.data ?? []).map((plan) => <button key={plan.id} type="button" onClick={() => setLastSavedId(plan.id)} className="w-full rounded-2xl border border-white/10 bg-slate-950/70 p-3 text-left hover:border-cyan-300/50"><div className="font-medium text-white">{plan.planName}</div><div className="mt-1 text-xs text-slate-400">{plan.propertyName} · {plan.status}</div></button>)}{!savedPlans.data?.length && <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">No saved link plans yet. Save the current field-validation draft to start the operational record.</p>}</div></Panel>
-          </div>
-
-          <Panel title="LOS-based link budget" icon={<CheckCircle2 className="h-4 w-4 text-emerald-300" />}><div className="overflow-x-auto"><table className="w-full min-w-[980px] text-left text-sm"><thead className="text-xs uppercase tracking-[0.18em] text-slate-400"><tr><th className="py-3">Type</th><th>Path</th><th>Distance</th><th>Bearing</th><th>RSL</th><th>Fade margin</th><th>Fresnel</th><th>Terrain</th><th>Status</th></tr></thead><tbody className="divide-y divide-white/10">{plannerState.links.map((link) => { const budget = budgets.get(link.id)!; return <tr key={link.id}><td className="py-3 text-cyan-200">{link.type.toUpperCase()}</td><td>{link.fromName} → {link.toName}</td><td>{link.distKm} km</td><td>{budget.bearingDeg}°</td><td>{budget.rslDbm} dBm</td><td className={metricClass(budget.fadeMarginDb)}>{budget.fadeMarginDb} dB</td><td>{budget.fresnelM} m</td><td>{typeof link.terrainMarginMeters === "number" ? `${link.terrainMarginMeters} m` : "—"}</td><td><button type="button" onClick={() => toggleLinkLive(link.id)} className="rounded-full px-2 py-1 text-xs" style={{ backgroundColor: `${linkStrokeColor(link)}22`, color: linkStrokeColor(link) }}>{losLabel(link)} · {link.live ? "field confirmed" : "planned"}</button></td></tr>; })}{!plannerState.links.length && <tr><td colSpan={9} className="py-6 text-center text-slate-400">Awaiting LOS topology generation.</td></tr>}</tbody></table></div><details className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4 text-sm leading-6 text-cyan-50"><summary className="cursor-pointer font-semibold text-white">Why this route was chosen</summary><p className="mt-3 text-cyan-50/90">{routeDecisionExplanation}</p></details></Panel>
-          <div className="rounded-3xl border border-emerald-300/20 bg-emerald-300/10 p-5 text-sm leading-6 text-emerald-50"><strong className="text-white">Recommendation:</strong> {plannerState.recommendationSummary}</div>
-        </main>
-      </section>
-    </div>
+        </section>
+      ) : null}
+      <div className="planner-topbar" aria-label="Infrastructure planning summary">
+        <strong>CTTX Infrastructure Intelligence — Link Planner</strong>
+        <span>{appStats.insideSites} core candidates</span>
+        <span>{appStats.facilities} operating points</span>
+        <span>{appStats.knownMasts} classified carriers</span>
+        <span>{appStats.warnings} LOS warnings</span>
+      </div>
+    </main>
   );
 }
-
-function MetricCard({ icon, label, value, detail, valueClass = "text-white" }: { icon: ReactNode; label: string; value: string; detail: string; valueClass?: string }) { return <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4"><div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-slate-400">{icon}{label}</div><div className={`mt-3 text-2xl font-semibold ${valueClass}`}>{value}</div><div className="mt-1 text-xs text-slate-500">{detail}</div></div>; }
-function Panel({ title, icon, children }: { title: string; icon: ReactNode; children: ReactNode }) { return <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-5"><div className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">{icon}{title}</div>{children}</section>; }
