@@ -4,6 +4,11 @@
 
 **Status:** Pending — execute Monday morning.
 
+**Notion Sprint Hub:** [CTTX Reserves Outreach Sprint](https://www.notion.so/35bab0d207a7817cae8dfb9d40c7e0ce)
+**Notion Monday Kickoff:** [Monday Sprint Kickoff — Website Launch + Reserve Owner Outreach](https://www.notion.so/362ab0d207a78115bb2aca79677a95b9)
+**Staging site:** https://cttxsrvcs-zatfctzm.manus.space
+**Source repo:** https://github.com/Gerhardhsmit/cttx-services-website
+
 ---
 
 ## Monday Morning Checklist
