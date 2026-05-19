@@ -448,3 +448,8 @@
 - [x] Work around GitHub token workflow-permission limits by exporting the source without an active `.github/workflows` file while preserving app source, schema, and documentation.
 
 - [x] Pull the `cttx-infrastructure-intelligence` GitHub source as the working handoff baseline and complete the remaining Link Planner integration items, including threshold control, topology serialization, report export integration, regression coverage, validation, GitHub push-back, and checkpoint handoff.
+
+## Navbar Branding Logo Replacement
+- [x] Add the supplied CTTX logo as a web asset with transparent/dark-navbar-friendly treatment.
+- [x] Replace the yellow `CT` placeholder mark in the public navbar with the CTTX logo at navbar scale while preserving aspect ratio.
+- [x] Validate the branding change with project checks before committing and redeploying.

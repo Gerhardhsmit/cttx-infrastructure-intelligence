@@ -40,6 +40,16 @@ describe("Home workflow and responsive validation", () => {
     expect(screen.getByRole("link", { name: /sign in/i }).getAttribute("href")).toBe("/login?returnPath=%2F");
   });
 
+  it("renders the real CTTX logo in the navbar instead of the placeholder CT mark", () => {
+    render(<Home />);
+
+    const logo = screen.getByRole("img", { name: /cttx logo/i });
+    expect(logo.getAttribute("src")).toContain("cttx-logo-transparent");
+    expect(logo.getAttribute("class")).toContain("h-9");
+    expect(logo.getAttribute("class")).toContain("object-contain");
+    expect(screen.queryByText("CT")).toBeNull();
+  });
+
   it("shows the authenticated operational handoff into the admin dashboard", () => {
     mocks.isAuthenticated = true;
 

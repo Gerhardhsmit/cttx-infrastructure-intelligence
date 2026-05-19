@@ -4,6 +4,7 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { MapPin, Zap, Shield, TrendingUp } from "lucide-react";
+import cttxLogo from "@/assets/cttx-logo-transparent.png";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -14,10 +15,12 @@ export default function Home() {
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container flex items-center justify-between h-16">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-              <span className="text-accent-foreground font-bold text-sm">CT</span>
-            </div>
+          <div className="flex items-center gap-3">
+            <img
+              src={cttxLogo}
+              alt="CTTX logo"
+              className="h-9 w-auto max-w-[96px] object-contain drop-shadow-[0_0_10px_rgba(34,197,94,0.18)]"
+            />
             <span className="font-bold text-lg">CTTX Infrastructure Intelligence</span>
           </div>
           <div className="flex items-center gap-4">
