@@ -886,7 +886,13 @@ export default function LinkPlanner() {
               <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Property / Reserve</label>
               <input
                 value={propertyName}
-                onChange={e => { setNameResults([]); setPropertyName(e.target.value); }}
+                onChange={e => { setSelectedResult(null); setNameResults([]); setPropertyName(e.target.value); }}
+                onKeyDown={e => {
+                  if (e.key === "Enter" && nameResults.length > 0) {
+                    e.preventDefault();
+                    handleSelectResult(nameResults[0]);
+                  }
+                }}
                 autoComplete="off"
                 placeholder="Search South Africa…"
                 className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5 text-sm text-white outline-none ring-cyan-400/40 focus:ring-2 placeholder:text-slate-600"
@@ -903,12 +909,14 @@ export default function LinkPlanner() {
                     return (
                       <button key={r.place_id} type="button"
                         className="block w-full border-b border-white/10 px-4 py-2.5 text-left text-xs hover:bg-cyan-400/10 last:border-0"
+                        onMouseDown={e => e.preventDefault()}
                         onClick={() => handleSelectResult(r)}>
                         <span className="block font-semibold text-white">{parts[0].trim()}</span>
                         <span className="block text-slate-400">{parts.slice(1, 4).join(",").trim()}</span>
                       </button>
                     );
                   })}
+                  <p className="px-4 py-1.5 text-[10px] text-slate-600 border-t border-white/5">Click or press Enter to select</p>
                 </div>
               )}
             </div>
@@ -921,13 +929,15 @@ export default function LinkPlanner() {
 
             <Button
               type="button"
-              disabled={isBuilding}
+              disabled={isBuilding || (!selectedResult && propertyName.trim().length < 3)}
               onClick={handlePlanNetwork}
-              className="w-full bg-yellow-400 text-slate-950 hover:bg-yellow-300 font-bold text-sm h-11 rounded-xl"
+              className="w-full bg-yellow-400 text-slate-950 hover:bg-yellow-300 font-bold text-sm h-11 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isBuilding
                 ? <><Clock className="mr-2 h-4 w-4 animate-spin" />{PHASE_LABELS[phase]}</>
-                : <><Zap className="mr-2 h-4 w-4" />Plan Network</>
+                : selectedResult
+                  ? <><Zap className="mr-2 h-4 w-4" />Plan Network</>
+                  : <><MapPin className="mr-2 h-4 w-4" />Search &amp; select a property first</>
               }
             </Button>
           </div>
