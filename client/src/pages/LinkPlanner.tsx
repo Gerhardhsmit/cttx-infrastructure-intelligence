@@ -658,6 +658,25 @@ export default function LinkPlanner() {
         console.log(`[LP] ${masts.length} carrier masts within 15 km`);
       } catch { toast.warning("Carrier mast discovery failed."); }
 
+      // Fallback L0: synthesise a carrier node 12 km north of property if OSM found none
+      if (!masts.length && hs.length) {
+        const bbox = bboxOf(poly);
+        const synthLat = bbox.n + 0.11; // ≈ 12 km north of northern boundary edge
+        const synthCarrier: CarrierNode = {
+          id: "L0-synth",
+          lat: synthLat,
+          lng: centre.lng,
+          operator: "SP Carrier",
+          name: "Nearest carrier (inferred)",
+          rank: 0,
+          distKm: r2(calculateDistanceKm({ lat: synthLat, lng: centre.lng }, centre)),
+        };
+        masts = [synthCarrier];
+        setCarrierMasts(masts);
+        setSelectedCarrierId(synthCarrier.id);
+        toast.info("No carrier masts found in OSM — L0 uplink inferred 12 km north of property.");
+      }
+
       // Step 6 — build topology (MST)
       setPhase("topology");
       const carrier = masts.find(m => m.id === selectedCarrierId) ?? masts[0] ?? null;
