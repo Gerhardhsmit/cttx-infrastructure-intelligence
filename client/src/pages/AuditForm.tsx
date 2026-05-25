@@ -408,6 +408,9 @@ export default function AuditForm() {
   const [stepErrors, setStepErrors] = useState<Record<string, string>>({});
   const [placeSearchValue, setPlaceSearchValue] = useState("");
   const [nominatimResults, setNominatimResults] = useState<NominatimBoundaryResult[]>([]);
+  const [nameAutoResults, setNameAutoResults] = useState<Array<{ place_id: number; display_name: string; lat: string; lon: string }>>([]);
+  const [isNameSearching, setIsNameSearching] = useState(false);
+  const nameSearchAbortRef = useRef<AbortController | null>(null);
   const [isBoundarySearching, setIsBoundarySearching] = useState(false);
   const [boundarySearchMessage, setBoundarySearchMessage] = useState("Type at least three characters to search OpenStreetMap boundaries.");
   const [loadedPropertyBoundary, setLoadedPropertyBoundary] = useState<LoadedPropertyBoundary | null>(null);
@@ -418,25 +421,18 @@ export default function AuditForm() {
   const [manualLatitude, setManualLatitude] = useState("");
   const [manualLongitude, setManualLongitude] = useState("");
   const [manualCoordinates, setManualCoordinates] = useState("");
-  const mapRef = useRef<google.maps.Map | null>(null);
+  const mapRef = useRef<any>(null); // maplibregl.Map
+  const [mapReady, setMapReady] = useState(false);
   const activePinTargetRef = useRef<PinTarget | null>(null);
   const isManualBoundaryModeRef = useRef(false);
-  const mapClickListenerRef = useRef<google.maps.MapsEventListener | null>(null);
+  const mapClickHandlerRef = useRef<((e: any) => void) | null>(null);
   const placeSearchInputRef = useRef<HTMLInputElement | null>(null);
-  const placeAutocompleteListenerRef = useRef<google.maps.MapsEventListener | null>(null);
   const selectedPlaceSearchValueRef = useRef<string | null>(null);
   const boundarySearchAbortRef = useRef<AbortController | null>(null);
   const overpassAbortRef = useRef<AbortController | null>(null);
   const autoBoundarySearchValueRef = useRef<string | null>(null);
   const userEditedBoundarySearchRef = useRef(false);
-  const markersRef = useRef<google.maps.Marker[]>([]);
-  const relayCandidateMarkersRef = useRef<google.maps.Marker[]>([]);
-  const topologyLabelMarkersRef = useRef<google.maps.Marker[]>([]);
-  const fibrePolylineRefs = useRef<google.maps.Polyline[]>([]);
-  const eskomPolylineRefs = useRef<google.maps.Polyline[]>([]);
-  const topologyPolylineRefs = useRef<google.maps.Polyline[]>([]);
-  const propertyBoundaryPolygonRef = useRef<google.maps.Polygon | null>(null);
-  const propertyBoundaryCircleRef = useRef<google.maps.Circle | null>(null);
+  const overlayRefs = useRef<Array<{ remove(): void }>>([]);
   const [relayCandidates, setRelayCandidates] = useState<RelayCandidate[]>([]);
   const [incidentCoordinates, setIncidentCoordinates] = useState("");
   const [incidentRelayResult, setIncidentRelayResult] = useState<GisIncidentRelayResult | null>(null);
@@ -523,6 +519,34 @@ export default function AuditForm() {
       abortController.abort();
     };
   }, [placeSearchValue]);
+
+  // Step 1 — live name autocomplete via Nominatim
+  useEffect(() => {
+    if (step !== 1) { setNameAutoResults([]); return; }
+    const query = formData.clientName.trim();
+    nameSearchAbortRef.current?.abort();
+    if (query.length < 3) { setNameAutoResults([]); setIsNameSearching(false); return; }
+    const controller = new AbortController();
+    nameSearchAbortRef.current = controller;
+    setIsNameSearching(true);
+    const timer = window.setTimeout(async () => {
+      try {
+        const url = new URL("https://nominatim.openstreetmap.org/search");
+        url.searchParams.set("q", query);
+        url.searchParams.set("format", "json");
+        url.searchParams.set("limit", "6");
+        url.searchParams.set("countrycodes", NOMINATIM_COUNTRY_CODES);
+        const res = await fetch(url.toString(), { signal: controller.signal });
+        if (!res.ok) throw new Error("Nominatim error");
+        setNameAutoResults(await res.json());
+      } catch (e) {
+        if ((e as DOMException).name !== "AbortError") setNameAutoResults([]);
+      } finally {
+        if (!controller.signal.aborted) setIsNameSearching(false);
+      }
+    }, 380);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [formData.clientName, step]);
 
   useEffect(() => {
     if (step !== 2 || loadedPropertyBoundary || userEditedBoundarySearchRef.current) return;
@@ -989,22 +1013,13 @@ export default function AuditForm() {
   const closeMapFullscreen = () => setIsMapFullscreen(false);
 
   const clearRenderedMapOverlays = () => {
-    markersRef.current.forEach((marker) => marker.setMap(null));
-    relayCandidateMarkersRef.current.forEach((marker) => marker.setMap(null));
-    topologyLabelMarkersRef.current.forEach((marker) => marker.setMap(null));
-    fibrePolylineRefs.current.forEach((polyline) => polyline.setMap(null));
-    eskomPolylineRefs.current.forEach((polyline) => polyline.setMap(null));
-    topologyPolylineRefs.current.forEach((polyline) => polyline.setMap(null));
-    propertyBoundaryPolygonRef.current?.setMap(null);
-    propertyBoundaryCircleRef.current?.setMap(null);
-    markersRef.current = [];
-    relayCandidateMarkersRef.current = [];
-    topologyLabelMarkersRef.current = [];
-    fibrePolylineRefs.current = [];
-    eskomPolylineRefs.current = [];
-    topologyPolylineRefs.current = [];
-    propertyBoundaryPolygonRef.current = null;
-    propertyBoundaryCircleRef.current = null;
+    overlayRefs.current.forEach((o) => o.remove());
+    overlayRefs.current = [];
+    const map = mapRef.current;
+    if (map) {
+      if (map.getSource("audit-boundary")) (map.getSource("audit-boundary") as any).setData({ type: "FeatureCollection", features: [] });
+      if (map.getSource("audit-lines")) (map.getSource("audit-lines") as any).setData({ type: "FeatureCollection", features: [] });
+    }
   };
 
 
@@ -1036,42 +1051,30 @@ export default function AuditForm() {
     if (result) toast.success(`Live Relay check complete: ${result.relay.label} is ${result.distanceKm.toFixed(1)} km away.`);
   };
 
-  const bindPlaceAutocomplete = (map: google.maps.Map) => {
-    if (!window.google?.maps?.places || !placeSearchInputRef.current) return;
-    placeAutocompleteListenerRef.current?.remove();
-    const autocomplete = new window.google.maps.places.Autocomplete(placeSearchInputRef.current, {
-      fields: ["formatted_address", "geometry", "name"],
-    });
-    autocomplete.bindTo("bounds", map);
-    placeAutocompleteListenerRef.current = autocomplete.addListener("place_changed", () => {
-      const place = autocomplete.getPlace();
-      const location = place.geometry?.location;
-      if (!location) {
-        toast.error("Select a search result with a mapped location.");
-        return;
-      }
-      const latitude = location.lat();
-      const longitude = location.lng();
-      map.setCenter({ lat: latitude, lng: longitude });
-      map.setZoom(16);
-      setPlaceSearchValue(place.formatted_address || place.name || placeSearchInputRef.current?.value || "");
-      setPropertyCoordinates(latitude, longitude, "Property pin captured from the selected search result.");
-    });
-  };
-
-  const handleMapReady = (map: google.maps.Map) => {
+  const handleMapReady = (map: any) => {
     mapRef.current = map;
-    bindPlaceAutocomplete(map);
-    mapClickListenerRef.current?.remove();
-    mapClickListenerRef.current = map.addListener("click", (event: google.maps.MapMouseEvent) => {
-      const clicked = event.latLng;
-      if (!clicked) return;
+    // Add GeoJSON sources and layers for polylines and polygons
+    map.addSource("audit-boundary", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addLayer({ id: "audit-boundary-fill", type: "fill", source: "audit-boundary", paint: { "fill-color": ["get", "color"], "fill-opacity": ["get", "fillOpacity"] } });
+    map.addLayer({ id: "audit-boundary-line", type: "line", source: "audit-boundary", paint: { "line-color": ["get", "color"], "line-width": ["get", "lineWidth"], "line-opacity": 0.95 } });
+    map.addSource("audit-lines", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    // MapLibre does not support data expressions on line-dasharray — use two filtered layers instead
+    map.addLayer({ id: "audit-lines-solid", type: "line", source: "audit-lines", filter: ["!", ["get", "dashed"]], paint: { "line-color": ["get", "color"], "line-width": ["get", "width"], "line-opacity": ["get", "opacity"] } });
+    map.addLayer({ id: "audit-lines-dashed", type: "line", source: "audit-lines", filter: ["get", "dashed"], paint: { "line-color": ["get", "color"], "line-width": ["get", "width"], "line-opacity": ["get", "opacity"], "line-dasharray": [4, 4] } });
+    // Click handler
+    if (mapClickHandlerRef.current) map.off("click", mapClickHandlerRef.current);
+    const handler = (event: any) => {
+      const lat = event.lngLat.lat;
+      const lng = event.lngLat.lng;
       if (isManualBoundaryModeRef.current) {
-        addManualBoundaryPoint(clicked.lat(), clicked.lng());
+        addManualBoundaryPoint(lat, lng);
         return;
       }
-      capturePin(clicked.lat(), clicked.lng(), activePinTargetRef.current);
-    });
+      capturePin(lat, lng, activePinTargetRef.current);
+    };
+    map.on("click", handler);
+    mapClickHandlerRef.current = handler;
+    setMapReady(true);
   };
 
   const gisPreview = useMemo(() => {
@@ -1199,176 +1202,130 @@ export default function AuditForm() {
   }, [gisPreview, loadedPropertyBoundary]);
 
   useEffect(() => {
-    if (!mapRef.current || !window.google) return;
+    const map = mapRef.current;
+    const ml = window.maplibregl;
+    if (!map || !ml || !mapReady) return;
     clearRenderedMapOverlays();
 
-    const map = mapRef.current;
-    const bounds = new window.google.maps.LatLngBounds();
-    const boundaryFirstBounds = new window.google.maps.LatLngBounds();
+    const mlBounds = new ml.LngLatBounds();
+    const mlBoundaryBounds = new ml.LngLatBounds();
     let hasBounds = false;
-    let hasBoundaryFirstBounds = false;
-    const extendBounds = (point: GisCoordinate) => {
-      bounds.extend(point);
-      hasBounds = true;
-    };
-    const extendBoundaryFirstBounds = (point: GisCoordinate) => {
-      boundaryFirstBounds.extend(point);
-      hasBoundaryFirstBounds = true;
+    let hasBoundaryBounds = false;
+    const extendBounds = (point: GisCoordinate) => { mlBounds.extend([point.lng, point.lat]); hasBounds = true; };
+    const extendBoundaryBounds = (point: GisCoordinate) => { mlBoundaryBounds.extend([point.lng, point.lat]); hasBoundaryBounds = true; };
+
+    const makeMarkerEl = (bg: string, text: string, size = 26, textColor = "#0B0B0B") => {
+      const el = document.createElement("div");
+      el.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:2px solid #0B0B0B;display:flex;align-items:center;justify-content:center;color:${textColor};font-size:10px;font-weight:700;font-family:Inter,sans-serif;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.5);`;
+      el.textContent = text;
+      return el;
     };
 
-    markersRef.current = mapPins.map((pin) => {
-      const position = { lat: pin.latitude, lng: pin.longitude };
-      extendBounds(position);
-      return new window.google!.maps.Marker({
-        map,
-        position,
-        title: pin.title,
-        label: { text: pin.label, color: "#000000", fontWeight: "700" },
-        icon: {
-          path: window.google!.maps.SymbolPath.CIRCLE,
-          scale: 11,
-          fillColor: pin.color,
-          fillOpacity: 1,
-          strokeColor: "#0B0B0B",
-          strokeWeight: 2,
-        },
-      });
+    // Pin markers
+    mapPins.forEach((pin) => {
+      extendBounds({ lat: pin.latitude, lng: pin.longitude });
+      const el = makeMarkerEl(pin.color, pin.label);
+      el.title = pin.title;
+      overlayRefs.current.push(new ml.Marker({ element: el }).setLngLat([pin.longitude, pin.latitude]).addTo(map));
     });
 
+    const lineFeatures: any[] = [];
+    const boundaryFeatures: any[] = [];
+
     if (gisPreview) {
+      // Fibre routes
       if (mapLayers.fibreRoutes) gisPreview.fibreRoutes.forEach((route) => {
         route.path.forEach(extendBounds);
-        fibrePolylineRefs.current.push(new window.google!.maps.Polyline({
-          map,
-          path: route.path,
-          strokeColor: route.color,
-          strokeOpacity: 0.95,
-          strokeWeight: 4,
-          title: route.label,
-        } as google.maps.PolylineOptions & { title: string }));
+        lineFeatures.push({ type: "Feature", geometry: { type: "LineString", coordinates: route.path.map((p: GisCoordinate) => [p.lng, p.lat]) }, properties: { color: route.color, width: 4, opacity: 0.95, dashed: false } });
       });
 
+      // Eskom corridors (dashed)
       if (mapLayers.eskomCorridors) gisPreview.eskomCorridors.forEach((corridor) => {
         corridor.path.forEach(extendBounds);
-        eskomPolylineRefs.current.push(new window.google!.maps.Polyline({
-          map,
-          path: corridor.path,
-          strokeColor: corridor.color,
-          strokeOpacity: 0,
-          strokeWeight: 3,
-          icons: [{
-            icon: { path: "M 0,-1 0,1", strokeOpacity: 1, strokeColor: corridor.color, scale: 4 },
-            offset: "0",
-            repeat: "18px",
-          }],
-          title: corridor.label,
-        } as google.maps.PolylineOptions & { title: string }));
+        lineFeatures.push({ type: "Feature", geometry: { type: "LineString", coordinates: corridor.path.map((p: GisCoordinate) => [p.lng, p.lat]) }, properties: { color: corridor.color, width: 3, opacity: 0.95, dashed: true } });
       });
 
+      // Property boundary polygon
       const boundaryPaths = loadedPropertyBoundary?.paths ?? [gisPreview.propertyBoundary.polygon];
-      const boundaryTitle = loadedPropertyBoundary?.label ?? gisPreview.propertyBoundary.label;
-      const loadedBoundaryColor = loadedPropertyBoundary?.source === "estimated" ? "#F59E0B" : "#22C55E";
-      if (mapLayers.propertyBoundary && window.google.maps.Polygon && boundaryPaths.some((path) => path.length >= 3)) {
-        boundaryPaths.flat().forEach((point) => {
-          extendBounds(point);
-          extendBoundaryFirstBounds(point);
+      const boundaryColor = loadedPropertyBoundary ? (loadedPropertyBoundary.source === "estimated" ? "#F59E0B" : "#22C55E") : "#FFE600";
+      const boundaryFillOpacity = loadedPropertyBoundary ? 0.16 : 0.12;
+      const boundaryLineWidth = loadedPropertyBoundary ? 3 : 2;
+      if (mapLayers.propertyBoundary && boundaryPaths.some((path) => path.length >= 3)) {
+        boundaryPaths.flat().forEach((pt) => { extendBounds(pt); extendBoundaryBounds(pt); });
+        boundaryPaths.forEach((path) => {
+          const coords = [...path.map((p: GisCoordinate) => [p.lng, p.lat]), [path[0].lng, path[0].lat]];
+          boundaryFeatures.push({ type: "Feature", geometry: { type: "Polygon", coordinates: [coords] }, properties: { color: boundaryColor, fillOpacity: boundaryFillOpacity, lineWidth: boundaryLineWidth } });
         });
-        propertyBoundaryPolygonRef.current = new window.google.maps.Polygon({
-          map,
-          paths: boundaryPaths,
-          strokeColor: loadedPropertyBoundary ? loadedBoundaryColor : "#FFE600",
-          strokeOpacity: 0.95,
-          strokeWeight: loadedPropertyBoundary ? 3 : 2,
-          fillColor: loadedPropertyBoundary ? loadedBoundaryColor : "#FFE600",
-          fillOpacity: loadedPropertyBoundary ? 0.16 : 0.12,
-          title: boundaryTitle,
-        } as google.maps.PolygonOptions & { title: string });
       }
 
+      // Boundary circle (approx polygon)
       const boundaryRadius = getPropertyBoundaryRadiusMeters();
       if (mapLayers.propertyBoundary && boundaryRadius) {
-        propertyBoundaryCircleRef.current = new window.google!.maps.Circle({
-          map,
-          center: gisPreview.property,
-          radius: boundaryRadius,
-          strokeColor: "#FFE600",
-          strokeOpacity: 0.9,
-          strokeWeight: 2,
-          fillColor: "#FFE600",
-          fillOpacity: 0.08,
+        const steps = 64;
+        const circleCoords = Array.from({ length: steps + 1 }, (_, i) => {
+          const angle = (i / steps) * 2 * Math.PI;
+          const latOffset = (boundaryRadius / 111320) * Math.cos(angle);
+          const lngOffset = (boundaryRadius / (111320 * Math.cos((gisPreview.property.lat * Math.PI) / 180))) * Math.sin(angle);
+          return [gisPreview.property.lng + lngOffset, gisPreview.property.lat + latOffset];
         });
+        boundaryFeatures.push({ type: "Feature", geometry: { type: "Polygon", coordinates: [circleCoords] }, properties: { color: "#FFE600", fillOpacity: 0.08, lineWidth: 2 } });
         [0, 90, 180, 270].forEach((bearing) => {
-          const radiusPoint = getDestinationPoint(gisPreview.property, boundaryRadius / 1000, bearing);
-          extendBounds(radiusPoint);
-          if (loadedPropertyBoundary) extendBoundaryFirstBounds(radiusPoint);
+          const rp = getDestinationPoint(gisPreview.property, boundaryRadius / 1000, bearing);
+          extendBounds(rp);
+          if (loadedPropertyBoundary) extendBoundaryBounds(rp);
         });
       }
 
-      if (mapLayers.highSitePeaks) relayCandidateMarkersRef.current = relayCandidates.map((candidate) => {
+      // Relay candidate markers (triangle-style)
+      if (mapLayers.highSitePeaks) relayCandidates.forEach((candidate) => {
         extendBounds(candidate);
-        const markerStyle = candidate.siteClass === "inside-boundary"
-          ? { fillColor: "#22C55E", fillOpacity: 1, strokeColor: "#052E16", scale: 1.05, zIndex: 45 }
-          : candidate.siteClass === "off-property-near"
-            ? { fillColor: "#F97316", fillOpacity: 0, strokeColor: "#F97316", scale: 1, zIndex: 42 }
-            : { fillColor: "#9CA3AF", fillOpacity: 0.65, strokeColor: "#4B5563", scale: 0.72, zIndex: 38 };
-        return new window.google!.maps.Marker({
-          map,
-          position: candidate,
-          title: `${candidate.label} — SRTM ${candidate.elevationMeters} m · ${candidate.siteClass.replaceAll("-", " ")}`,
-          label: { text: `${candidate.elevationMeters}m`, color: candidate.siteClass === "inside-boundary" ? "#052E16" : "#111827", fontSize: "11px", fontWeight: "800" },
-          zIndex: markerStyle.zIndex,
-          icon: {
-            path: "M 0 -14 L 13 10 L -13 10 Z",
-            scale: markerStyle.scale,
-            fillColor: markerStyle.fillColor,
-            fillOpacity: markerStyle.fillOpacity,
-            strokeColor: markerStyle.strokeColor,
-            strokeWeight: 2,
-          },
+        const color = candidate.siteClass === "inside-boundary" ? "#22C55E" : candidate.siteClass === "off-property-near" ? "#F97316" : "#9CA3AF";
+        const el = document.createElement("div");
+        el.style.cssText = `width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:18px solid ${color};cursor:default;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));`;
+        el.title = `${candidate.label} — SRTM ${candidate.elevationMeters} m · ${candidate.siteClass.replaceAll("-", " ")}`;
+        const label = document.createElement("div");
+        label.style.cssText = `position:absolute;top:18px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:800;color:${candidate.siteClass === "inside-boundary" ? "#052E16" : "#111827"};text-shadow:0 0 3px #fff;`;
+        label.textContent = `${candidate.elevationMeters}m`;
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "relative";
+        wrapper.appendChild(el);
+        wrapper.appendChild(label);
+        overlayRefs.current.push(new ml.Marker({ element: wrapper }).setLngLat([candidate.lng, candidate.lat]).addTo(map));
+      });
+
+      // LOS topology lines + distance labels
+      if (mapLayers.losCandidateLines) {
+        gisPreview.minimumHighSitePlan.clearSegments.filter((seg: any) => seg.viable && !seg.outOfRange).forEach((segment: any) => {
+          segment.path.forEach(extendBounds);
+          const isUplink = segment.role === "uplink";
+          lineFeatures.push({ type: "Feature", geometry: { type: "LineString", coordinates: segment.path.map((p: GisCoordinate) => [p.lng, p.lat]) }, properties: { color: isUplink ? "#3B82F6" : "#FFFFFF", width: isUplink ? 4 : 3, opacity: isUplink ? 0.92 : 0.86, dashed: isUplink } });
+          // Distance label marker
+          const midLat = (segment.path[0].lat + segment.path[1].lat) / 2;
+          const midLng = (segment.path[0].lng + segment.path[1].lng) / 2;
+          const lblEl = document.createElement("div");
+          lblEl.style.cssText = `font-size:10px;font-weight:800;color:${isUplink ? "#BFDBFE" : "#FFFFFF"};text-shadow:0 0 3px rgba(0,0,0,.7);white-space:nowrap;pointer-events:none;`;
+          lblEl.textContent = `${isUplink ? "uplink " : ""}${segment.distanceKm.toFixed(1)} km`;
+          overlayRefs.current.push(new ml.Marker({ element: lblEl }).setLngLat([midLng, midLat]).addTo(map));
         });
-      });
 
-      if (mapLayers.losCandidateLines) gisPreview.minimumHighSitePlan.clearSegments.filter((segment) => segment.viable && !segment.outOfRange).forEach((segment) => {
-        segment.path.forEach(extendBounds);
-        const midpoint = { lat: (segment.path[0].lat + segment.path[1].lat) / 2, lng: (segment.path[0].lng + segment.path[1].lng) / 2 };
-        const isUplink = segment.role === "uplink";
-        topologyPolylineRefs.current.push(new window.google!.maps.Polyline({
-          map,
-          path: segment.path,
-          strokeColor: isUplink ? "#3B82F6" : "#FFFFFF",
-          strokeOpacity: isUplink ? 0.92 : 0.86,
-          strokeWeight: isUplink ? 4 : 3,
-          icons: isUplink ? [{ icon: { path: "M 0,-1 0,1", strokeOpacity: 1, strokeColor: "#3B82F6", scale: 4 }, offset: "0", repeat: "16px" }] : undefined,
-          title: `${isUplink ? "Single uplink" : "Nearest-neighbour backbone"}: ${segment.sourceLabel} → ${segment.targetLabel} — ${segment.distanceKm.toFixed(1)} km`,
-        } as google.maps.PolylineOptions & { title: string }));
-        topologyLabelMarkersRef.current.push(new window.google!.maps.Marker({
-          map,
-          position: midpoint,
-          title: `${segment.role} ${segment.distanceKm.toFixed(1)} km`,
-          label: { text: `${isUplink ? "uplink " : ""}${segment.distanceKm.toFixed(1)} km`, color: isUplink ? "#BFDBFE" : "#FFFFFF", fontSize: "10px", fontWeight: "800" },
-          icon: { path: window.google!.maps.SymbolPath.CIRCLE, scale: 0, fillOpacity: 0, strokeOpacity: 0 },
-          zIndex: isUplink ? 36 : 34,
-        }));
-      });
-
-      if (mapLayers.losCandidateLines && incidentRelayResult) {
-        const incidentPath = [incidentRelayResult.incident, incidentRelayResult.relay];
-        incidentPath.forEach(extendBounds);
-        topologyPolylineRefs.current.push(new window.google!.maps.Polyline({
-          map,
-          path: incidentPath,
-          strokeColor: GIS_LOS_CLASSIFICATION_STYLES[incidentRelayResult.classification].color,
-          strokeOpacity: 0.92,
-          strokeWeight: 5,
-          title: `Day-2 Live Relay incident LOS — ${incidentRelayResult.distanceKm.toFixed(1)} km`,
-        } as google.maps.PolylineOptions & { title: string }));
+        if (incidentRelayResult) {
+          const incidentPath = [incidentRelayResult.incident, incidentRelayResult.relay];
+          incidentPath.forEach(extendBounds);
+          lineFeatures.push({ type: "Feature", geometry: { type: "LineString", coordinates: incidentPath.map((p: GisCoordinate) => [p.lng, p.lat]) }, properties: { color: GIS_LOS_CLASSIFICATION_STYLES[incidentRelayResult.classification].color, width: 5, opacity: 0.92, dashed: false } });
+        }
       }
     }
 
-    if (hasBounds && typeof map.fitBounds === "function") {
-      map.fitBounds(loadedPropertyBoundary && hasBoundaryFirstBounds ? boundaryFirstBounds : bounds, loadedPropertyBoundary ? 64 : 48);
+    // Update GeoJSON sources
+    if (map.getSource("audit-lines")) (map.getSource("audit-lines") as any).setData({ type: "FeatureCollection", features: lineFeatures });
+    if (map.getSource("audit-boundary")) (map.getSource("audit-boundary") as any).setData({ type: "FeatureCollection", features: boundaryFeatures });
+
+    // fitBounds
+    if (hasBounds) {
+      const useBoundary = loadedPropertyBoundary && hasBoundaryBounds;
+      map.fitBounds(useBoundary ? mlBoundaryBounds : mlBounds, { padding: useBoundary ? 64 : 48 });
     }
-  }, [mapPins, gisPreview, relayCandidates, incidentRelayResult, formData.propertySizeHa, mapLayers, loadedPropertyBoundary]);
+  }, [mapPins, gisPreview, relayCandidates, incidentRelayResult, formData.propertySizeHa, mapLayers, loadedPropertyBoundary, mapReady]);
 
   useEffect(() => {
     if (!isMapFullscreen) return;
@@ -1377,16 +1334,13 @@ export default function AuditForm() {
     };
     window.addEventListener("keydown", handleEscape);
     setTimeout(() => {
-      if (mapRef.current && window.google?.maps?.event?.trigger) {
-        window.google.maps.event.trigger(mapRef.current, "resize");
-      }
+      if (mapRef.current) mapRef.current.resize();
     }, 0);
     return () => window.removeEventListener("keydown", handleEscape);
   }, [isMapFullscreen]);
 
   useEffect(() => () => {
-    mapClickListenerRef.current?.remove();
-    placeAutocompleteListenerRef.current?.remove();
+    if (mapRef.current && mapClickHandlerRef.current) mapRef.current.off("click", mapClickHandlerRef.current);
     boundarySearchAbortRef.current?.abort();
     overpassAbortRef.current?.abort();
     clearRenderedMapOverlays();
@@ -1560,19 +1514,50 @@ export default function AuditForm() {
           <CardContent>
             {step === 1 && (
               <div className="space-y-5">
-                <div>
+                <div className="relative">
                   <Label htmlFor="clientName">Organization / Property Name *</Label>
                   <Input
                     id="clientName"
                     placeholder="e.g., Kwandwe Private Game Reserve"
                     value={formData.clientName}
-                    onChange={(e) => handleInputChange("clientName", e.target.value)}
+                    onChange={(e) => { setNameAutoResults([]); handleInputChange("clientName", e.target.value); }}
                     aria-invalid={Boolean(stepErrors.clientName)}
                     aria-describedby="clientName-help clientName-error"
                     className="mt-2 bg-input/40 text-foreground placeholder:text-muted-foreground"
+                    autoComplete="off"
                   />
+                  {(isNameSearching || nameAutoResults.length > 0) && (
+                    <div className="absolute left-0 right-0 top-full z-[70] mt-1 overflow-hidden rounded-xl border border-border bg-popover shadow-2xl">
+                      {isNameSearching && nameAutoResults.length === 0 && (
+                        <p className="px-4 py-3 text-xs text-muted-foreground">Searching OpenStreetMap…</p>
+                      )}
+                      {nameAutoResults.map((result) => {
+                        const parts = result.display_name.split(",");
+                        const shortName = parts[0].trim();
+                        const location = parts.slice(1, 3).join(",").trim();
+                        return (
+                          <button
+                            key={result.place_id}
+                            type="button"
+                            className="block w-full border-b border-border/50 px-4 py-3 text-left text-sm transition hover:bg-accent/10 focus:bg-accent/10 focus:outline-none last:border-0"
+                            onClick={() => {
+                              handleInputChange("clientName", shortName);
+                              setPropertyCoordinates(Number(result.lat), Number(result.lon), "Property coordinates set from name search.");
+                              setPlaceSearchValue(shortName);
+                              selectedPlaceSearchValueRef.current = null;
+                              autoBoundarySearchValueRef.current = shortName;
+                              setNameAutoResults([]);
+                            }}
+                          >
+                            <span className="block font-semibold text-foreground">{shortName}</span>
+                            <span className="block mt-0.5 text-xs text-muted-foreground">{location}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                   <p id="clientName-help" className="mt-2 text-xs text-muted-foreground">
-                    Use the trading name, reserve name, farm name, mine name, or primary site name that should appear on the audit.
+                    Type 3+ characters — suggestions load automatically from OpenStreetMap. Selecting one sets the name, coordinates, and pre-loads the boundary for Step 2.
                   </p>
                   {stepErrors.clientName && (
                     <p id="clientName-error" className="mt-2 text-xs font-medium text-destructive">

@@ -436,8 +436,9 @@ export default function InfrastructureMap({ audit, observations = [], infrastruc
   const [isLayerPanelOpen, setIsLayerPanelOpen] = useState(false);
   const [pinOverrides, setPinOverrides] = useState<Record<string, PinOverride>>({});
   const [coordinateDrafts, setCoordinateDrafts] = useState<Record<string, { lat?: string; lng?: string }>>({});
-  const mapRef = useRef<google.maps.Map | null>(null);
-  const overlaysRef = useRef<Array<google.maps.Marker | google.maps.Polyline | google.maps.Circle>>([]);
+  const mapRef = useRef<any>(null); // maplibregl.Map
+  const [mapReady, setMapReady] = useState(false);
+  const overlaysRef = useRef<Array<{ remove(): void }>>([]);
 
   const precisionPins = useMemo(() => model.precisionPins.map((pin) => {
     const override = pinOverrides[pin.id];
@@ -462,181 +463,110 @@ export default function InfrastructureMap({ audit, observations = [], infrastruc
 
   const getPinCoordinateDraft = (pin: PrecisionPlanningPin, axis: "lat" | "lng") => coordinateDrafts[pin.id]?.[axis] ?? formatCoordinate(pin[axis]);
 
-  const renderMapOverlays = (map: google.maps.Map) => {
-    overlaysRef.current.forEach((overlay) => overlay.setMap(null));
+  const makeCircleCoords = (lat: number, lng: number, radiusM: number, steps = 48) =>
+    Array.from({ length: steps + 1 }, (_, i) => {
+      const angle = (i / steps) * 2 * Math.PI;
+      const latOff = (radiusM / 111320) * Math.cos(angle);
+      const lngOff = (radiusM / (111320 * Math.cos((lat * Math.PI) / 180))) * Math.sin(angle);
+      return [lng + lngOff, lat + latOff];
+    });
+
+  const renderMapOverlays = (map: any) => {
+    const ml = window.maplibregl;
+    if (!ml) return;
+    overlaysRef.current.forEach((o) => o.remove());
     overlaysRef.current = [];
+    map.jumpTo({ center: [model.center.lng, model.center.lat], zoom: model.points.length > 1 ? 18 : 17 });
 
-    map.setMapTypeId("hybrid");
-    map.setCenter(model.center);
-    map.setZoom(model.points.length > 1 ? 18 : 17);
+    const lineFeatures: any[] = [];
+    const circleFeatures: any[] = [];
 
+    // Draggable point markers
     visiblePoints.forEach((point) => {
-      const marker = new google.maps.Marker({
-        map,
-        position: { lat: point.lat, lng: point.lng },
-        title: `${point.label}: ${point.description}`,
-        draggable: true,
-        cursor: "grab",
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: point.category === "property" ? 8 : 6,
-          fillColor: point.providerColor || categoryStyles[point.category].color,
-          fillOpacity: 0.95,
-          strokeColor: "#020617",
-          strokeWeight: 2,
-        },
-      });
-      marker.addListener("dragend", () => {
-        const position = marker.getPosition();
-        if (!position) return;
-        const lat = Number(position.lat().toFixed(6));
-        const lng = Number(position.lng().toFixed(6));
-        setPinOverrides((current) => ({
-          ...current,
-          [point.id]: { lat, lng },
-        }));
-        setCoordinateDrafts((current) => ({
-          ...current,
-          [point.id]: { lat: formatCoordinate(lat), lng: formatCoordinate(lng) },
-        }));
+      const color = point.providerColor || categoryStyles[point.category].color;
+      const size = point.category === "property" ? 20 : 16;
+      const el = document.createElement("div");
+      el.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;background:${color};border:2px solid #020617;cursor:grab;box-shadow:0 1px 3px rgba(0,0,0,.5);`;
+      el.title = `${point.label}: ${point.description}`;
+      const marker = new ml.Marker({ element: el, draggable: true })
+        .setLngLat([point.lng, point.lat])
+        .addTo(map);
+      marker.on("dragend", () => {
+        const lngLat = marker.getLngLat();
+        const lat = Number(lngLat.lat.toFixed(6));
+        const lng = Number(lngLat.lng.toFixed(6));
+        setPinOverrides((current) => ({ ...current, [point.id]: { lat, lng } }));
+        setCoordinateDrafts((current) => ({ ...current, [point.id]: { lat: formatCoordinate(lat), lng: formatCoordinate(lng) } }));
       });
       overlaysRef.current.push(marker);
 
       if (point.businessDrivers?.length) {
         const driverColor = BUSINESS_DRIVER_BY_ID[point.businessDrivers[0]].color;
-        overlaysRef.current.push(new google.maps.Circle({
-          map,
-          center: { lat: point.lat, lng: point.lng },
-          radius: point.topologyRole === "hub" ? 650 : 420,
-          strokeColor: driverColor,
-          strokeOpacity: 0.45,
-          strokeWeight: 2,
-          fillColor: driverColor,
-          fillOpacity: 0.12,
-        }));
+        const r = point.topologyRole === "hub" ? 650 : 420;
+        circleFeatures.push({ type: "Feature", geometry: { type: "Polygon", coordinates: [makeCircleCoords(point.lat, point.lng, r)] }, properties: { color: driverColor, fillOpacity: 0.12, lineWidth: 2, lineOpacity: 0.45 } });
       }
-
       if (point.category === "signal" && enabledLayers.signal) {
-        overlaysRef.current.push(new google.maps.Circle({
-          map,
-          center: { lat: point.lat, lng: point.lng },
-          radius: 900,
-          strokeColor: "#22C55E",
-          strokeOpacity: 0.35,
-          strokeWeight: 1,
-          fillColor: "#22C55E",
-          fillOpacity: 0.16,
-        }));
+        circleFeatures.push({ type: "Feature", geometry: { type: "Polygon", coordinates: [makeCircleCoords(point.lat, point.lng, 900)] }, properties: { color: "#22C55E", fillOpacity: 0.16, lineWidth: 1, lineOpacity: 0.35 } });
       }
     });
 
     const property = planningPoints.find((point) => point.category === "property");
     if (property) {
+      // Links
       visibleLinks.forEach((link) => {
-        const sourcePoint = planningPoints.find((candidate) => candidate.id === link.sourceId) || property;
-        const point = planningPoints.find((candidate) => candidate.id === link.targetId);
-        if (!point || !sourcePoint) return;
-        const line = new google.maps.Polyline({
-          map,
-          path: [
-            { lat: sourcePoint.lat, lng: sourcePoint.lng },
-            { lat: point.lat, lng: point.lng },
-          ],
-          geodesic: true,
-          strokeColor: "#C6FF00",
-          strokeOpacity: 0.96,
-          strokeWeight: link.role === "backbone" ? 4 : link.role === "backhaul" ? 5 : 3,
-          icons: [{
-            icon: { path: "M 0,-1 0,1", strokeOpacity: 1, scale: 3 },
-            offset: "0",
-            repeat: "16px",
-          }],
-        });
-        overlaysRef.current.push(line);
+        const src = planningPoints.find((c) => c.id === link.sourceId) || property;
+        const tgt = planningPoints.find((c) => c.id === link.targetId);
+        if (!tgt || !src) return;
+        lineFeatures.push({ type: "Feature", geometry: { type: "LineString", coordinates: [[src.lng, src.lat], [tgt.lng, tgt.lat]] }, properties: { color: "#C6FF00", width: link.role === "backhaul" ? 5 : link.role === "backbone" ? 4 : 3, opacity: 0.96 } });
       });
 
+      // LOS profile line
       if (losProfile) {
         const start = precisionPins.find((pin) => pin.id === losProfile.startPinId);
         const end = precisionPins.find((pin) => pin.id === losProfile.endPinId);
-        if (start && end) {
-          overlaysRef.current.push(new google.maps.Polyline({
-            map,
-            path: [{ lat: start.lat, lng: start.lng }, { lat: end.lat, lng: end.lng }],
-            geodesic: true,
-            strokeColor: losProfile.statusColor,
-            strokeOpacity: 0.95,
-            strokeWeight: 5,
-          }));
-        }
+        if (start && end) lineFeatures.push({ type: "Feature", geometry: { type: "LineString", coordinates: [[start.lng, start.lat], [end.lng, end.lat]] }, properties: { color: losProfile.statusColor, width: 5, opacity: 0.95 } });
       }
 
+      // Fibre routes
       if (enabledLayers.fibre && model.gisScan) {
-        model.gisScan.fibreRoutes.forEach((route) => {
-          overlaysRef.current.push(new google.maps.Polyline({
-            map,
-            path: route.path,
-            geodesic: true,
-            strokeColor: route.color,
-            strokeOpacity: 0.9,
-            strokeWeight: 4,
-          }));
+        model.gisScan.fibreRoutes.forEach((route: any) => {
+          lineFeatures.push({ type: "Feature", geometry: { type: "LineString", coordinates: route.path.map((p: any) => [p.lng, p.lat]) }, properties: { color: route.color, width: 4, opacity: 0.9 } });
         });
       }
 
+      // Eskom corridors
       if (enabledLayers.eskom && model.gisScan) {
-        model.gisScan.eskomCorridors.forEach((corridor) => {
-          overlaysRef.current.push(new google.maps.Polyline({
-            map,
-            path: corridor.path,
-            geodesic: true,
-            strokeColor: corridor.color,
-            strokeOpacity: 0.82,
-            strokeWeight: 5,
-            icons: [{
-              icon: { path: "M 0,-1 0,1", strokeOpacity: 1, scale: 4 },
-              offset: "0",
-              repeat: "22px",
-            }],
-          }));
+        model.gisScan.eskomCorridors.forEach((corridor: any) => {
+          lineFeatures.push({ type: "Feature", geometry: { type: "LineString", coordinates: corridor.path.map((p: any) => [p.lng, p.lat]) }, properties: { color: corridor.color, width: 5, opacity: 0.82 } });
         });
       }
 
+      // Terrain circles
       if (enabledLayers.terrain) {
-        const radius = new google.maps.Circle({
-          map,
-          center: { lat: property.lat, lng: property.lng },
-          radius: 3000,
-          strokeColor: "#22C55E",
-          strokeOpacity: 0.45,
-          strokeWeight: 1,
-          fillColor: "#22C55E",
-          fillOpacity: 0.08,
-        });
-        overlaysRef.current.push(radius);
-        model.gisScan?.terrainContours.forEach((contour) => {
-          overlaysRef.current.push(new google.maps.Circle({
-            map,
-            center: { lat: property.lat, lng: property.lng },
-            radius: contour.radiusKm * 1000,
-            strokeColor: contour.color,
-            strokeOpacity: 0.7,
-            strokeWeight: 1,
-            fillColor: contour.color,
-            fillOpacity: 0.025,
-          }));
+        circleFeatures.push({ type: "Feature", geometry: { type: "Polygon", coordinates: [makeCircleCoords(property.lat, property.lng, 3000)] }, properties: { color: "#22C55E", fillOpacity: 0.08, lineWidth: 1, lineOpacity: 0.45 } });
+        model.gisScan?.terrainContours.forEach((contour: any) => {
+          circleFeatures.push({ type: "Feature", geometry: { type: "Polygon", coordinates: [makeCircleCoords(property.lat, property.lng, contour.radiusKm * 1000)] }, properties: { color: contour.color, fillOpacity: 0.025, lineWidth: 1, lineOpacity: 0.7 } });
         });
       }
     }
+
+    if (map.getSource("infra-lines")) (map.getSource("infra-lines") as any).setData({ type: "FeatureCollection", features: lineFeatures });
+    if (map.getSource("infra-circles")) (map.getSource("infra-circles") as any).setData({ type: "FeatureCollection", features: circleFeatures });
   };
 
-  const handleMapReady = (map: google.maps.Map) => {
+  const handleMapReady = (map: any) => {
     mapRef.current = map;
-    renderMapOverlays(map);
+    map.addSource("infra-circles", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addLayer({ id: "infra-circles-fill", type: "fill", source: "infra-circles", paint: { "fill-color": ["get", "color"], "fill-opacity": ["get", "fillOpacity"] } });
+    map.addLayer({ id: "infra-circles-line", type: "line", source: "infra-circles", paint: { "line-color": ["get", "color"], "line-width": ["get", "lineWidth"], "line-opacity": ["get", "lineOpacity"] } });
+    map.addSource("infra-lines", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addLayer({ id: "infra-lines-line", type: "line", source: "infra-lines", paint: { "line-color": ["get", "color"], "line-width": ["get", "width"], "line-opacity": ["get", "opacity"] } });
+    setMapReady(true);
   };
 
   useEffect(() => {
-    if (mapRef.current) renderMapOverlays(mapRef.current);
-  }, [enabledLayers, visiblePoints, visibleLinks, losProfile]);
+    if (mapRef.current && mapReady) renderMapOverlays(mapRef.current);
+  }, [enabledLayers, visiblePoints, visibleLinks, losProfile, mapReady]);
 
   const selectedPins = precisionPins.slice(0, 8);
   const profileHeight = 150;
