@@ -612,7 +612,18 @@ export default function LinkPlanner() {
 
       // Step 2 — SRTM elevation grid
       setPhase("elevation");
-      const grid = await fetchElevationGrid(poly, abort.signal);
+      let grid: ElevGrid[] = [];
+      try {
+        grid = await fetchElevationGrid(poly, abort.signal);
+      } catch (elevErr) {
+        if (abort.signal.aborted) return;
+        const elevMsg = elevErr instanceof Error ? elevErr.message : "";
+        if (elevMsg.includes("429")) {
+          toast.error("Elevation API rate-limited. Wait 30 s then retry.", { duration: 8000 });
+          setPhase("idle"); return;
+        }
+        toast.warning("Elevation fetch failed — high-site detection skipped.");
+      }
       if (abort.signal.aborted) return;
 
       // Step 3 — high sites
@@ -683,7 +694,12 @@ export default function LinkPlanner() {
     } catch (e) {
       if ((e as Error).name === "AbortError") return;
       console.error("[LP] Plan build error", e);
-      toast.error(e instanceof Error ? e.message : "Network build failed.");
+      const msg = e instanceof Error ? e.message : "Network build failed.";
+      if (msg.includes("429")) {
+        toast.error("Elevation API rate-limited. Wait 30 seconds then click Plan Network again.", { duration: 8000 });
+      } else {
+        toast.error(msg);
+      }
       setPhase("idle");
     }
   };
