@@ -512,12 +512,14 @@ export default function LinkPlanner() {
   const overlayRefs = useRef<Array<{ remove(): void }>>([]);
   const buildAbortRef = useRef<AbortController | null>(null);
   const nameAbortRef = useRef<AbortController | null>(null);
+  const skipSearchRef = useRef(false); // set true after selection to suppress re-query
 
   // ─────────────────────────────────────────────────────────────────────────
   // NOMINATIM AUTOCOMPLETE
   // ─────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
+    if (skipSearchRef.current) { skipSearchRef.current = false; return; }
     nameAbortRef.current?.abort();
     const q = propertyName.trim();
     if (q.length < 3) { setNameResults([]); setIsSearching(false); return; }
@@ -540,6 +542,7 @@ export default function LinkPlanner() {
   const handleSelectResult = async (result: NomResult) => {
     setSelectedResult(result);
     const name = result.display_name.split(",")[0].trim();
+    skipSearchRef.current = true; // prevent re-query when propertyName updates
     setPropertyName(name);
     setNameResults([]);
     setIsSearching(false);
