@@ -415,11 +415,23 @@ function buildUplinkLink(carrier: CarrierNode, hsNodes: HSNode[]): NetLink | nul
 // LOS / FRESNEL ANALYSIS
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** Nearest-neighbour lookup into the Step-2 elevation grid (no API call). */
+function interpolateElevFromGrid(pt: Coord, grid: ElevGrid[]): number {
+  if (!grid.length) return 0;
+  let best = grid[0], bestDist = Infinity;
+  for (const g of grid) {
+    const d = (g.lat - pt.lat) ** 2 + (g.lng - pt.lng) ** 2;
+    if (d < bestDist) { bestDist = d; best = g; }
+  }
+  return best.elevation;
+}
+
 async function calcLinkLos(
   link: NetLink,
   aglTx: number,
   aglRx: number,
   signal: AbortSignal,
+  grid?: ElevGrid[], // when provided, use cached grid (no API call)
 ): Promise<LosStatus> {
   const totalKm = calculateDistanceKm(link.fromPt, link.toPt);
   const intervals = Math.max(2, Math.ceil(totalKm / LOS_SPACING_KM));
@@ -427,7 +439,17 @@ async function calcLinkLos(
     lat: link.fromPt.lat + (link.toPt.lat - link.fromPt.lat) * (i / intervals),
     lng: link.fromPt.lng + (link.toPt.lng - link.fromPt.lng) * (i / intervals),
   }));
-  const elevs = await batchElevation(pts, signal);
+  // Use cached grid when available to avoid re-hitting the elevation API (rate limits)
+  let elevs: number[];
+  if (grid && grid.length) {
+    elevs = pts.map(p => interpolateElevFromGrid(p, grid));
+  } else {
+    try {
+      elevs = await batchElevation(pts, signal);
+    } catch {
+      return "PENDING"; // API unavailable / rate-limited — leave as PENDING
+    }
+  }
   if (signal.aborted) return "PENDING";
 
   const startEl = (elevs[0] ?? 0) + aglTx;
@@ -697,7 +719,7 @@ export default function LinkPlanner() {
           const override = heightOverrides[link.id];
           const aglTx = override?.tx ?? link.aglTx;
           const aglRx = override?.rx ?? link.aglRx;
-          const status = await calcLinkLos(link, aglTx, aglRx, abort.signal);
+          const status = await calcLinkLos(link, aglTx, aglRx, abort.signal, grid);
           if (abort.signal.aborted) return;
           updatedLinks[idx] = { ...link, losStatus: status };
           setLinks([...updatedLinks]); // stream update as each completes
