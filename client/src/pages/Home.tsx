@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { CttxLogo } from "@/components/CttxLogo";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
@@ -14,11 +15,11 @@ export default function Home() {
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container flex items-center justify-between h-16">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-              <span className="text-accent-foreground font-bold text-sm">CT</span>
-            </div>
-            <span className="font-bold text-lg">CTTX Infrastructure Intelligence</span>
+          <div className="flex items-center gap-3">
+            <CttxLogo height="h-9" />
+            <span className="font-semibold text-sm text-muted-foreground tracking-wide hidden sm:block">
+              Infrastructure Intelligence
+            </span>
           </div>
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
