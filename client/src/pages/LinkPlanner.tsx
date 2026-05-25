@@ -555,11 +555,18 @@ export default function LinkPlanner() {
         fitToBoundary(mapRef.current, poly);
         toast.success(`${name} — boundary loaded. Press Plan Network to build the topology.`);
       } else {
-        // Fallback: use lat/lng point
-        setBoundary([]);
+        // Fallback: build a synthetic ~10 km bounding box around the point
         const lat = Number(result.lat), lng = Number(result.lon);
-        fitToBoundary(mapRef.current, [{ lat: lat + 0.05, lng: lng - 0.05 }, { lat: lat - 0.05, lng: lng + 0.05 }]);
-        toast.info(`${name} — no polygon boundary found. The planner will use a point reference.`);
+        const d = 0.045; // ≈5 km per side
+        const synthPoly: Coord[] = [
+          { lat: lat + d, lng: lng - d },
+          { lat: lat + d, lng: lng + d },
+          { lat: lat - d, lng: lng + d },
+          { lat: lat - d, lng: lng - d },
+        ];
+        setBoundary(synthPoly);
+        fitToBoundary(mapRef.current, synthPoly);
+        toast.info(`${name} — no OSM polygon found. Planning within a ~10 km reference area.`);
       }
     } catch {
       toast.error("Failed to load property boundary.");
@@ -586,6 +593,17 @@ export default function LinkPlanner() {
         poly = await fetchBoundaryPolygon(selectedResult.osm_type, selectedResult.osm_id, abort.signal);
         if (abort.signal.aborted) return;
         if (poly.length >= 3) { setBoundary(poly); fitToBoundary(mapRef.current, poly); }
+      }
+      if (poly.length < 3 && selectedResult) {
+        // Last resort: build synthetic bounding box from point coords
+        const lat = Number(selectedResult.lat), lng = Number(selectedResult.lon);
+        const d = 0.045;
+        poly = [
+          { lat: lat + d, lng: lng - d }, { lat: lat + d, lng: lng + d },
+          { lat: lat - d, lng: lng + d }, { lat: lat - d, lng: lng - d },
+        ];
+        setBoundary(poly);
+        fitToBoundary(mapRef.current, poly);
       }
       if (poly.length < 3) {
         toast.error("No property boundary available. Search for a property and select it first.");
