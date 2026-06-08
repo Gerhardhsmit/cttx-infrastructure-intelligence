@@ -48,6 +48,11 @@ export function shouldReplaceExistingMapScript(_status: string | undefined, _has
   return false;
 }
 
+/** Backward-compat shim: loads MapLibre and resolves once ready. */
+export function loadMapScript(): Promise<void> {
+  return loadMapLibre();
+}
+
 interface MapViewProps {
   className?: string;
   initialCenter?: { lat: number; lng: number };

@@ -85,6 +85,63 @@ export type Facility = PlannerCoordinate & {
   name: string;
 };
 
+export type PlannerThresholds = {
+  viableLinkThresholdKm: number;
+};
+
+export type SerializedPlannerTopologyLink = {
+  type: NetworkLinkType;
+  fromName: string;
+  toName: string;
+  distKm: number;
+  rslDbm: number;
+  fadeMarginDb: number;
+  outOfRange: boolean;
+};
+
+export type SerializedPlannerTopologyHighSite = {
+  name: string;
+  category: HighSiteCategory;
+  elevation: number | null;
+  source: HighSiteSource;
+  lat: number;
+  lng: number;
+};
+
+export type SerializedPlannerTopologyMast = {
+  name: string;
+  provider: MastProvider;
+  closestForProvider: boolean;
+  lat: number;
+  lng: number;
+};
+
+export type SerializedPlannerTopologyFacility = {
+  name: string;
+  type: FacilityType;
+  lat: number;
+  lng: number;
+};
+
+export type SerializedPlannerTopology = {
+  planName: string;
+  propertyName: string;
+  totalDistanceKm: number;
+  liveDistanceKm: number;
+  linkCount: number;
+  uplinkCount: number;
+  backboneCount: number;
+  overThresholdCount: number;
+  weakestFadeMarginDb: number;
+  viableLinkThresholdKm: number;
+  routeDecisionExplanation: string;
+  recommendationSummary: string;
+  links: SerializedPlannerTopologyLink[];
+  highSites: SerializedPlannerTopologyHighSite[];
+  selectedMast: SerializedPlannerTopologyMast | null;
+  facilities: SerializedPlannerTopologyFacility[];
+};
+
 export type PlannerState = {
   propertyName: string;
   propertyCentre: PlannerCoordinate | null;

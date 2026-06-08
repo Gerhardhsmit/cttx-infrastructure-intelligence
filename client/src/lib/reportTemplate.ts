@@ -9,6 +9,7 @@ export type ReportTemplateSectionId =
   | "reserve-manager-recommendations"
   | "cttx-follow-up-workflow"
   | "decision-pack"
+  | "link-planner-topology"
   | "engineering-brief";
 
 export type ReportTemplateSection = {
@@ -70,6 +71,12 @@ export const CTTX_PDF_REPORT_TEMPLATE = {
       title: "Decision Pack to Prepare",
       purpose: "List the supporting information the client should prepare before the engineering discovery call.",
       pdfRole: "appendix",
+    },
+    {
+      id: "link-planner-topology",
+      title: "Link Planner Topology & ROI",
+      purpose: "Present the saved Link Planner topology including high sites, carrier masts, backbone/distribution links, LOS status, and route-decision rationale for engineering validation.",
+      pdfRole: "plan",
     },
     {
       id: "engineering-brief",

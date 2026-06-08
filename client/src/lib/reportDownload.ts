@@ -1,3 +1,4 @@
+import type { SerializedPlannerTopology } from "./plannerTypes";
 import type { AuditReportGuidance } from "./reportGuidance";
 import { CTTX_CONFIDENTIAL_DESIGNATION, getReportTemplateSectionTitle } from "./reportTemplate";
 import { BUSINESS_DRIVERS, RESERVE_SITE_TYPE_BY_ID, formatDriverLabels, type BusinessDriverId, type ReserveSiteTypeId } from "@shared/reserveFramework";
@@ -154,10 +155,11 @@ export function buildGeneratedReportHtml(input: {
   observations: ReportDownloadObservation[];
   operationalCriticalLocations?: ReportDownloadOperationalCriticalLocation[];
   operationalPainPoints?: ReportDownloadOperationalPainPoint[];
+  linkPlannerTopology?: SerializedPlannerTopology | null;
   guidance: AuditReportGuidance;
   lead: LeadReportConfirmation;
 }) {
-  const { audit, observations, operationalCriticalLocations = [], operationalPainPoints = [], guidance, lead } = input;
+  const { audit, observations, operationalCriticalLocations = [], operationalPainPoints = [], linkPlannerTopology, guidance, lead } = input;
   const knownProblems = Array.isArray(audit.knownProblems)
     ? audit.knownProblems.filter((item): item is string => typeof item === "string")
     : [];
@@ -251,6 +253,23 @@ export function buildGeneratedReportHtml(input: {
     <h2>${escapeHtml(getReportTemplateSectionTitle("reserve-manager-recommendations"))}</h2>${htmlList(guidance.reserveManagerRecommendations)}
     <h2>${escapeHtml(getReportTemplateSectionTitle("cttx-follow-up-workflow"))}</h2>${htmlList(guidance.cttxFollowUpSteps)}
     <h2>${escapeHtml(getReportTemplateSectionTitle("decision-pack"))}</h2>${htmlList(guidance.decisionPackItems)}
+    ${linkPlannerTopology ? `<h2>${escapeHtml(getReportTemplateSectionTitle("link-planner-topology"))}</h2>
+    <p><strong>Plan:</strong> ${escapeHtml(linkPlannerTopology.planName)} · <strong>Property:</strong> ${escapeHtml(linkPlannerTopology.propertyName)}</p>
+    <table><tbody>
+      <tr><th>Total link distance</th><td>${escapeHtml(linkPlannerTopology.totalDistanceKm.toFixed(1))} km</td></tr>
+      <tr><th>Live distance</th><td>${escapeHtml(linkPlannerTopology.liveDistanceKm.toFixed(1))} km</td></tr>
+      <tr><th>Link count</th><td>${escapeHtml(String(linkPlannerTopology.linkCount))} (${escapeHtml(String(linkPlannerTopology.uplinkCount))} uplink, ${escapeHtml(String(linkPlannerTopology.backboneCount))} backbone)</td></tr>
+      <tr><th>Over-threshold links</th><td>${escapeHtml(String(linkPlannerTopology.overThresholdCount))}</td></tr>
+      <tr><th>Weakest fade margin</th><td>${escapeHtml(linkPlannerTopology.weakestFadeMarginDb.toFixed(1))} dB</td></tr>
+      <tr><th>Viable link threshold</th><td>${escapeHtml(linkPlannerTopology.viableLinkThresholdKm.toFixed(1))} km</td></tr>
+      <tr><th>Selected carrier mast</th><td>${escapeHtml(linkPlannerTopology.selectedMast?.name ?? "None selected")}</td></tr>
+    </tbody></table>
+    <p><strong>Route decision:</strong> ${escapeHtml(linkPlannerTopology.routeDecisionExplanation)}</p>
+    <p><strong>Recommendation:</strong> ${escapeHtml(linkPlannerTopology.recommendationSummary)}</p>
+    ${linkPlannerTopology.links.length > 0 ? `<table><thead><tr><th>Link type</th><th>From</th><th>To</th><th>Distance (km)</th><th>RSL (dBm)</th><th>Fade margin (dB)</th></tr></thead><tbody>${linkPlannerTopology.links.map((link) => `<tr><td>${escapeHtml(link.type)}</td><td>${escapeHtml(link.fromName)}</td><td>${escapeHtml(link.toName)}</td><td>${escapeHtml(link.distKm.toFixed(1))}</td><td>${escapeHtml(link.rslDbm.toFixed(1))}</td><td>${escapeHtml(link.fadeMarginDb.toFixed(1))}</td></tr>`).join("")}</tbody></table>` : ""}
+    ${linkPlannerTopology.highSites.length > 0 ? `<p><strong>High sites:</strong></p><table><thead><tr><th>Name</th><th>Category</th><th>Elevation (m)</th><th>Source</th></tr></thead><tbody>${linkPlannerTopology.highSites.map((hs) => `<tr><td>${escapeHtml(hs.name)}</td><td>${escapeHtml(hs.category)}</td><td>${escapeHtml(hs.elevation !== null ? String(hs.elevation) : "Unknown")}</td><td>${escapeHtml(hs.source)}</td></tr>`).join("")}</tbody></table>` : ""}
+    ${linkPlannerTopology.facilities.length > 0 ? `<p><strong>Facilities:</strong></p><table><thead><tr><th>Name</th><th>Type</th><th>Lat</th><th>Lng</th></tr></thead><tbody>${linkPlannerTopology.facilities.map((fac) => `<tr><td>${escapeHtml(fac.name)}</td><td>${escapeHtml(fac.type)}</td><td>${escapeHtml(fac.lat.toFixed(6))}</td><td>${escapeHtml(fac.lng.toFixed(6))}</td></tr>`).join("")}</tbody></table>` : ""}` : ""}
+
     <h2>${escapeHtml(getReportTemplateSectionTitle("engineering-brief"))}</h2>
     <p>${escapeHtml(audit.engineeringNotes || audit.infrastructureNotes || "No engineering notes captured yet.")}</p>
 
@@ -265,10 +284,11 @@ export function buildGeneratedReportMarkdown(input: {
   observations: ReportDownloadObservation[];
   operationalCriticalLocations?: ReportDownloadOperationalCriticalLocation[];
   operationalPainPoints?: ReportDownloadOperationalPainPoint[];
+  linkPlannerTopology?: SerializedPlannerTopology | null;
   guidance: AuditReportGuidance;
   lead: LeadReportConfirmation;
 }) {
-  const { audit, observations, operationalCriticalLocations = [], operationalPainPoints = [], guidance, lead } = input;
+  const { audit, observations, operationalCriticalLocations = [], operationalPainPoints = [], linkPlannerTopology, guidance, lead } = input;
   const knownProblems = Array.isArray(audit.knownProblems)
     ? audit.knownProblems.filter((item): item is string => typeof item === "string")
     : [];
@@ -366,7 +386,49 @@ export function buildGeneratedReportMarkdown(input: {
     ``,
     bulletList(guidance.decisionPackItems),
     ``,
-    `## 8. ${getReportTemplateSectionTitle("engineering-brief")}`,
+    ...(linkPlannerTopology ? [
+    `## 8. ${getReportTemplateSectionTitle("link-planner-topology")}`,
+    ``,
+    `**Plan:** ${linkPlannerTopology.planName} · **Property:** ${linkPlannerTopology.propertyName}`,
+    ``,
+    `| Metric | Value |`,
+    `| --- | --- |`,
+    `| Total link distance | ${linkPlannerTopology.totalDistanceKm.toFixed(1)} km |`,
+    `| Live distance | ${linkPlannerTopology.liveDistanceKm.toFixed(1)} km |`,
+    `| Link count | ${linkPlannerTopology.linkCount} (${linkPlannerTopology.uplinkCount} uplink, ${linkPlannerTopology.backboneCount} backbone) |`,
+    `| Over-threshold links | ${linkPlannerTopology.overThresholdCount} |`,
+    `| Weakest fade margin | ${linkPlannerTopology.weakestFadeMarginDb.toFixed(1)} dB |`,
+    `| Viable link threshold | ${linkPlannerTopology.viableLinkThresholdKm.toFixed(1)} km |`,
+    `| Selected carrier mast | ${linkPlannerTopology.selectedMast?.name ?? "None selected"} |`,
+    ``,
+    `**Route decision:** ${linkPlannerTopology.routeDecisionExplanation}`,
+    ``,
+    `**Recommendation:** ${linkPlannerTopology.recommendationSummary}`,
+    ``,
+    ...(linkPlannerTopology.links.length > 0 ? [
+      `| Link type | From | To | Distance (km) | RSL (dBm) | Fade margin (dB) |`,
+      `| --- | --- | --- | ---: | ---: | ---: |`,
+      ...linkPlannerTopology.links.map((link) => `| ${link.type} | ${link.fromName} | ${link.toName} | ${link.distKm.toFixed(1)} | ${link.rslDbm.toFixed(1)} | ${link.fadeMarginDb.toFixed(1)} |`),
+      ``,
+    ] : []),
+    ...(linkPlannerTopology.highSites.length > 0 ? [
+      `**High sites:**`,
+      ``,
+      `| Name | Category | Elevation (m) | Source |`,
+      `| --- | --- | ---: | --- |`,
+      ...linkPlannerTopology.highSites.map((hs) => `| ${hs.name} | ${hs.category} | ${hs.elevation ?? "Unknown"} | ${hs.source} |`),
+      ``,
+    ] : []),
+    ...(linkPlannerTopology.facilities.length > 0 ? [
+      `**Facilities:**`,
+      ``,
+      `| Name | Type | Lat | Lng |`,
+      `| --- | --- | ---: | ---: |`,
+      ...linkPlannerTopology.facilities.map((fac) => `| ${fac.name} | ${fac.type} | ${fac.lat.toFixed(6)} | ${fac.lng.toFixed(6)} |`),
+      ``,
+    ] : []),
+    ] : []),
+    `## ${linkPlannerTopology ? "9" : "8"}. ${getReportTemplateSectionTitle("engineering-brief")}`,
     ``,
     audit.engineeringNotes || audit.infrastructureNotes || "No engineering notes captured yet.",
     ``,

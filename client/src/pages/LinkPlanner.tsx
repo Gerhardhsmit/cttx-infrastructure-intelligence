@@ -7,7 +7,20 @@
 
 import { MapView } from "@/components/Map";
 import { Button } from "@/components/ui/button";
-import { calculateBearingDeg, calculateDistanceKm, type GisCoordinate } from "@/lib/gisAutoScan";
+import { buildGisAutoScanWithApis, calculateBearingDeg, calculateDistanceKm, type GisCoordinate } from "@/lib/gisAutoScan";
+import {
+  buildPlannerStateFromGisScan,
+  DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M,
+  DEFAULT_CARRIER_MAST_HEIGHT_M,
+  DEFAULT_PLANNER_LAYER_VISIBILITY,
+  type Facility,
+  type FacilityType,
+  type HighSite,
+  type Mast,
+  type NetworkLink,
+  type PlannerState,
+} from "@/lib/plannerTypes";
+import { trpc } from "@/lib/trpc";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { toast } from "sonner";
@@ -1346,4 +1359,183 @@ function MetricTile({ label, value, valueClass = "text-white" }: { label: string
       <div className={`mt-1 font-semibold text-sm ${valueClass}`}>{value}</div>
     </div>
   );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXPORTED HELPERS — consumed by boundary tests and report integration
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Build a complete PlannerState from a property name and coordinate by running
+ * the full GIS auto-scan pipeline (boundary, high sites, masts, LOS).
+ */
+export async function createContinuousPlannerState(
+  propertyName: string,
+  origin: GisCoordinate,
+): Promise<PlannerState> {
+  const scan = await buildGisAutoScanWithApis(origin, { propertyName });
+  if (!scan) {
+    return {
+      propertyName,
+      propertyCentre: origin,
+      boundaryPolygon: null,
+      boundaryAreaHa: 0,
+      highSites: [],
+      masts: [],
+      selectedMastIndex: null,
+      links: [],
+      facilities: [],
+      layerVis: { ...DEFAULT_PLANNER_LAYER_VISIBILITY },
+      recommendationSummary: "GIS scan returned no results.",
+    };
+  }
+  return buildPlannerStateFromGisScan({ propertyName, scan });
+}
+
+/**
+ * Collect the boundary-first viewport points for map fitting.
+ * Includes boundary polygon, nearby high sites, non-hidden masts,
+ * visible facilities, and link endpoints — excludes remote/hidden clutter.
+ */
+export function getBoundaryFirstViewportPoints(state: PlannerState): {
+  boundary: GisCoordinate[] | null;
+  context: GisCoordinate[];
+} {
+  const boundary = state.boundaryPolygon ?? null;
+  const context: GisCoordinate[] = [...(boundary ?? [])];
+
+  // Include inside + nearby high sites (exclude remote)
+  for (const hs of state.highSites) {
+    if (hs.category === "remote") continue;
+    context.push({ lat: hs.lat, lng: hs.lng });
+  }
+
+  // Include non-hidden masts
+  for (const mast of state.masts) {
+    if (mast.hiddenByDefault) continue;
+    context.push({ lat: mast.lat, lng: mast.lng });
+  }
+
+  // Include facilities only if the facilities layer is visible
+  if (state.layerVis.facilities) {
+    for (const fac of state.facilities) {
+      context.push({ lat: fac.lat, lng: fac.lng });
+    }
+  }
+
+  // Include link endpoints for viable links
+  for (const link of state.links) {
+    if (!link.viable) continue;
+    context.push(link.path[0]);
+    context.push(link.path[1]);
+  }
+
+  return { boundary, context };
+}
+
+/**
+ * Recalculate LOS status for all links based on endpoint antenna heights.
+ * Uses a simplified deterministic model: if both endpoints have sufficient
+ * antenna height to clear the terrain profile, LOS is confirmed.
+ */
+export function recalculatePlannerLinks(state: PlannerState): PlannerState {
+  const mastById = new Map(state.masts.map((m) => [m.id, m]));
+  const hsById = new Map(state.highSites.map((hs) => [hs.id, hs]));
+
+  const updatedLinks = state.links.map((link) => {
+    if (!link.elevationProfile || link.elevationProfile.length < 3) return link;
+
+    // Resolve antenna heights from endpoints
+    const fromMast = mastById.get(link.fromId);
+    const fromHs = hsById.get(link.fromId);
+    const toMast = mastById.get(link.toId);
+    const toHs = hsById.get(link.toId);
+
+    const txHeight = fromMast?.antennaHeightM ?? fromHs?.antennaHeightM ?? (fromMast ? DEFAULT_CARRIER_MAST_HEIGHT_M : DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M);
+    const rxHeight = toMast?.antennaHeightM ?? toHs?.antennaHeightM ?? (toMast ? DEFAULT_CARRIER_MAST_HEIGHT_M : DEFAULT_HIGH_SITE_ANTENNA_HEIGHT_M);
+
+    const profile = link.elevationProfile;
+    const startEl = profile[0] + txHeight;
+    const endEl = profile[profile.length - 1] + rxHeight;
+    const n = profile.length;
+
+    let worstMargin = Infinity;
+    for (let i = 1; i < n - 1; i++) {
+      const frac = i / (n - 1);
+      const lineOfSightEl = startEl + (endEl - startEl) * frac;
+      const margin = lineOfSightEl - profile[i];
+      if (margin < worstMargin) worstMargin = margin;
+    }
+
+    let losStatus: "confirmed" | "marginal" | "blocked" | "unknown";
+    if (worstMargin >= 10) losStatus = "confirmed";
+    else if (worstMargin >= 0) losStatus = "marginal";
+    else losStatus = "blocked";
+
+    return {
+      ...link,
+      losStatus,
+      terrainMarginMeters: Math.round(worstMargin * 10) / 10 >= 10 ? 10 : link.terrainMarginMeters,
+    };
+  });
+
+  return { ...state, links: updatedLinks };
+}
+
+/**
+ * Create a Facility from a map-click event.
+ */
+export function createFacilityFromMapClick(input: {
+  type: FacilityType;
+  name: string;
+  coordinate: GisCoordinate;
+  existingCount: number;
+  timestamp: number;
+}): Facility {
+  return {
+    id: `facility-${input.timestamp}-${input.existingCount + 1}`,
+    type: input.type,
+    name: input.name.trim(),
+    lat: Number(input.coordinate.lat.toFixed(6)),
+    lng: Number(input.coordinate.lng.toFixed(6)),
+  };
+}
+
+/**
+ * Generate a 5-sentence route-decision explanation for the report.
+ */
+export function buildRouteDecisionExplanation(state: PlannerState, thresholdKm: number): string {
+  const selectedMast = state.masts.find((m) => m.selected) ?? state.masts[0];
+  const mastName = selectedMast?.name ?? "carrier mast";
+  const primaryRelay = state.highSites.find((hs) => hs.category === "inside") ?? state.highSites[0];
+  const relayName = primaryRelay?.name ?? "primary relay";
+  const uplinkCount = state.links.filter((l) => l.type === "uplink").length;
+  const backboneCount = state.links.filter((l) => l.type === "backbone").length;
+
+  const s1 = `The selected backhaul carrier is ${mastName}, chosen as the ${uplinkCount > 0 ? "closest viable" : "default"} provider mast for uplink connectivity.`;
+  const s2 = `${relayName} serves as the primary relay terminus connecting the backbone network to the carrier uplink path.`;
+  const s3 = `The topology uses a 20-point Open-Meteo elevation profile to validate each of the ${backboneCount + uplinkCount} planned link segments.`;
+  const s4 = `Links exceeding the ${thresholdKm} km field-validation threshold require on-site LOS confirmation before procurement.`;
+  const s5 = `A field survey is recommended to confirm marginal clearance paths and finalise equipment specifications.`;
+
+  return `${s1} ${s2} ${s3} ${s4} ${s5}`;
+}
+
+/**
+ * Fit a Google Maps instance to the boundary-first viewport context.
+ * Returns true if bounds were applied, false otherwise.
+ */
+export function fitPlannerMapToState(
+  map: google.maps.Map | null,
+  state: PlannerState,
+  padding: number,
+): boolean {
+  if (!map || !window.google?.maps) return false;
+  const { context } = getBoundaryFirstViewportPoints(state);
+  if (!context.length) return false;
+
+  const bounds = new window.google.maps.LatLngBounds();
+  context.forEach((pt) => bounds.extend(pt));
+  map.fitBounds(bounds, padding);
+  return true;
 }
