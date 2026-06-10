@@ -1097,6 +1097,74 @@ export default function LinkPlanner() {
   };
 
   // ─────────────────────────────────────────────────────────────────────────
+  // JSON SERIALIZATION
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const serializeTopology = useCallback((): SerializedPlannerTopology => {
+    const overThresholdCount = links.filter(l => l.distKm > thresholdKm).length;
+    const fadeMargins = links.map(l => linkFadeMargin(l.distKm));
+    const weakestFadeMarginDb = fadeMargins.length > 0 ? Math.min(...fadeMargins) : 0;
+    const selectedMast = carrierMasts.find(m => m.id === selectedCarrierId) ?? null;
+    return {
+      planName,
+      propertyName: propertyName || "Unnamed Property",
+      totalDistanceKm: links.reduce((s, l) => s + l.distKm, 0),
+      liveDistanceKm: links.filter(l => l.losStatus === "CLEAR").reduce((s, l) => s + l.distKm, 0),
+      linkCount: links.length,
+      uplinkCount: links.filter(l => l.layer === "L0").length,
+      backboneCount: links.filter(l => l.layer === "L1").length,
+      overThresholdCount,
+      weakestFadeMarginDb,
+      viableLinkThresholdKm: thresholdKm,
+      routeDecisionExplanation: `Topology uses MST backbone with ${hsNodes.length} high sites, nearest-neighbour distribution to ${distribNodes.length} structures, and carrier uplink via ${selectedMast?.operator ?? "unknown"} at ${selectedMast?.distKm ?? 0} km. Links exceeding ${thresholdKm} km require field validation.`,
+      recommendationSummary: `${hsNodes.length} high sites, ${distribNodes.length} structures, ${links.length} links. ${links.filter(l => l.losStatus === "CLEAR").length} CLEAR LOS.`,
+      links: links.map(l => ({
+        type: l.layer === "L0" ? "uplink" as const : l.layer === "L1" ? "backbone" as const : "distribution" as const,
+        fromName: l.label.split(" \u2192 ")[0] ?? l.fromId,
+        toName: l.label.split(" \u2192 ")[1] ?? l.toId,
+        distKm: l.distKm,
+        rslDbm: -(92.45 + 20 * Math.log10(Math.max(l.distKm, 0.1)) + 20 * Math.log10(FREQ_GHZ)) + 24 + 30 * 2,
+        fadeMarginDb: linkFadeMargin(l.distKm),
+        outOfRange: l.distKm > thresholdKm,
+      })),
+      highSites: hsNodes.map(hs => ({
+        name: hs.label,
+        category: "inside" as const,
+        elevation: hs.elevation,
+        source: "srtm" as const,
+        lat: hs.lat,
+        lng: hs.lng,
+      })),
+      selectedMast: selectedMast ? {
+        name: selectedMast.name ?? selectedMast.operator,
+        provider: selectedMast.operator.toLowerCase().includes("vodacom") ? "vodacom" as const :
+                  selectedMast.operator.toLowerCase().includes("mtn") ? "mtn" as const :
+                  selectedMast.operator.toLowerCase().includes("telkom") ? "telkom" as const :
+                  selectedMast.operator.toLowerCase().includes("cell c") ? "cellc" as const : "unknown" as const,
+        closestForProvider: selectedMast.rank === 1,
+        lat: selectedMast.lat,
+        lng: selectedMast.lng,
+      } : null,
+      facilities: facilities.map(f => ({ name: f.name, type: f.type as any, lat: f.lat, lng: f.lng })),
+    };
+  }, [links, thresholdKm, hsNodes, distribNodes, carrierMasts, selectedCarrierId, planName, propertyName, facilities]);
+
+  const handleExportJson = () => {
+    const topology = serializeTopology();
+    const json = JSON.stringify(topology, null, 2);
+    const blob = new Blob([json], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `CTTX-LinkPlan-${(propertyName || "plan").replace(/\s+/g, "-")}-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast.success("Topology exported as JSON");
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────
   // EXPORT REPORT
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -1362,7 +1430,22 @@ export default function LinkPlanner() {
                 max={MAX_VIABLE_LINK_THRESHOLD_KM}
                 step={1}
                 value={thresholdKm}
-                onChange={e => setThresholdKm(Number(e.target.value))}
+                onChange={e => {
+                  const newThreshold = Number(e.target.value);
+                  setThresholdKm(newThreshold);
+                  // Recompute backbone and distribution links with new threshold
+                  if (hsNodes.length > 0) {
+                    const carrier = carrierMasts.find(m => m.id === selectedCarrierId) ?? carrierMasts[0] ?? null;
+                    const newLinks: NetLink[] = [
+                      ...buildMstBackbone(hsNodes, newThreshold),
+                      ...buildDistribLinks(distribNodes, hsNodes, newThreshold),
+                      ...(carrier ? [buildUplinkLink(carrier, hsNodes)].filter(Boolean) as NetLink[] : []),
+                    ];
+                    setLinks(newLinks);
+                    const overCount = newLinks.filter(l => l.distKm > newThreshold).length;
+                    toast.info(`Threshold ${newThreshold} km — ${newLinks.length} links rebuilt, ${overCount} over-threshold`);
+                  }
+                }}
                 className="w-full accent-cyan-400"
               />
               <div className="flex justify-between text-[10px] text-slate-500">
@@ -1459,8 +1542,12 @@ export default function LinkPlanner() {
                   <Upload className="mr-1.5 h-3 w-3" /> Load Plan
                 </Button>
                 <Button type="button" variant="outline" size="sm" onClick={handleExportReport}
-                  className="col-span-2 border-cyan-400/40 text-xs h-9 bg-slate-950 text-cyan-200 hover:bg-cyan-400/10">
-                  <Download className="mr-1.5 h-3 w-3" /> Export Report (HTML)
+                  className="border-cyan-400/40 text-xs h-9 bg-slate-950 text-cyan-200 hover:bg-cyan-400/10">
+                  <Download className="mr-1.5 h-3 w-3" /> Report (HTML)
+                </Button>
+                <Button type="button" variant="outline" size="sm" onClick={handleExportJson}
+                  className="border-emerald-400/40 text-xs h-9 bg-slate-950 text-emerald-200 hover:bg-emerald-400/10">
+                  <Download className="mr-1.5 h-3 w-3" /> Topology (JSON)
                 </Button>
               </div>
 

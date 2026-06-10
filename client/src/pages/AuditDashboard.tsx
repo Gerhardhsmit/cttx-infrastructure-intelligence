@@ -30,6 +30,7 @@ export default function AuditDashboard() {
     { latitude: propertyLatitude ?? 0, longitude: propertyLongitude ?? 0, radiusKm: 80, limit: 25 },
     { enabled: Number.isFinite(propertyLatitude) && Number.isFinite(propertyLongitude) },
   );
+  const savedLinkPlan = trpc.linkPlans.list.useQuery({ limit: 1 }, { enabled: Boolean(audit) });
   const createLead = trpc.leads.create.useMutation();
 
   const handleLeadSubmit = async () => {
@@ -176,12 +177,31 @@ export default function AuditDashboard() {
     cttxFollowUpSteps,
     decisionPackItems,
   } = reportGuidance;
+  const linkPlannerTopology = savedLinkPlan.data?.[0]?.recommendationSummary ? {
+    planName: savedLinkPlan.data[0].planName ?? "CTTX Link Plan",
+    propertyName: savedLinkPlan.data[0].propertyName ?? audit.clientName,
+    totalDistanceKm: Number(savedLinkPlan.data[0].totalDistanceKm) || 0,
+    liveDistanceKm: Number(savedLinkPlan.data[0].liveDistanceKm) || 0,
+    linkCount: Array.isArray(savedLinkPlan.data[0].links) ? (savedLinkPlan.data[0].links as any[]).length : 0,
+    uplinkCount: Array.isArray(savedLinkPlan.data[0].links) ? (savedLinkPlan.data[0].links as any[]).filter((l: any) => l?.type === "uplink" || l?.layer === "L0").length : 0,
+    backboneCount: Array.isArray(savedLinkPlan.data[0].links) ? (savedLinkPlan.data[0].links as any[]).filter((l: any) => l?.type === "backbone" || l?.layer === "L1").length : 0,
+    overThresholdCount: 0,
+    weakestFadeMarginDb: 0,
+    viableLinkThresholdKm: 15,
+    routeDecisionExplanation: savedLinkPlan.data[0].recommendationSummary ?? "",
+    recommendationSummary: savedLinkPlan.data[0].recommendationSummary ?? "",
+    links: [],
+    highSites: [],
+    selectedMast: null,
+    facilities: [],
+  } : undefined;
   const generatedReportMarkdown = reportConfirmation
     ? buildGeneratedReportMarkdown({
         audit,
         observations,
         operationalCriticalLocations,
         operationalPainPoints,
+        linkPlannerTopology,
         guidance: reportGuidance,
         lead: reportConfirmation,
       })
@@ -195,6 +215,7 @@ export default function AuditDashboard() {
         observations,
         operationalCriticalLocations,
         operationalPainPoints,
+        linkPlannerTopology,
         guidance: reportGuidance,
         lead: reportConfirmation,
       })

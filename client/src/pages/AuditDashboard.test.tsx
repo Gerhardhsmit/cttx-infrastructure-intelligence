@@ -154,6 +154,11 @@ vi.mock("@/lib/trpc", () => ({
         useMutation: () => ({ mutateAsync: mocks.createLeadMutateAsync, isPending: mocks.leadMutationIsPending }),
       },
     },
+    linkPlans: {
+      list: {
+        useQuery: () => ({ data: [], isLoading: false }),
+      },
+    },
   },
 }));
 

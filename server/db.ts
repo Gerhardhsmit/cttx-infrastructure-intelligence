@@ -382,9 +382,39 @@ export async function createLead(lead: InsertLead): Promise<any> {
 
 
 // Link Planner saved-plan queries
+// ─── In-memory fallback for local dev (no DATABASE_URL) ───
+const inMemoryLinkPlans: LinkPlan[] = [];
+let inMemoryNextId = 1;
+
 export async function createLinkPlan(plan: InsertLinkPlan): Promise<LinkPlan | null> {
   const db = await getDb();
-  if (!db) return null;
+  if (!db) {
+    // In-memory fallback for local dev
+    const now = new Date();
+    const record: LinkPlan = {
+      id: inMemoryNextId++,
+      ownerUserId: (plan as any).ownerUserId ?? null,
+      planName: plan.planName ?? "Untitled",
+      propertyName: plan.propertyName ?? null,
+      centerLatitude: (plan as any).centerLatitude ?? null,
+      centerLongitude: (plan as any).centerLongitude ?? null,
+      propertyAreaHa: (plan as any).propertyAreaHa ?? null,
+      selectedMastId: (plan as any).selectedMastId ?? null,
+      boundary: (plan as any).boundary ?? null,
+      highSites: (plan as any).highSites ?? null,
+      providerMasts: (plan as any).providerMasts ?? null,
+      links: (plan as any).links ?? null,
+      assumptions: (plan as any).assumptions ?? null,
+      recommendationSummary: (plan as any).recommendationSummary ?? null,
+      totalDistanceKm: (plan as any).totalDistanceKm ?? null,
+      liveDistanceKm: (plan as any).liveDistanceKm ?? null,
+      status: (plan as any).status ?? "draft",
+      createdAt: now,
+      updatedAt: now,
+    } as LinkPlan;
+    inMemoryLinkPlans.push(record);
+    return record;
+  }
   try {
     const result = await db.insert(linkPlans).values(plan);
     const id = getInsertId(result);
@@ -401,7 +431,12 @@ export async function createLinkPlan(plan: InsertLinkPlan): Promise<LinkPlan | n
 
 export async function updateLinkPlan(id: number, updates: Partial<InsertLinkPlan>): Promise<LinkPlan | null> {
   const db = await getDb();
-  if (!db) return null;
+  if (!db) {
+    const idx = inMemoryLinkPlans.findIndex(p => p.id === id);
+    if (idx < 0) return null;
+    inMemoryLinkPlans[idx] = { ...inMemoryLinkPlans[idx], ...updates, updatedAt: new Date() } as LinkPlan;
+    return inMemoryLinkPlans[idx];
+  }
   try {
     await db.update(linkPlans).set(updates).where(eq(linkPlans.id, id));
     const rows = await db.select().from(linkPlans).where(eq(linkPlans.id, id)).limit(1);
@@ -414,7 +449,9 @@ export async function updateLinkPlan(id: number, updates: Partial<InsertLinkPlan
 
 export async function getLinkPlanById(id: number): Promise<LinkPlan | null> {
   const db = await getDb();
-  if (!db) return null;
+  if (!db) {
+    return inMemoryLinkPlans.find(p => p.id === id) ?? null;
+  }
   try {
     const rows = await db.select().from(linkPlans).where(eq(linkPlans.id, id)).limit(1);
     return rows.length > 0 ? rows[0] : null;
@@ -426,7 +463,9 @@ export async function getLinkPlanById(id: number): Promise<LinkPlan | null> {
 
 export async function listLinkPlans(limit = 25): Promise<LinkPlan[]> {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) {
+    return inMemoryLinkPlans.slice().sort((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0)).slice(0, limit);
+  }
   try {
     return await db.select().from(linkPlans).orderBy(desc(linkPlans.createdAt)).limit(limit);
   } catch (error) {
