@@ -11,26 +11,23 @@ Professional RF network planning and infrastructure intelligence for rural/remot
 - **Maps:** MapLibre GL 4 with Esri satellite tiles
 - **Database:** MySQL/TiDB (production) — runs without database for local development
 
-## Local Setup (No Database Required)
+# CTTX Link Planner — Local Setup
 
-The app runs fully locally without MySQL. When `DATABASE_URL` is not set, the server uses an in-memory store and a dev guest user (no login required).
+## Prerequisites
+- Node.js v18+ (download from https://nodejs.org)
+- Git
 
+## Steps
 ```bash
-# 1. Clone the repository
 git clone https://github.com/Gerhardhsmit/cttx-infrastructure-intelligence.git
 cd cttx-infrastructure-intelligence
-
-# 2. Install dependencies
 npm install
-
-# 3. Start the development server
 npm run dev
-
-# 4. Open in browser
-# http://localhost:5000/link-planner
 ```
 
-That's it. No `.env` file needed for local development.
+Then open http://localhost:5000/link-planner in your browser.
+
+No database, no .env file, no login needed. Everything runs locally with in-memory storage.
 
 ## Link Planner
 
