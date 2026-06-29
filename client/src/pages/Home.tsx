@@ -4,14 +4,85 @@ import { CttxLogo } from "@/components/CttxLogo";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
-import { MapPin, Zap, Shield, TrendingUp } from "lucide-react";
+import { MapPin, Zap, Shield, TrendingUp, ChevronDown } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const { isAuthenticated } = useAuth();
 
+  const schemaMarkup = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://business.cttx.co.za/#organization",
+        "name": "CTTX",
+        "url": "https://business.cttx.co.za",
+        "knowsAbout": [
+          "Rural Internet Solutions South Africa",
+          "Wireless Internet for Mining Operations South Africa",
+          "Farm Internet Providers South Africa",
+          "Off-grid Internet South Africa"
+        ]
+      },
+      {
+        "@type": "ProfessionalService",
+        "@id": "https://business.cttx.co.za/#service",
+        "name": "CTTX Connectivity Services",
+        "description": "authorised Vodacom Business reseller providing reliable internet solutions, including LTE, fixed wireless, and carrier-grade connectivity, specifically for farms, mines, game reserves, and remote businesses across South Africa."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the best internet for farms in South Africa?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Vodacom Business Fixed Wireless via CTTX is designed specifically for rural operations. It provides symmetrical speeds and carrier-grade reliability without the need for fibre infrastructure, making it ideal for remote farms."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I get business internet without fibre in South Africa?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Through CTTX, you can access LTE and Fixed Wireless alternatives powered by Vodacom Business. These solutions are engineered to deliver high-performance connectivity even in areas where fibre is unavailable."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is there reliable internet for mining operations in remote South Africa?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, CTTX provides carrier-grade managed connectivity specifically designed for the demanding environments of mining operations, ensuring continuous uptime for critical telemetry and communications."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is Private Wireless Infrastructure (PSI)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Private Wireless Infrastructure (PSI) is a carrier-grade private wireless network built for large operations. It goes beyond standard business packages by providing a dedicated, secure, and highly resilient connectivity ecosystem tailored to your specific terrain and operational needs."
+            }
+          }
+        ]
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaMarkup) }}
+      />
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container flex items-center justify-between h-16">
@@ -53,7 +124,7 @@ export default function Home() {
                 onClick={() => setLocation("/audit/new")}
               >
                 <MapPin className="w-5 h-5 mr-2" />
-                Start Site Audit
+                Get a Free Coverage Check & Quote
               </Button>
               <Button size="lg" variant="outline">
                 Learn More
@@ -101,6 +172,39 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="py-20 border-t border-border bg-background">
+        <div className="container max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold mb-12 text-center">Frequently Asked Questions</h2>
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="item-1">
+              <AccordionTrigger>What is the best internet for farms in South Africa?</AccordionTrigger>
+              <AccordionContent>
+                Vodacom Business Fixed Wireless via CTTX is designed specifically for rural operations. It provides symmetrical speeds and carrier-grade reliability without the need for fibre infrastructure, making it ideal for remote farms.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>How do I get business internet without fibre in South Africa?</AccordionTrigger>
+              <AccordionContent>
+                Through CTTX, you can access LTE and Fixed Wireless alternatives powered by Vodacom Business. These solutions are engineered to deliver high-performance connectivity even in areas where fibre is unavailable.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger>Is there reliable internet for mining operations in remote South Africa?</AccordionTrigger>
+              <AccordionContent>
+                Yes, CTTX provides carrier-grade managed connectivity specifically designed for the demanding environments of mining operations, ensuring continuous uptime for critical telemetry and communications.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-4">
+              <AccordionTrigger>What is Private Wireless Infrastructure (PSI)?</AccordionTrigger>
+              <AccordionContent>
+                Private Wireless Infrastructure (PSI) is a carrier-grade private wireless network built for large operations. It goes beyond standard business packages by providing a dedicated, secure, and highly resilient connectivity ecosystem tailored to your specific terrain and operational needs.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 border-t border-border">
         <div className="container max-w-2xl mx-auto text-center">
@@ -114,7 +218,7 @@ export default function Home() {
             onClick={() => setLocation("/audit/new")}
           >
             <MapPin className="w-5 h-5 mr-2" />
-            Start Your First Audit
+            Get Your Quote Today
           </Button>
         </div>
       </section>
