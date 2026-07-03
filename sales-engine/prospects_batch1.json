@@ -1,0 +1,252 @@
+[
+  {
+    "name": "Sekala Private Game Lodge",
+    "town": "Vaalwater, Limpopo",
+    "segment": "Reserve/Lodge",
+    "decision_maker": "Operations Manager",
+    "phone": "+27 82 561 4257",
+    "pain": "Remote Welgevonden reserve; relies on LTE/satellite for guest WiFi and operations",
+    "coverage": "Vodacom LTE coverage confirmed; no fibre to reserve",
+    "source": "https://www.sekala.com/contact-us/contact-information/"
+  },
+  {
+    "name": "Mabula Game Lodge",
+    "town": "Bela-Bela, Limpopo",
+    "segment": "Reserve/Lodge",
+    "decision_maker": "General Manager",
+    "phone": "+27 11 516 4367",
+    "pain": "Big 5 reserve needing reliable guest WiFi and security camera backhaul across 12000ha",
+    "coverage": "Vodacom LTE; no fibre to reserve",
+    "source": "https://mabula.com/"
+  },
+  {
+    "name": "Khaya Ndlovu Manor House",
+    "town": "Hoedspruit, Limpopo",
+    "segment": "Reserve/Lodge",
+    "decision_maker": "Reservations Manager",
+    "phone": "+27 73 301 1913",
+    "pain": "Luxury lodge in Hoedspruit bush; guest expectations for connectivity vs reality of rural link",
+    "coverage": "Vodacom LTE; no fibre infrastructure",
+    "source": "https://www.facebook.com/groups/1399961760434641/posts/2613311152433023/"
+  },
+  {
+    "name": "Ngama Tented Safari Lodge",
+    "town": "Hoedspruit, Limpopo",
+    "segment": "Reserve/Lodge",
+    "decision_maker": "Owner/Manager",
+    "phone": "+27 74 587 8351",
+    "pain": "Tented camp on Guernsey reserve; limited connectivity for bookings and guest experience",
+    "coverage": "Vodacom LTE; no fibre",
+    "source": "https://www.south-africa-info.co.za/country/business/3045/ngama-tented-safari-lodge-hoedspruit"
+  },
+  {
+    "name": "Fleur de Lys Guest Farm",
+    "town": "Hoedspruit, Limpopo",
+    "segment": "Farm",
+    "decision_maker": "Owner",
+    "phone": "+27 79 505 3665",
+    "pain": "Guest farm needing reliable connectivity for bookings, POS, and guest WiFi",
+    "coverage": "Vodacom LTE; no fibre",
+    "source": "https://www.zoominfo.com/c/fleur-de-lys-guest-farm/539113389"
+  },
+  {
+    "name": "Shibula Lodge (Welgevonden)",
+    "town": "Vaalwater, Limpopo",
+    "segment": "Reserve/Lodge",
+    "decision_maker": "Lodge Manager",
+    "phone": "+27 15 330 5062",
+    "pain": "Deep bush location in Welgevonden; connectivity critical for security and guest experience",
+    "coverage": "Vodacom LTE; no fibre to reserve",
+    "source": "https://www.welgevonden.org/limpopo-game-lodge/"
+  },
+  {
+    "name": "Waterberg Game Park",
+    "town": "Melkrivier, Limpopo",
+    "segment": "Reserve/Lodge",
+    "decision_maker": "Resort Manager",
+    "phone": "+27 14 755 4978",
+    "pain": "Large resort with multiple chalets needing campus-wide WiFi; rural location",
+    "coverage": "Vodacom LTE confirmed; no fibre",
+    "source": "https://www.waterberggamepark.co.za/contact"
+  },
+  {
+    "name": "SecuriForce / SecureAgri",
+    "town": "Bloemfontein, Free State",
+    "segment": "Security",
+    "decision_maker": "Tania (Operations)",
+    "phone": "+27 51 101 1601",
+    "pain": "Farm security company needing wireless backhaul for CCTV, beams, and alarm systems on rural farms",
+    "coverage": "Serves Free State/Northern Cape farms; needs point-to-point links",
+    "source": "https://securiforce.co.za/p26/secureagri/secureagri:-keeping-farmers-safe.html"
+  },
+  {
+    "name": "The X Group (Citrus)",
+    "town": "Tzaneen, Limpopo",
+    "segment": "Farm",
+    "decision_maker": "Office Manager",
+    "phone": "+27 15 306 6260",
+    "pain": "Citrus grower/packer needing connectivity for logistics, cold chain monitoring, and admin",
+    "coverage": "Vodacom LTE; limited fibre in Tzaneen industrial",
+    "source": "http://www.thexgroup.co.za/contact.php"
+  },
+  {
+    "name": "Excelsior Wine Estate",
+    "town": "Robertson, Western Cape",
+    "segment": "Farm",
+    "decision_maker": "Estate Manager",
+    "phone": "+27 23 615 2050",
+    "pain": "Wine estate on R317 needing reliable connectivity for cellar operations, POS, guest house",
+    "coverage": "Vodacom LTE; no fibre on R317 route",
+    "source": "https://www.route-62-info.co.za/routes/business/32161/excelsior-wine-walks-robertson"
+  },
+  {
+    "name": "Van Loveren Family Vineyards",
+    "town": "Robertson, Western Cape",
+    "segment": "Farm",
+    "decision_maker": "Estate Manager",
+    "phone": "+27 23 615 1505",
+    "pain": "Large wine farm on R317; needs connectivity for tasting room POS, cellar IoT, admin",
+    "coverage": "Vodacom LTE; no fibre on rural R317",
+    "source": "https://www.cape-winelands-info.co.za/region/business/33541/van-loveren-family-vineyards-robertson"
+  },
+  {
+    "name": "Robertson Winery",
+    "town": "Robertson, Western Cape",
+    "segment": "Farm",
+    "decision_maker": "IT/Operations Manager",
+    "phone": "+27 21 822 5444",
+    "pain": "Major winery needing high-bandwidth for production systems, CCTV, and visitor centre",
+    "coverage": "Partial fibre in town; outlying vineyards on LTE only",
+    "source": "https://robertsonwinery.co.za/"
+  },
+  {
+    "name": "ROAR Construction",
+    "town": "White River, Mpumalanga",
+    "segment": "Construction",
+    "decision_maker": "Robbie Spruit (Director)",
+    "phone": "+27 83 300 3412",
+    "pain": "Construction company needing temporary site connectivity for project management and CCTV",
+    "coverage": "Vodacom LTE; sites often in areas without fixed-line",
+    "source": "https://www.roarconstruction.co.za/contact.html"
+  },
+  {
+    "name": "Polyoak Packaging (Middelburg Warehouse)",
+    "town": "Middelburg, Mpumalanga",
+    "segment": "Factory/Warehouse",
+    "decision_maker": "Branch Manager",
+    "phone": "+27 13 246 8840",
+    "pain": "Distribution warehouse needing reliable connectivity for logistics, inventory, and comms",
+    "coverage": "Vodacom LTE; industrial area may lack fibre",
+    "source": "https://polyoakpackaging.co.za/stores/middelburg-mpumalanga/"
+  },
+  {
+    "name": "Lowveld Academy",
+    "town": "Tzaneen, Limpopo",
+    "segment": "School",
+    "decision_maker": "Principal",
+    "phone": "+27 15 307 1413",
+    "pain": "Private school needing reliable internet for e-learning, admin systems, and campus WiFi",
+    "coverage": "Vodacom LTE; limited fibre in Tzaneen",
+    "source": "https://www.lowveldacademy.co.za/contact.html"
+  },
+  {
+    "name": "Southern Cross Schools",
+    "town": "Hoedspruit, Limpopo",
+    "segment": "School",
+    "decision_maker": "Headmaster",
+    "phone": "+27 15 793 0590",
+    "pain": "IEB school in bush town; needs reliable bandwidth for online assessments and admin",
+    "coverage": "Vodacom LTE; no fibre in Hoedspruit",
+    "source": "https://www.thescschools.com/"
+  },
+  {
+    "name": "Educare Primary School",
+    "town": "Tzaneen, Limpopo",
+    "segment": "School",
+    "decision_maker": "Principal",
+    "phone": "+27 15 004 0588",
+    "pain": "Private primary school needing connectivity for digital learning and parent communication",
+    "coverage": "Vodacom LTE; limited fibre options",
+    "source": "https://www.educaretzaneen.co.za/"
+  },
+  {
+    "name": "Grace Christian Private School",
+    "town": "Siyabuswa, Mpumalanga",
+    "segment": "School",
+    "decision_maker": "Principal",
+    "phone": "+27 13 004 0192",
+    "pain": "Rural school needing internet for curriculum delivery; area has poor fixed-line infrastructure",
+    "coverage": "Vodacom LTE only; no fibre",
+    "source": "https://gracechristianprivateschool.co.za/"
+  },
+  {
+    "name": "Limpopo Wildlife Resorts",
+    "town": "Polokwane, Limpopo",
+    "segment": "Reserve/Lodge",
+    "decision_maker": "General Manager",
+    "phone": "+27 15 293 8015",
+    "pain": "Government resort group managing multiple rural lodges; needs connectivity across remote sites",
+    "coverage": "Multiple sites in Vodacom LTE areas; no fibre",
+    "source": "https://www.lwr.gov.za/"
+  },
+  {
+    "name": "Karoo Catch (Fish Farm)",
+    "town": "Graaff-Reinet, Eastern Cape",
+    "segment": "Farm",
+    "decision_maker": "Operations Manager",
+    "phone": "+27 40 555 0057",
+    "pain": "Aquaculture operation needing connectivity for water quality monitoring and logistics",
+    "coverage": "Vodacom LTE; no fibre in rural Karoo",
+    "source": "https://www.karoo-catch.co.za/wp/contact/"
+  },
+  {
+    "name": "Letaba Estates (Citrus)",
+    "town": "Tzaneen, Limpopo",
+    "segment": "Farm",
+    "decision_maker": "Farm Manager",
+    "phone": "+27 15 306 6260",
+    "pain": "Large citrus estate needing connectivity for irrigation automation, cold chain, and admin",
+    "coverage": "Vodacom LTE; farm spread beyond town fibre reach",
+    "source": "https://www.letaba.com/"
+  },
+  {
+    "name": "Ditholo Game Lodge",
+    "town": "Bela-Bela, Limpopo",
+    "segment": "Reserve/Lodge",
+    "decision_maker": "Lodge Manager",
+    "phone": "+27 14 736 8000",
+    "pain": "Private reserve lodge needing guest WiFi and security connectivity",
+    "coverage": "Vodacom LTE; no fibre to reserve",
+    "source": "https://www.south-african-lodges.com/region/waterberg/lodges/"
+  },
+  {
+    "name": "Marataba Safari Lodge",
+    "town": "Thabazimbi, Limpopo",
+    "segment": "Reserve/Lodge",
+    "decision_maker": "General Manager",
+    "phone": "+27 11 880 9992",
+    "pain": "Luxury lodge in Marakele National Park; 23000ha concession needs reliable comms",
+    "coverage": "Vodacom LTE; extremely remote, no fibre",
+    "source": "https://www.south-african-lodges.com/region/waterberg/lodges/"
+  },
+  {
+    "name": "Newrak Mining",
+    "town": "Thabazimbi, Limpopo",
+    "segment": "Mine",
+    "decision_maker": "Operations Director",
+    "phone": "+27 14 772 2295",
+    "pain": "Mining operations needing reliable connectivity for safety systems, fleet management, and admin",
+    "coverage": "Vodacom LTE; mining area lacks fibre",
+    "source": "https://newrakmining.co.za/"
+  },
+  {
+    "name": "Limberg Mining Company",
+    "town": "Thabazimbi, Limpopo",
+    "segment": "Mine",
+    "decision_maker": "General Manager",
+    "phone": "+27 14 777 1531",
+    "pain": "Chrome/PGM producer needing connectivity for production monitoring, safety, and logistics",
+    "coverage": "Vodacom LTE; no fibre to mine site",
+    "source": "https://www.limberg.co.za/"
+  }
+]
