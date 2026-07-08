@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CRUISER Speed Test — Free Network Diagnostics | South Africa</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CRUISER">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="author" content="CTTX — Authorised Vodacom Business Reseller">
+  <meta name="description" content="Test your internet speed FREE with CRUISER — South Africa's premium network speed diagnostic tool. Download, upload, ping &amp; jitter. Powered by Cloudflare. Slow? Get a CTTX Business Line.">
+  <meta name="keywords" content="speed test, internet speed test, South Africa speed test, CTTX, Vodacom Business, 5G speed test, LTE speed test, SA broadband, rural internet, farm connectivity">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#e8851a">
+  <link rel="canonical" href="https://cttx.co.za/cruiser/">
+  <meta property="og:title" content="CRUISER Speed Test — How Fast Is Your Line?">
+  <meta property="og:description" content="Test your internet speed FREE. Download · Upload · Ping · Jitter. South Africa's sharpest network diagnostic tool. Challenge your friends!">
+  <meta property="og:image" content="https://cruiser-sa.netlify.app/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://cttx.co.za/cruiser/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_ZA">
+  <meta property="og:site_name" content="CRUISER Speed Test">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CRUISER Speed Test — How Fast Is Your Line?">
+  <meta name="twitter:description" content="Test your internet speed FREE. South Africa's sharpest network diagnostic tool.">
+  <meta name="twitter:image" content="https://cruiser-sa.netlify.app/og-image.jpg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="install-banner" id="installBanner" style="display:none;">
+    <div class="install-banner-inner">
+      <img src="icon-192.png" alt="CRUISER icon" class="install-icon">
+      <div class="install-text">
+        <strong>Installeer CRUISER op jou foon</strong>
+        <span>Werk sonder data na eerste laai • Geen app store nodig</span>
+      </div>
+      <button class="install-btn" id="installBtn">Installeer</button>
+      <button class="install-dismiss" id="installDismiss" aria-label="Dismiss">×</button>
+    </div>
+  </div>
+  <div class="bg-layer">
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
+    <canvas class="data-lines-canvas" id="dataLines"></canvas>
+  </div>
+  <main class="app-shell">
+    <header class="header glass-panel">
+      <div class="header-brand">
+        <div class="logo-mark"><img src="icon.svg" alt="CRUISER" class="logo-icon"></div>
+        <div class="logo-text">
+          <span class="logo-title">CRUISER</span>
+          <span class="logo-sub">SPEED DIAGNOSTICS</span>
+        </div>
+      </div>
+      <div class="header-status">
+        <div class="conn-badge lte" id="connBadge">
+          <div class="conn-dot"></div>
+          <span class="conn-label" id="connLabel">LTE+</span>
+        </div>
+      </div>
+    </header>
+    <div class="info-strip glass-panel-subtle">
+      <span id="ipInfo">IP: detecting...</span>
+      <span id="dateStamp"></span>
+    </div>
+    <section class="gauge-section">
+      <div class="status-bar">
+        <span class="status-text" id="statusText">READY</span>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="primary-gauge glass-panel-dark">
+        <canvas id="mainGauge"></canvas>
+        <div class="gauge-center-info">
+          <div class="gauge-phase" id="gaugePhase">READY</div>
+          <div class="gauge-big-value" id="gaugeBigValue">0.0</div>
+          <div class="gauge-big-unit" id="gaugeBigUnit">Mbps</div>
+        </div>
+      </div>
+      <div class="metrics-row">
+        <div class="metric-card glass-panel">
+          <span class="metric-icon down-icon">↓</span>
+          <span class="metric-value" id="metricDown">0.0</span>
+          <span class="metric-label">DOWNLOAD</span>
+          <span class="metric-unit">Mbps</span>
+        </div>
+        <div class="metric-card glass-panel">
+          <span class="metric-icon up-icon">↑</span>
+          <span class="metric-value" id="metricUp">0.0</span>
+          <span class="metric-label">UPLOAD</span>
+          <span class="metric-unit">Mbps</span>
+        </div>
+        <div class="metric-card glass-panel">
+          <span class="metric-icon ping-icon">●</span>
+          <span class="metric-value" id="metricPing">0</span>
+          <span class="metric-label">PING</span>
+          <span class="metric-unit">ms</span>
+        </div>
+        <div class="metric-card glass-panel">
+          <span class="metric-icon jitter-icon">~</span>
+          <span class="metric-value" id="metricJitter">0</span>
+          <span class="metric-label">JITTER</span>
+          <span class="metric-unit">ms</span>
+        </div>
+      </div>
+      <button class="start-btn" id="startBtn" aria-label="Start speed test">
+        <div class="btn-pulse"></div>
+        <div class="btn-ring"></div>
+        <div class="btn-inner">
+          <svg class="btn-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <span class="btn-label" id="btnLabel">START ENGINE</span>
+        </div>
+      </button>
+    </section>
+    <section class="results-panel" id="resultsPanel">
+      <div class="coaching-section glass-panel">
+        <div class="coaching-header">
+          <span class="coaching-icon">⚙</span>
+          <span class="coaching-title" id="coachingTitle">ENGINE REPORT</span>
+        </div>
+        <div class="coaching-verdict" id="coachingVerdict"></div>
+        <div class="coaching-grid" id="coachingGrid"></div>
+        <div class="coaching-tip" id="coachingTip"></div>
+      </div>
+      <div class="share-section glass-panel">
+        <div class="share-title">CHALLENGE YOUR MATES</div>
+        <p class="share-sub">Think your line is fast? Prove it. Share your results and challenge your friends.</p>
+        <div class="share-buttons">
+          <button class="share-btn share-whatsapp" id="shareWA" aria-label="Share on WhatsApp">
+            <svg class="share-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            WhatsApp
+          </button>
+          <button class="share-btn" id="shareNative" aria-label="Share or copy results">
+            <svg class="share-icon" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+            Share
+          </button>
+        </div>
+      </div>
+      <div class="upgrade-nudge glass-panel" id="upgradeNudge" style="display:none;">
+        <div class="nudge-content">
+          <div class="nudge-header">
+            <span class="nudge-icon">🔌</span>
+            <span class="nudge-badge">CTTX BUSINESS</span>
+          </div>
+          <p class="nudge-text" id="nudgeText"></p>
+          <a href="https://business.cttx.co.za" class="nudge-cta" target="_blank" rel="noopener">Explore Business Lines →</a>
+        </div>
+      </div>
+      <div class="glass-panel" style="padding:20px;margin-top:16px;">
+        <div class="share-title">WANT A LINE THAT ACTUALLY PERFORMS?</div>
+        <p class="share-sub">Los jou details — ons kyk wat by jou site moontlik is en kom terug met opsies. Geen verpligting nie.</p>
+        <form id="cruiser-lead-form" autocomplete="on">
+          <label for="cl-name" style="display:block;font-size:13px;opacity:.8;margin:10px 0 4px;">Name *</label>
+          <input type="text" id="cl-name" name="name" required style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.3);color:#fff;font-size:15px;">
+          <label for="cl-phone" style="display:block;font-size:13px;opacity:.8;margin:10px 0 4px;">Phone / WhatsApp *</label>
+          <input type="tel" id="cl-phone" name="phone" required style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.3);color:#fff;font-size:15px;">
+          <label for="cl-email" style="display:block;font-size:13px;opacity:.8;margin:10px 0 4px;">Email</label>
+          <input type="email" id="cl-email" name="email" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.3);color:#fff;font-size:15px;">
+          <label for="cl-location" style="display:block;font-size:13px;opacity:.8;margin:10px 0 4px;">Town / farm / site</label>
+          <input type="text" id="cl-location" name="location" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.3);color:#fff;font-size:15px;">
+          <label style="display:flex;gap:8px;align-items:flex-start;font-size:12px;opacity:.75;margin:12px 0;">
+            <input type="checkbox" name="consent" value="yes" required style="margin-top:2px;">
+            CTTX mag my kontak oor hierdie navraag. My speed test resultate word saamgestuur.
+          </label>
+          <button type="submit" style="width:100%;padding:12px;border-radius:10px;border:0;background:#2ee06f;color:#06240f;font-weight:800;font-size:16px;cursor:pointer;">Get my options</button>
+        </form>
+      </div>
+    </section>
+    <footer class="footer">
+      <div class="footer-brand">CRUISER v3.3 · Powered by Cloudflare</div>
+      <div class="footer-cttx">CTTX — Authorised Vodacom Business Reseller</div>
+      <p class="footer-disclaimer">Results are indicative. Actual speeds depend on network conditions, device, location and time of day.</p>
+    </footer>
+  </main>
+  <a href="https://business.cttx.co.za" class="cttx-banner" target="_blank" rel="noopener">
+    <div class="banner-content">
+      <div class="banner-left">
+        <span class="banner-brand">CTTX</span>
+        <span class="banner-sep">|</span>
+        <span class="banner-tagline">Authorised Vodacom Business Reseller</span>
+      </div>
+      <div class="banner-right"><span class="banner-cta">Get Connected →</span></div>
+    </div>
+  </a>
+  <div class="popup-overlay" id="uploadPopup" style="display:none;" role="dialog" aria-modal="true">
+    <div class="popup-card glass-panel-dark">
+      <div class="popup-emoji">⚠️</div>
+      <div class="popup-title">So kan ons nie boer nie!</div>
+      <p class="popup-text">Jou upload is onder 2 Mbps — dit beteken jou sekuriteitskameras kan nie na die cloud stream nie, video calls sal val, en groot lêers stuur is onmoontlik. Die meeste ou wireless providers gee vinnige download maar terrible upload. Upload is wat jou plaas veilig hou.</p>
+      <div class="popup-solution">'n Dedicated CTTX besigheidslyn gee jou simmetriese spoed — dieselfde upload as download. Jou kameras bly aan, jou data is veilig.</div>
+      <div class="popup-actions">
+        <a href="https://business.cttx.co.za" class="popup-btn primary" target="_blank" rel="noopener">Kyk na CTTX Oplossings</a>
+        <button class="popup-btn secondary" onclick="closeUploadPopup()">Verstaan, dankie</button>
+      </div>
+    </div>
+  </div>
+  <script src="gauge.js"></script>
+  <script src="speedtest.js"></script>
+  <script src="app.js"></script>
+  <script src="cttx-capture.js"></script>
+  <script>
+  // Journey analytics — beacons to /track (Workers Analytics Engine)
+  (function () {
+    function track(e) {
+      try {
+        var t = 'https://cruiser-sa.gerhardcttx.workers.dev/track?e=' + e;
+        if (navigator.sendBeacon) { navigator.sendBeacon(t); }
+        else { fetch(t, { keepalive: true, mode: 'no-cors' }).catch(function () {}); }
+      } catch (_) {}
+    }
+    track('visit');
+    var bind = function (id, ev) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('click', function () { track(ev); });
+    };
+    bind('startBtn', 'test_started');
+    bind('shareWA', 'share_whatsapp');
+    bind('shareNative', 'share_native');
+    var f = document.getElementById('cruiser-lead-form');
+    if (f) f.addEventListener('submit', function () { track('lead_submitted'); });
+  })();
+  </script>
+</body>
+</html>

@@ -36,6 +36,13 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  // CRUISER speed-test app — static assets live in client/public/cruiser/.
+  // Vite serves publicDir files automatically in dev; express.static serves
+  // dist/public/cruiser in production. This redirect makes the bare /cruiser
+  // path (and /cruiser/) resolve to the app's index.html in both modes.
+  app.get(["/cruiser", "/cruiser/"], (_req, res) => {
+    res.redirect(302, "/cruiser/index.html");
+  });
   // tRPC API
   app.use(
     "/api/trpc",

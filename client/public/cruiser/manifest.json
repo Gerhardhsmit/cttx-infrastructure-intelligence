@@ -1,0 +1,25 @@
+{
+    "name": "CRUISER Speed Test",
+    "short_name": "CRUISER",
+    "description": "South Africa's premium network speed diagnostic tool. Test download, upload, ping & jitter. Free.",
+    "start_url": "/cruiser/index.html",
+    "scope": "/cruiser/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#1a1208",
+    "theme_color": "#e8851a",
+    "categories": ["utilities", "productivity"],
+    "lang": "en-ZA",
+    "prefer_related_applications": false,
+    "screenshots": [
+        { "src": "og-image.jpg", "sizes": "1200x630", "type": "image/jpeg", "form_factor": "wide", "label": "CRUISER Speed Test \u2014 Desktop" },
+        { "src": "og-image.jpg", "sizes": "1200x630", "type": "image/jpeg", "form_factor": "narrow", "label": "CRUISER Speed Test \u2014 Mobile" }
+    ],
+    "icons": [
+        { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+        { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+        { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+        { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+        { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    ]
+}
