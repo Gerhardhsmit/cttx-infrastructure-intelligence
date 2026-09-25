@@ -163,7 +163,9 @@ graph TD
 
 ## 5. Monthly Recurring — Carrier Connectivity
 
-**Vodacom Business Connect 100 Mbps** — Uncontended (1:1), Uncapped, Unshaped, No FUP, Symmetrical, Business SLA, Huawei router included, 1 static IP standard. 24-month contract. Subject to feasibility confirmation.
+**Vodacom Business Connect 100 Mbps** — Uncontended (1:1), Uncapped, Unshaped, No FUP, Symmetrical, Business SLA, Huawei router included, 1 static IP standard. 36-month contract (per Gerhard's instruction, 26 Sept 2026 — see note below). Subject to feasibility confirmation.
+
+> ⚠️ **Unconfirmed:** the Notion Vodacom Reseller Pricing Master lists Business Connect on a standard 24-month term; the MRC/NRC figures below are the confirmed 24-month rates. Whether Vodacom's 36-month rate for this product differs (better or worse) has not been checked with Vodacom directly. Confirm before this goes to contract — the monthly figure in this quote may need adjusting once a 36-month rate is confirmed.
 
 | Item | Price (Excl. VAT) | Price (Incl. VAT) |
 |------|---------------------|---------------------|
