@@ -223,26 +223,47 @@ Carrier: Vodacom (100m away)
 
 ## ⚡ Recurring Task Automation
 
-**Using Manus/Notion Calendar:**
-
+**Option 1: Notion Native Reminders** (Free, Built-in)
 ```
-Daily (Mon-Fri 09:00 SAST):
-├─ Check Notion for new tasks
-├─ Review Phase 1 site surveys
-├─ Update Phase 2 Link Planner progress
-└─ Log daily time for invoicing
-
-Weekly (Friday 17:00):
-├─ Export all Link Planner designs
-├─ Update field validation status
-├─ Reconcile costs vs contract value
-└─ Email Gerhard: phase status
-
-Bi-weekly (Every other Monday):
-├─ Review all proposals sent
-├─ Update client communications
-└─ Identify blockers
+Set in Notion Calendar/Database:
+├─ Daily reminder: "Check Notion Active Projects view"
+├─ Weekly (Friday): "Export Link Planner designs + send status to Gerhard"
+└─ Bi-weekly (Monday): "Review proposals & identify blockers"
 ```
+
+**Option 2: Gmail Labels + Filters** (Free)
+```
+Create filters:
+├─ "CTTX Daily Standup" label → auto-flag projects needing update
+├─ "Phase Complete" label → trigger next phase task creation
+└─ "Cost Form Added" label → reconcile budget
+```
+
+**Option 3: GitHub Actions** (Free - built into repo)
+```yaml
+# .github/workflows/daily-standup.yml
+schedule:
+  - cron: '0 7 * * 1-5'  # Mon-Fri 07:00 UTC (08:00 SAST)
+  
+On trigger:
+├─ Fetch all "Active" projects from Notion
+├─ Email Gerhard daily task list
+└─ Slack notification: "Check Notion for Phase tasks"
+```
+
+**Option 4: Simple Self-Reminder** (Lowest friction)
+```
+Every morning:
+├─ Open Notion app on phone
+├─ Quick glance: Active Projects view
+├─ 2 min: Check which phase, which tasks
+└─ Done. No automation needed.
+```
+
+**Recommended: Combination**
+1. Notion native reminders (5 sec setup, works offline)
+2. GitHub Actions daily standup (free, automated)
+3. Your manual morning check (2 min, takes 30 seconds)
 
 ---
 
@@ -265,9 +286,9 @@ Bi-weekly (Every other Monday):
 - ✅ **Link Planner:** Boundary-first design ready
 - ✅ **Notion Tracking:** Clients + Cost Forms databases ready
 - ✅ **OneDrive Structure:** Organized by project code
+- ✅ **Task Automation:** Use Notion reminders or GitHub Actions (no Manus)
 - ⏳ **Auto-Workflow:** To be connected (webhook from Sales Engine → Notion)
-- ⏳ **Task Automation:** To be scheduled (Manus daily check)
-- ⏳ **Link Planner Export:** To be auto-imported to Notion (manual for now)
+- ⏳ **Link Planner Export:** Manual copy-paste to Notion for now (or GitHub Actions webhook)
 
 ---
 
