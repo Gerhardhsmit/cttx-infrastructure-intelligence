@@ -19,11 +19,11 @@ This proposal outlines a comprehensive wireless infrastructure upgrade for Baref
 - Cabinet (w/ MPPT & Li Battery Switchgear): R32,970.50
 - Solar Panels (Canadian 680W x4): R10,120.00
 - Invertor (Grid/Solar): R2,472.50
-- **Infrastructure Subtotal:** R90,068.00  
+- Outdoor Cabling (40m @ R12/m): R552.00
+- Mounting Brackets (15x @ R450): R7,762.50
+- **Infrastructure Subtotal:** R98,382.50  
 
-**Total Equipment + Infrastructure (Incl. VAT):** R251,394.60  
-**Still Pending:** Mounting Brackets & Hardware — Quote TBD  
-**Grand Total (Incl. All):** R251,394.60 + TBD  
+**GRAND TOTAL (Equipment + Infrastructure):** **R259,709.10**  
 *(Cost Saving: R20,730 excluded for surge suppressors — using proper earthing instead)*  
 **Currency:** South African Rand  
 **Delivery:** Stock available; selected items ETA mid-November 2026
@@ -171,18 +171,19 @@ The CTTX infrastructure solution leverages a hybrid wireless network architectur
 | | Outdoor Cabinet w/ MPPT & Li Battery Switchgear | 1 | R28,670 | **R28,670** |
 | | Canadian 680W Solar Panels | 4 | R2,200 | **R8,800** |
 | | Grid/Solar Invertor | 1 | R2,150 | **R2,150** |
-| | Mounting Brackets & Hardware | TBD | TBD | **TBD** |
+| | Outdoor Cabling (40m @ R12/m) | 40m | R12 | **R480** |
+| | Mounting Brackets & Hardware | 15 | R450 | **R6,750** |
 | | | | | |
 | **Equipment SUBTOTAL (Excl. VAT)** | | | | **R140,284.00** |
 | **Equipment VAT (15%)** | | | | **R21,042.60** |
 | **Equipment TOTAL (Incl. VAT)** | | | | **R161,326.60** |
 | | | | | |
-| **Infrastructure SUBTOTAL (Excl. VAT)** | *Mast + Cabinet + Solar Panels + Invertor + Brackets* | | | **R78,320 + TBD** |
-| **Infrastructure VAT (15%)** | | | | **R11,748 + TBD** |
-| **Infrastructure TOTAL (Incl. VAT)** | *Mast + Cabinet + Solar (Partial)* | | | **R90,068 + TBD** |
+| **Infrastructure SUBTOTAL (Excl. VAT)** | *Mast + Cabinet + Solar + Invertor + Cables + Brackets* | | | **R85,550** |
+| **Infrastructure VAT (15%)** | | | | **R12,832.50** |
+| **Infrastructure TOTAL (Incl. VAT)** | *Complete Outdoor Infrastructure* | | | **R98,382.50** |
 | | | | | |
-| **EQUIPMENT + INFRASTRUCTURE (Incl. VAT)** | *(Equipment + Mast + Cabinet + Solar Panels + Invertor)* | | | **R251,394.60** |
-| **GRAND TOTAL (+ Mounting Brackets)** | *(Final - Pending Brackets Quote)* | | | **R251,394.60 + TBD** |
+| **EQUIPMENT + INFRASTRUCTURE (Incl. VAT)** | *(Equipment + Complete Outdoor Infrastructure)* | | | **R259,709.10** |
+| **GRAND TOTAL (Incl. All)** | *(Final Proposal Total)* | | | **R259,709.10** |
 
 ### Additional Costs (If Required)
 
