@@ -200,6 +200,53 @@
   .invest-block .invest-sub { color: var(--muted); font-size: 14px; margin-top: 12px; }
 
   /* ---------- Scope list ---------- */
+  /* ---------- Driver cards ---------- */
+  .driver-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin: 28px 0;
+  }
+  .driver-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 22px;
+  }
+  .driver-card .driver-label {
+    font-family: "Roboto Mono", monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .driver-card p { font-size: 14.5px; color: var(--text); margin: 0; max-width: none; }
+
+  .avail-block {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    padding: 28px 26px;
+    margin: 32px 0 8px;
+    flex-wrap: wrap;
+  }
+  .avail-block .avail-num {
+    font-family: "Inter Tight", sans-serif;
+    font-weight: 800;
+    font-size: 52px;
+    color: var(--accent);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .avail-block .avail-num span { font-size: 20px; color: var(--muted); font-weight: 600; }
+  .avail-block .avail-text { flex: 1; min-width: 240px; }
+  .avail-block .avail-text .avail-title { font-weight: 600; font-size: 15.5px; margin-bottom: 6px; }
+  .avail-block .avail-text p { color: var(--muted); font-size: 14px; margin: 0; }
+
   .scope-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -359,6 +406,37 @@
 <section>
   <div class="section-head">
     <span class="section-num">03</span>
+    <h2>Why this has to work every time</h2>
+  </div>
+  <p class="lede">A lodge network carries three different loads at once. This design was built to hold all three, not just the one that's easiest to sell.</p>
+
+  <div class="driver-grid">
+    <div class="driver-card">
+      <div class="driver-label">Client Experience</div>
+      <p>Many guests are international, checking in with family across several time zones — sharing the day's sighting, confirming they've arrived safely, staying reachable somewhere their own cellphone has no signal. That only works if the connection is as reliable at 2am as it is at 2pm.</p>
+    </div>
+    <div class="driver-card">
+      <div class="driver-label">Operational Requirement</div>
+      <p>Bookings, POS, staff communication and day-to-day lodge management all run over this same network. A dropped connection on a busy weekend isn't an inconvenience — it's a stalled payment or a missed booking.</p>
+    </div>
+    <div class="driver-card">
+      <div class="driver-label">Security Requirement</div>
+      <p>Reserves deal with real incidents — a boundary breach, a security concern that surfaces after the office has closed for the night. When that happens, communication is what determines how fast a response reaches the right people. A network that goes quiet after hours is an operational risk, not a technicality.</p>
+    </div>
+  </div>
+
+  <div class="avail-block">
+    <div class="avail-num mono">99.9<span>%</span></div>
+    <div class="avail-text">
+      <div class="avail-title">Designed availability</div>
+      <p>Built on an engineered mast in place of the gum pole it replaces, a Vodacom Business SLA link already confirmed for high availability at this site, and solar/battery power with no single point of failure. CTTX also monitors the network remotely, so an issue is caught before it becomes an outage.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <span class="section-num">04</span>
     <h2>The investment</h2>
   </div>
   <p class="lede">One number, covering the complete build — design, hardware, mast, power system, installation, and commissioning.</p>
@@ -419,7 +497,7 @@
 
 <section>
   <div class="section-head">
-    <span class="section-num">04</span>
+    <span class="section-num">05</span>
     <h2>The financial case</h2>
   </div>
   <p class="lede">Once built, the lodge's monthly bill drops and stays down — while the current provider's would only keep climbing.</p>
@@ -499,7 +577,7 @@
 
 <section>
   <div class="section-head">
-    <span class="section-num">05</span>
+    <span class="section-num">06</span>
     <h2>Next steps</h2>
   </div>
   <ul class="steps">
