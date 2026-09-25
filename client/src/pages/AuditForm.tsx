@@ -2082,7 +2082,7 @@ export default function AuditForm() {
                           <Label htmlFor={`${location.id}-photo-url`}>Photo or evidence reference</Label>
                           <Input
                             id={`${location.id}-photo-url`}
-                            placeholder="/manus-storage/... or evidence link"
+                            placeholder="Evidence link (URL or file path)"
                             value={location.photoUrl}
                             onChange={(e) => updateOperationalCriticalLocation(location.id, { photoUrl: e.target.value })}
                             className="mt-2 bg-input/40"
