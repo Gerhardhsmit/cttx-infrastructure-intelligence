@@ -15,9 +15,10 @@ This proposal outlines a comprehensive wireless infrastructure upgrade for Baref
 
 **Equipment Investment (Incl. VAT):** R161,326.60  
 **Mast Investment (9m + Plinth):** R44,505.00 (Incl. VAT)  
-**Equipment + Mast Total (Incl. VAT):** R205,831.60  
-**Remaining Infrastructure (TBD):** Cabinet, Solar, Brackets — Pending Quotes  
-**Grand Total (Incl. All):** R205,831.60 + TBD  
+**Cabinet Investment (w/ MPPT & Li Battery Switchgear):** R32,970.50 (Incl. VAT)  
+**Equipment + Mast + Cabinet Total (Incl. VAT):** R239,307.10  
+**Remaining Infrastructure (TBD):** Solar Panels + Batteries, Mounting Brackets — Pending Quotes  
+**Grand Total (Incl. All):** R239,307.10 + TBD  
 *(Cost Saving: R20,730 excluded for surge suppressors — using proper earthing instead)*  
 **Currency:** South African Rand  
 **Delivery:** Stock available; selected items ETA mid-November 2026
@@ -113,7 +114,7 @@ The CTTX infrastructure solution leverages a hybrid wireless network architectur
 | **Network Switches** | DuxNet 8-Port PoE+ L2 Cloud | 4 | Gigabit, 2x SFP uplinks, cloud managed |
 | **Grounding & Earthing** | Comprehensive Earthing System | 1 | Protects all nodes via proper ground design |
 | **Outdoor Mast** | 9m Galvanized Steel Tower with Plinth | 1 | Height: 9m, Pre-installed concrete foundation, CTTX certified |
-| **Equipment Cabinet** | Weather-Sealed Outdoor Enclosure | 1 | Backhaul radios, switches, surge protection, climate control (Quote TBD) |
+| **Equipment Cabinet** | Weather-Sealed Outdoor Enclosure w/ MPPT & Li Battery Switchgear | 1 | Backhaul radios, switches, MPPT charge controller, Lithium battery switchgear, climate control |
 | **Solar Power System** | Grid-Independent Power Solution | 1 | Panels, battery bank, charge controller, inverter (Quote TBD) |
 | **Mounting Hardware** | Radio Brackets & Mounts | TBD | Stainless steel, vibration-dampened, UV-resistant (Quote TBD) |
 
@@ -161,7 +162,7 @@ The CTTX infrastructure solution leverages a hybrid wireless network architectur
 | | DuxNet Gigabit PoE+ L2 Switches | 4 | R1,899 | R7,596 |
 | **Grounding & Protection** | Comprehensive Earthing System | 1 | — | Included |
 | **Outdoor Infrastructure** | 9m Steel Mast with Plinth (CTTX) | 1 | R38,700 | **R38,700** |
-| | Weather-Sealed Cabinet | 1 | TBD | **TBD** |
+| | Outdoor Cabinet w/ MPPT & Li Battery Switchgear | 1 | R28,670 | **R28,670** |
 | | Solar Power System | 1 | TBD | **TBD** |
 | | Mounting Brackets & Hardware | TBD | TBD | **TBD** |
 | | | | | |
@@ -169,12 +170,12 @@ The CTTX infrastructure solution leverages a hybrid wireless network architectur
 | **Equipment VAT (15%)** | | | | **R21,042.60** |
 | **Equipment TOTAL (Incl. VAT)** | | | | **R161,326.60** |
 | | | | | |
-| **Infrastructure SUBTOTAL (Excl. VAT)** | *Mast (R38,700) + Cabinet + Solar + Brackets* | | | **R38,700 + TBD** |
-| **Infrastructure VAT (15%)** | | | | **R5,805 + TBD** |
-| **Infrastructure TOTAL (Incl. VAT)** | | | | **R44,505 + TBD** |
+| **Infrastructure SUBTOTAL (Excl. VAT)** | *Mast (R38,700) + Cabinet (R28,670) + Solar + Brackets* | | | **R67,370 + TBD** |
+| **Infrastructure VAT (15%)** | | | | **R10,105.50 + TBD** |
+| **Infrastructure TOTAL (Incl. VAT)** | *Mast + Cabinet (Partial)* | | | **R77,475.50 + TBD** |
 | | | | | |
-| **EQUIPMENT + MAST TOTAL (Incl. VAT)** | *(Equipment + 9m Mast with Plinth)* | | | **R205,831.60** |
-| **GRAND TOTAL (+ Cabinet + Solar + Brackets)** | *(Final - Pending Cabinet/Solar Quotes)* | | | **R205,831.60 + TBD** |
+| **EQUIPMENT + MAST + CABINET (Incl. VAT)** | *(Equipment + 9m Mast + Cabinet w/ MPPT)* | | | **R239,307.10** |
+| **GRAND TOTAL (+ Solar + Brackets)** | *(Final - Pending Solar/Brackets Quotes)* | | | **R239,307.10 + TBD** |
 
 ### Additional Costs (If Required)
 
