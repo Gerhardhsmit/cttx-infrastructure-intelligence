@@ -356,13 +356,88 @@ cttx-infrastructure-intelligence/
 
 1. Load this CLAUDE.md for context
 2. Check .claude/skills/ for available project skills
-3. When user provides opportunity intent, recognize it and route to new-opportunity workflow
-4. Retrieve customer context from existing files (if customer already worked on)
-5. Inspect supplied files automatically
-6. Reference CTTX_CRITICAL_DECISIONS for network/technical rules
-7. Reference strategic positioning and sales engine for commercial context
-8. Mark any invoked pricing/commercial rules as coming from specific authoritative source
-9. Flag any information that does NOT exist with MISSING → WHY IT MATTERS → QUESTION format
+3. Be ready to recognize and immediately execute new opportunities
+
+---
+
+## EXECUTION TRIGGER: DETECT & EXECUTE "NEW OPPORTUNITY"
+
+**When user provides any of these patterns:**
+- "New opportunity: [anything]"
+- "New [type] opportunity"
+- "New hybrid", "New PSI", "New assessment", etc.
+- "[Customer] [Type] [Carrier/Details]" (obvious opportunity description)
+- "Vodacom + CTTX [anything]" (recognized hybrid pattern)
+
+**IMMEDIATE RESPONSE (do NOT ask what to do):**
+
+1. **Invoke the skill immediately:**
+   ```
+   Skill("new-opportunity.md") 
+   ```
+   (or call it directly without asking)
+
+2. **Execute the workflow step-by-step:**
+   - Parse customer name and opportunity type
+   - Load CTTX business context (this file)
+   - Retrieve customer context (if exists)
+   - Retrieve opportunity-specific context
+   - Inspect supplied files automatically
+   - Build solution architecture
+   - Build commercial model
+   - Generate proposal/quotation
+   - Identify blockers (only then ask)
+
+3. **Do NOT say:** "What would you like me to do?"
+
+4. **DO say:** "Recognized [Opportunity Type] for [Customer]. Loading context and beginning execution. I'll retrieve existing information, analyze technical evidence, and build the solution."
+
+5. **Then ACTUALLY BEGIN DOING IT** — do not merely describe the plan.
+
+---
+
+## AUTOMATIC WORKFLOW ROUTING
+
+| Input Pattern | Opportunity Type | Workflow |
+|---|---|---|
+| Lodge/Reserve/Farm + connectivity | Hybrid (automatic) | Load carrier + private infra context |
+| Vodacom + CTTX | Hybrid | Load Vodacom reseller + infrastructure context |
+| "New hybrid" | Hybrid | Load full hybrid model (carrier handoff, backbone, distribution, power) |
+| "New assessment" | Assessment | Load GIS/RF analysis context |
+| "New PSI" | PSI | Load spectrum/radio network context |
+| [Customer name] only | Lookup + route | Retrieve existing customer records and classify by history |
+
+**Default behavior:** Route to HYBRID if property + connectivity is mentioned (per CTTX core model)
+
+---
+
+## NEVER ASK THESE QUESTIONS (answers exist in system)
+
+❌ "Are you a Varrucom/Vodacom reseller?" → Already documented  
+❌ "What does CTTX do?" → CLAUDE.md defines it  
+❌ "What proposal template should we use?" → Determined by opportunity type  
+❌ "What would you like me to do?" → Assume WORK THE OPPORTUNITY  
+❌ "Do you have technical files?" → Ask specifically if relevant, don't ask generically  
+
+---
+
+## EXPLICIT DEFAULT ACTION
+
+**When user says "New opportunity":**
+
+The default action is: **EXECUTE THE OPPORTUNITY WORKFLOW**
+
+Not: research, not: ask questions, not: explain CTTX
+
+**BEGIN WITH:**
+1. Parse input
+2. Load context
+3. Retrieve evidence
+4. Classify
+5. Build solution
+6. Only ask for genuinely missing information
+
+**The system is instructed to WORK, not to ASK.**
 
 ---
 
