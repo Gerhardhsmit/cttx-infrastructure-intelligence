@@ -27,27 +27,78 @@
 - Ongoing managed service (offered as a separate optional add-on below)
 - Any works beyond the confirmed coverage zones without a change order
 
-### Assumption Flagged
-Line-of-sight from the proposed mast position to the Vodacom Business Connect handoff point has **not yet been formally confirmed**. Pricing below is presented on the basis that feasibility is confirmed during site survey. If LOS is not clear from the current mast position, a design revision may be required before final sign-off.
+### ⚠️ CORRECTION (26 Sept 2026) — Field RF Survey Received
+
+Abel Ringisai (CTTX Wireless Team Leader) has already completed the actual RF link-planning survey for this site (KML export, field-dated 22 September 2026). This is **real, confirmed LOS data** — not an assumption — and it changes two things the original draft got wrong:
+
+1. **LOS is confirmed, not pending.** Every one of the 28 subscriber links below has a modeled Fresnel/LOS profile in Abel's survey. The "LOS not yet confirmed" language below is superseded.
+2. **This is a two-site network, not a single mast.** The survey shows two separate base station locations — site **"7"** (co-located with the main lodge, serving 8 close-range links) and site **"Tower"** (~1.3km away, serving 20 links including a long-range hop of up to 3km to the staff village). The BOM below prices **one** 9m mast with plinth. **Open question for Gerhard: is "Tower" an existing structure already on site, or does this design require a second mast that is not yet priced?** This must be resolved before the quote is finalized — see Section 13.
 
 ---
 
-## Network Topology
+## Network Topology (Corrected — Two-Site Design per Field Survey)
 
 ```mermaid
 graph TD
-    A[Vodacom Core Network] -->|Business Connect 100 Mbps SLA| B[9m Mast: Cambium ePMP 4500L Base Station]
-    B -->|Dedicated Microwave Backhaul| C[Cambium ePMP Force 4525L Subscriber Modules x28]
-    C --> D[Outdoor Equipment Cabinet]
-    D --> E[MPPT Charge Controller + Li Battery Switchgear]
-    D --> F[4x DuxNet L2 PoE+ Cloud Switches]
-    G[Solar Array: 4x Canadian 680W] --> E
-    E -->|Backup Power| F
-    F --> H[28x DuxNet Wi-Fi 6 Ceiling APs - Indoor]
-    F --> I[2x DuxNet Outdoor Dual-Band APs]
-    H --> J[Guest & Operational Wi-Fi]
-    I --> J
+    V[Vodacom Core Network] -->|Business Connect 100 Mbps SLA| S7[Site 7: 9m Mast, ePMP 4500L Base Station]
+    S7 -->|~50-200m PMP links, 8 endpoints| SUB1[Rooms 2,3,4,5,9,10 + School + Workshop]
+    S7 -.->|Backbone hop, ~1.3km, LOS confirmed| ST[Site Tower: ePMP 4500L Base Station - structure TBC]
+    ST -->|~750-950m, near cluster| SUB2[Rooms 1,6,7,8,11 + Boma + Spa + Main Link]
+    ST -->|~1.7-3.0km, far cluster| SUB3[Villas + Directors House + Staff 1-10]
+    SUB1 --> CAB[Outdoor Equipment Cabinet: MPPT + Li Battery Switchgear]
+    SUB2 --> CAB
+    SUB3 --> CAB
+    SOLAR[Solar Array: 4x Canadian 680W] --> CAB
+    CAB --> SW[4x DuxNet L2 PoE+ Cloud Switches]
+    SW --> APIN[28x DuxNet Wi-Fi 6 Ceiling APs - Indoor]
+    SW --> APOUT[2x DuxNet Outdoor Dual-Band APs]
+    APIN --> WIFI[Guest & Operational Wi-Fi]
+    APOUT --> WIFI
 ```
+
+---
+
+## Field RF Survey — Link Detail (Source: Abel Ringisai, CTTX Wireless Team Leader, 22 Sept 2026)
+
+**Site "7"** (co-located with main lodge cluster) — 8 short-range links:
+
+| Link | Distance | Notes |
+|------|---------|-------|
+| 7 → Room 2 | 86m | Clear |
+| 7 → Room 3 | 52m | Clear |
+| 7 → Room 4 | 71m | Clear |
+| 7 → Room 5 | 97m | Clear |
+| 7 → Room 9 | 59m | Clear |
+| 7 → Room 10 | 83m | Clear |
+| 7 → School | 160m | Clear |
+| 7 → Workshop | 201m | Clear |
+
+**Site "Tower"** (~1.3km from Site 7) — 20 links, near cluster + far cluster:
+
+| Link | Distance | Notes |
+|------|---------|-------|
+| Tower → Room 1 | 772m | Near cluster |
+| Tower → Room 6 | 765m | Near cluster |
+| Tower → Room 7 | 769m | Near cluster (co-located with Site 7) |
+| Tower → Room 8 | 754m | Near cluster |
+| Tower → Room 11 | 847m | Near cluster |
+| Tower → Boma | 941m | Near cluster |
+| Tower → Main Link | 812m | Near cluster |
+| Tower → Spa | 845m | Near cluster |
+| Tower → Villas | 1,770m | **Mid-range — verify link budget** |
+| Tower → Directors House | 2,361m | **Long-range — verify link budget at 100Mbps** |
+| Tower → Staff 1 | 2,278m | **Long-range — verify link budget** |
+| Tower → Staff 2 | 2,327m | **Long-range — verify link budget** |
+| Tower → Staff 3 | 2,587m | **Long-range — verify link budget** |
+| Tower → Staff 4 | 2,872m | **Long-range — verify link budget** |
+| Tower → Staff 5 | 2,909m | **Long-range — verify link budget** |
+| Tower → Staff 6 | 2,940m | **Long-range — verify link budget** |
+| Tower → Staff 7 | 2,957m | **Long-range — verify link budget** |
+| Tower → Staff 8 | 3,003m | **Longest link in the network — verify link budget** |
+| Tower → Staff 9 | 2,976m | **Long-range — verify link budget** |
+| Tower → Staff 10 | 2,930m | **Long-range — verify link budget** |
+
+**Design implication:** This is not a uniform PMP cell. Per CTTX's own Backbone → Distribution → Backhaul doctrine, the Site 7 → Tower hop plus the 11 links beyond 1.7km to the staff village function as a genuine **backbone reach into a distant facility cluster**, not routine short-range distribution. The staff village links (up to 3km) need their own link budget check (BER, achievable payload throughput at 100 Mbps target, Fresnel clearance at those specific frequencies/antenna heights) before being priced identically to the sub-100m room links on the same BOM line. This is flagged, not yet resolved.
 
 ---
 
@@ -184,12 +235,15 @@ Total upfront (infrastructure R334,066.26 + Vodacom NRC R3,599.00) = **R337,665.
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|------------|
-| LOS not confirmed from proposed mast position | Medium | High | Site survey (included) confirms LOS before final commitment; design revision if required |
+| **Second base station site ("Tower") not priced** — BOM prices one mast; the field survey requires two physical hub sites | **Confirmed gap** | **High** | Resolve before sign-off: confirm whether "Tower" is an existing structure or needs its own mast/cabinet/power — see Next Steps |
+| Long-range links (1.7-3.0km to Villas/Directors House/Staff Village) may not sustain 100 Mbps symmetrical on the same hardware/pricing as the sub-100m room links | Medium | Medium-High | Link budget verification required per link before final commissioning; may need higher-gain antennas on longest hops |
 | Vodacom feasibility delay/rejection at this specific site | Low–Medium | High | Feasibility check submitted early in process; fallback options assessed if declined |
 | ePMP Force 4525L stock delay (ETA mid-Nov 2026) | Confirmed | Medium | Installation phased — mast/cabinet/solar/switches proceed first; subscriber modules follow on confirmed ETA |
-| Cable run distances differ from 40m estimate | Medium | Low–Medium | Confirmed on-site survey; cable line item adjusted before final invoice if materially different |
-| Power system undersized for load (28 APs + backhaul) | Low | High | Solar/battery sizing validated during design phase against actual measured load |
+| Cable run distances differ from 40m estimate | Medium | Low–Medium | Confirmed on-site survey; cable line item adjusted before final invoice if materially different — note the ~3km backbone hop and long subscriber runs mean actual cable/civil needs at the Tower site are likely much higher than the 40m estimate |
+| Power system undersized for load (28 APs + backhaul across two sites) | Low–Medium | High | Solar/battery sizing validated per site against actual measured load — confirm whether one solar/battery system (as priced) covers both sites or a second system is needed at "Tower" |
 | No managed retainer taken — issues go undetected | Medium | Medium–High | Recommended as add-on; lodge to confirm decision before go-live |
+
+> LOS itself is **no longer a risk item** — Abel Ringisai's field RF survey (22 Sept 2026) confirms modeled LOS/Fresnel clearance for all 28 links. The risks above are about scope completeness (second site) and link performance at distance, not whether LOS exists.
 
 ---
 
@@ -215,10 +269,29 @@ Total upfront (infrastructure R334,066.26 + Vodacom NRC R3,599.00) = **R337,665.
 
 ## 12. Next Steps
 
-1. Confirm site survey date (feasibility + LOS confirmation)
-2. Submit Vodacom Business Connect feasibility request for this site
-3. Confirm managed service retainer decision
-4. Approve quote and pay deposit to commence
+1. **Resolve the "Tower" site question with Abel** — existing structure, or a second mast/cabinet/power system to price? This changes the CAPEX total materially and must be settled before this quote is finalized.
+2. Confirm link budget for the 11 long-range links (1.7–3.0km) to the staff village / Directors House / Villas cluster
+3. Submit Vodacom Business Connect feasibility request for this site
+4. Confirm managed service retainer decision
+5. Approve quote and pay deposit to commence
+
+**This quote is not yet final** — it correctly prices the hardware, labour, and carrier connectivity that were confirmed, but Section 13 below and the Risk Table identify a real scope gap (second site) that changes the total. Do not send to Shelley until Section 13 is resolved.
+
+---
+
+## 13. Open Item Requiring Resolution — Second Base Station Site
+
+Per rule 9 (source-of-truth before inventing anything): the field survey (KML, Abel Ringisai, 22 Sept 2026) shows this network requires **two physical base station sites**, roughly 1.3km apart:
+
+- **Site "7"** — co-located with the main lodge, serves 8 short-range links (52–201m). This is what the current BOM (9m mast, cabinet, solar, 40m cable) prices.
+- **Site "Tower"** — a second location serving 20 links, including 11 long-range hops (1.7–3.0km) to the staff village, Director's House, and Villas.
+
+**MISSING → WHY IT MATTERS → WHERE IT SHOULD LIVE → WHAT I PROPOSE**
+
+- **MISSING:** Confirmation of what "Tower" physically is, and its power/mounting requirements.
+- **WHY IT MATTERS:** If "Tower" needs its own mast, cabinet, solar, and cable run, the CAPEX in Section 4 (R334,066.26) is understated — potentially by close to the cost of a second infrastructure package, which would push the total materially higher.
+- **WHERE IT SHOULD LIVE:** This should be resolved with Abel directly (he ran the survey) and recorded either in this quote or in the CTTX opportunity record for Barefoot Addo, so the next site with a similar two-site design doesn't hit the same gap.
+- **WHAT I PROPOSE:** Do not present a total price to Shelley until this is confirmed. If "Tower" is an existing structure (likely, given the naming — it may be pre-existing infrastructure on the property), only mounting/power tie-in needs pricing, not a full second mast+cabinet+solar package. If it is not existing, a second infrastructure package priced consistently with Section 2 needs to be added before the quote is final.
 
 ---
 
