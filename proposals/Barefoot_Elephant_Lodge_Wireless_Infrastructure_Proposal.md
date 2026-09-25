@@ -13,7 +13,10 @@
 
 This proposal outlines a comprehensive wireless infrastructure upgrade for Barefoot Elephant Lodge, designed to deliver enterprise-grade connectivity throughout the property. The solution combines industry-leading point-to-point and point-to-multipoint wireless technology with reliable local network infrastructure, enabling seamless guest connectivity, operational efficiency, and future scalability.
 
-**Investment Total (Incl. VAT):** R185,166.10  
+**Equipment Investment (Incl. VAT):** R161,326.60  
+**Infrastructure Investment (TBD):** Mast, Cabinet, Solar, Brackets — Pending Quotes  
+**Total Investment (TBD):** To be confirmed  
+*(Cost Saving: R20,730 excluded for surge suppressors — using proper earthing instead)*  
 **Currency:** South African Rand  
 **Delivery:** Stock available; selected items ETA mid-November 2026
 
@@ -52,28 +55,49 @@ The CTTX infrastructure solution leverages a hybrid wireless network architectur
 - **Seamless Roaming:** Guest devices automatically switch between APs without disconnection
 
 ### 2.3 Network Core & Protection
-**Equipment:** DuxNet Managed Switches + Surge Suppressors
+**Equipment:** DuxNet Managed Switches + Proper Earthing
 
 - **4x DuxNet 8-Port Gigabit PoE+ L2 Cloud Switches:** Intelligent network switching with cloud management
-- **Redundant Surge Protection:** 30x Gigabit Surge Suppressors (56V & 30V) protecting all network nodes
+- **Grounding & Earthing:** Comprehensive earthing system protecting all outdoor and indoor network nodes
+
+### 2.4 Outdoor Infrastructure & Power
+**Equipment:** Mast, Cabinet, Solar Power, Mounting Brackets
+
+- **Outdoor Mast:** Steel communication tower for elevated antenna placement and line-of-sight optimization
+- **Outdoor Equipment Cabinet:** Weather-sealed enclosure for backhaul equipment, switches, and power conditioning
+- **Solar Power System:** Renewable energy solution with battery backup for reliable off-grid operation
+- **Radio Brackets & Mounts:** Heavy-duty mounting hardware for antennas, APs, and equipment installation
 
 ---
 
 ## 3. Technical Architecture
 
 ```
-Internet/WAN
-    ↓
-ePMP 4500L Access Points (x2) [Backhaul Terminal]
-    ↓
-Surge Suppression & Protection Layer
-    ↓
-DuxNet L2 Cloud Switches (x4) [Network Intelligence]
-    ↓
-Primary Distribution: DuxNet Wi-Fi 6 Ceiling APs (x28)
-Secondary Distribution: DuxNet Outdoor APs (x2)
-    ↓
-Guest & Operational Networks
+                          OUTDOOR INFRASTRUCTURE
+                   ┌──────────────────────────────┐
+                   │   Steel Mast Tower           │
+                   │ ┌─ ePMP 4500L APs (x2)      │
+                   │ ├─ Radio Brackets            │
+                   │ └─ Sector Antennas (2x)      │
+                   └──────────────────────────────┘
+                          ↓ (Microwave Link)
+                   ┌──────────────────────────────┐
+              ┌────┤ Weather-Sealed Cabinet       │
+              │    │ • ePMP Backhaul Equipment   │
+              │    │ • DuxNet Switches           │
+              │    │ • Surge Suppressors         │
+              │    │ • Power Conditioning        │
+              │    └──────────────────────────────┘
+              │           ↓
+         SOLAR POWER    DuxNet L2 Cloud Switches
+         SYSTEM         (x4) [Network Intelligence]
+    • Panels               ↓
+    • Battery Bank   Primary Distribution
+    • Charge Ctrl    DuxNet Wi-Fi 6 Ceiling APs (x28)
+    • Inverter       Secondary Distribution
+                     DuxNet Outdoor APs (x2)
+                            ↓
+                     Guest & Operational Networks
 ```
 
 ### Key Technical Specifications
@@ -85,7 +109,11 @@ Guest & Operational Networks
 | **Indoor Access Points** | DuxNet WI-FI 6 Ceiling AP | 28 | 1Gb WAN/LAN, L3 capable |
 | **Outdoor Access Points** | DuxNet Outdoor Dual-Band WI-FI 6 | 2 | 1Gb LAN, weather-resistant |
 | **Network Switches** | DuxNet 8-Port PoE+ L2 Cloud | 4 | Gigabit, 2x SFP uplinks, cloud managed |
-| **Surge Protection** | Gigabit Suppressors (30V & 56V) | 30 | Complete redundancy across all nodes |
+| **Grounding & Earthing** | Comprehensive Earthing System | 1 | Protects all nodes via proper ground design |
+| **Outdoor Mast** | Galvanized Steel Tower | TBD | RF-optimized height, wind rating (Quote TBD) |
+| **Equipment Cabinet** | Weather-Sealed Outdoor Enclosure | 1 | Backhaul radios, switches, surge protection, climate control (Quote TBD) |
+| **Solar Power System** | Grid-Independent Power Solution | 1 | Panels, battery bank, charge controller, inverter (Quote TBD) |
+| **Mounting Hardware** | Radio Brackets & Mounts | TBD | Stainless steel, vibration-dampened, UV-resistant (Quote TBD) |
 
 ---
 
@@ -119,22 +147,31 @@ Guest & Operational Networks
 
 ## 5. Pricing Summary
 
-### Equipment Costs (Excl. VAT)
+### Equipment & Infrastructure Costs (Excl. VAT)
 
 | Category | Details | Qty | Unit Price | Total |
 |----------|---------|-----|------------|-------|
 | **Backhaul Equipment** | ePMP 4500L APs | 2 | R8,470 | R16,940 |
 | | ePMP Sector Antenna 90/120 | 2 | R3,209 | R6,418 |
 | | ePMP Force 4525L SMs (28 units) | 28 | R2,745 | R76,860 |
-| **Surge Protection** | Gigabit Suppressors (56V) | 2 | R775 | R1,550 |
-| | Gigabit Suppressors (30V) | 28 | R685 | R19,180 |
 | **Local Distribution** | DuxNet Wi-Fi 6 Ceiling APs | 28 | R1,025 | R28,700 |
 | | DuxNet Outdoor Dual-Band APs | 2 | R1,885 | R3,770 |
 | | DuxNet Gigabit PoE+ L2 Switches | 4 | R1,899 | R7,596 |
+| **Grounding & Protection** | Comprehensive Earthing System | 1 | — | Included |
+| **Outdoor Infrastructure** | Outdoor Mast (Steel Tower) | 1 | TBD | **TBD** |
+| | Weather-Sealed Cabinet | 1 | TBD | **TBD** |
+| | Solar Power System | 1 | TBD | **TBD** |
+| | Mounting Brackets & Hardware | TBD | TBD | **TBD** |
 | | | | | |
-| **SUBTOTAL (Excl. VAT)** | | | | **R161,014.00** |
-| **VAT (15%)** | | | | **R24,152.10** |
-| **TOTAL (Incl. VAT)** | | | | **R185,166.10** |
+| **Equipment SUBTOTAL (Excl. VAT)** | | | | **R140,284.00** |
+| **Equipment VAT (15%)** | | | | **R21,042.60** |
+| **Equipment TOTAL (Incl. VAT)** | | | | **R161,326.60** |
+| | | | | |
+| **Infrastructure SUBTOTAL (Excl. VAT)** | *Mast + Cabinet + Solar + Brackets* | | | **TBD** |
+| **Infrastructure VAT (15%)** | | | | **TBD** |
+| **Infrastructure TOTAL (Incl. VAT)** | | | | **TBD** |
+| | | | | |
+| **GRAND TOTAL (Equipment + Infrastructure, Incl. VAT)** | | | | **TBD** |
 
 ### Additional Costs (If Required)
 
