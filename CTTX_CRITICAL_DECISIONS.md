@@ -197,6 +197,31 @@ The preliminary audit PDF is the **sales conversation opener**. It should make t
 
 > **Decision rule:** The platform exists to turn GIS intelligence into credible CTTX sales and engineering conversations.
 
+## 13. Three Business Drivers (Every Reserve/Lodge Proposal)
+
+Every proposal to a reserve, lodge, or hospitality property must explicitly address three business drivers, not just cost. This is a hard rule, not a suggestion — a proposal that only argues price is incomplete.
+
+| Driver | What it must cover |
+|---|---|
+| Client Experience | Guest connectivity reliability, including international guests across time zones who depend on the connection outside normal business hours. |
+| Operational Requirement | Bookings, POS, staff communications, and day-to-day property management running over the network. |
+| Security Requirement | Real incident scenarios (boundary breaches, after-hours security concerns) where communication determines response time. Reference the risk category, never a specific client's confidential incident. |
+
+> **Decision rule:** Cost is the fourth argument, not the first three. A proposal missing any of Client Experience, Operational Requirement, or Security Requirement must be revised before it goes out.
+
+## 14. National Delivery Capability
+
+CTTX is based in Port Elizabeth, but every proposal must make clear that delivery and support are not limited to the Eastern Cape. Many clients — reserves and lodges especially — have overseas owners or investors with multiple properties across South Africa, and need confidence CTTX can service all of them, not just the one nearest CTTX's home base.
+
+The basis for this claim: CTTX resells and builds on Vodacom's national carrier network (14,000+ towers across South Africa), so the same carrier-grade design, build, and support model is deliverable at any property in the country, regardless of CTTX's physical base.
+
+| Situation | Proposal must state |
+|---|---|
+| Single-property client | CTTX can extend the same solution to any future property, anywhere in South Africa. |
+| Multi-property / investor client | CTTX already delivers nationally on Vodacom's carrier network — this is not a one-off local build. |
+
+> **Decision rule:** Never let a proposal imply CTTX's service area is limited to the Eastern Cape. National reach, via the Vodacom carrier relationship, is a standing fact to state plainly, not a stretch to justify.
+
 ## Implementation Guardrails
 
 Future implementation work must preserve these decisions across code, tests, map behavior, report output, intake wording, scoring logic, and UI design. If a feature proposal conflicts with this file, the conflict should be called out explicitly before code is changed.
