@@ -1,0 +1,37 @@
+{
+  "name": "vodacom-los-reseller-planning",
+  "version": "0.1.0",
+  "description": "LOS reseller planning tool for Vodacom infrastructure",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "import:towers": "node scripts/importTowers.js",
+    "import:equipment": "node scripts/importEquipment.js",
+    "process:data": "node scripts/processData.js",
+    "test": "node --test tests/**/*.test.js",
+    "lint": "eslint src --fix"
+  },
+  "keywords": [
+    "vodacom",
+    "los",
+    "reseller",
+    "planning",
+    "infrastructure",
+    "wireless"
+  ],
+  "author": "CTTX",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "sqlite3": "^5.1.6",
+    "turf": "^6.5.0",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.49.0"
+  }
+}

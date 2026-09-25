@@ -1,0 +1,16 @@
+node_modules/
+.env
+.env.local
+*.db
+*.db-journal
+dist/
+build/
+.DS_Store
+*.log
+*.swp
+.vscode/
+.idea/
+data/raw/*.kml
+data/vodacom.db
+coverage/
+.nyc_output/
