@@ -1,6 +1,8 @@
 # Barefoot Addo Elephant Lodge - ROI Analysis
 ## CTTX Wireless Solution vs Herotel Business
 
+> ⚠️ **SUPERSEDED — DO NOT USE.** This document used invented Vodacom connectivity pricing (~R6,500-7,000 estimate) before the authoritative CTTX Vodacom Reseller Pricing Master was checked in Notion. The correct figures, break-even (34 or 71 months depending on managed service option), and full BOM/labour/contingency build are in **`CTTX_Quote_BarefootAddoElephantLodge_2026-09-25.md`**. Kept here only for change-history reference.
+
 **Prepared:** 25 September 2026  
 **Prepared by:** Gerhard Smit, CTTX Services (Pty) Ltd
 

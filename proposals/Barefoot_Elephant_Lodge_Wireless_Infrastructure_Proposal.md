@@ -1,5 +1,7 @@
 # Barefoot Elephant Lodge - Wireless Infrastructure Proposal
 
+> ⚠️ **SUPERSEDED — DO NOT USE.** "Barefoot Elephant Lodge" and "DUX00455421 v2 / IR-1127371" are the Duxbury supplier quote reference, not the customer-facing quote identity. The correct customer name is **Barefoot Addo Elephant Lodge (Pty) Ltd**. Full BOM, labour, contingency, VAT, and monthly recurring are in **`CTTX_Quote_BarefootAddoElephantLodge_2026-09-25.md`**, the authoritative quote. Kept here only for BOM change-history reference.
+
 **Quote Reference:** DUX00455421 v2  
 **Prepared for:** Barefoot Elephant Lodge  
 **Client Contact:** (From IR-1127371)  

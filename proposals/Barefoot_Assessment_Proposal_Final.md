@@ -1,6 +1,8 @@
 # Barefoot Addo Elephant Lodge
 ## Independent Network Assessment & Proposal
 
+> ⚠️ **SUPERSEDED — DO NOT USE.** Vodacom connectivity figures here (R6,500 estimate, R7,500 combined) were invented before checking the authoritative CTTX Vodacom Reseller Pricing Master in Notion. The correct customer-facing price for Business Connect 100 Mbps is R8,168/month incl. VAT. The full corrected quote — BOM, labour, contingency, monthly recurring, managed service option, risk table — is in **`CTTX_Quote_BarefootAddoElephantLodge_2026-09-25.md`**. Kept here only for pain-point/assessment-scope reference.
+
 **To:** Barefoot Addo Elephant Lodge Management  
 **From:** Gerhard Smit, CTTX Services (Pty) Ltd  
 **Date:** 25 September 2026  
