@@ -287,35 +287,59 @@ Internal-Only Components:
 
 ---
 
+## PRICING & COMMERCIAL DATA LIVES IN NOTION — NOT THIS REPO
+
+**Do not mark Vodacom/reseller pricing as missing without checking Notion first.**
+
+Authoritative location: Notion workspace "🏢 CTTX Services — Master Workspace" →
+"📡 Vodacom Reseller — Lead Intake & Quote System" → "💰 Vodacom Products & Pricing"
+(https://app.notion.com/p/380ab0d207a781f9bd0dc1f234632915)
+
+This is the CTTX/Vodacom rate card: cost prices, tiered markup policy (20-30%
+depending on product/bandwidth — NOT flat), and client pricing for every
+Business Connect/Internet tier. It also lists the Vodacom channel manager
+(Duane Forlee) who confirms exact site cost/feasibility per deal.
+
+⚠️ A second, older, superseded-looking page exists with a flat-20%-markup
+version of the same rate card ("CTTX Vodacom Reseller — Business Connectivity
+Sales", 31 May 2026). The two disagree slightly. Treat the 15 June 2026 page
+as current (corroborated by real deal evidence — see COMMERCIAL_RULES.md
+Part 1) but flag the discrepancy rather than silently picking one, and note
+it to the director for cleanup.
+
+**Full retrieved detail, cross-checks, and the specific numbers used for
+Elephant Barefoot Lodge are in `sales-engine/COMMERCIAL_RULES.md` Part 1.**
+Retrieve fresh from Notion each time rather than trusting a stale copy —
+Vodacom pricing changes (promotions expire, rates revise).
+
+**Session procedure:** Before marking ANY commercial/pricing item as
+"missing," search Notion first (`notion-search` / `notion-ai-search`). Only
+mark it MISSING if a Notion search genuinely turns up nothing.
+
+---
+
 ## MISSING — REQUIRES DIRECTOR DECISION
 
-The following information does NOT exist in documented form and must be provided by director or sourced from authoritative records:
+The following genuinely does not exist in Notion or this repo (checked) and must be provided by director:
 
 **Commercial Rules:**
-- [ ] Varrucom markup/margin
-- [ ] Vodacom Business margin
+- [ ] Varrucom markup/margin (Varrucom is the ALTERNATIVE carrier — Vodacom pricing is found, Varrucom is not yet located)
 - [ ] Equipment reseller margins (Cambium, Victron, Hubble)
-- [ ] Installation rate (per day or per type)
-- [ ] Assessment fee pricing
-- [ ] Recurring service pricing structure
+- [ ] Installation/labor day-rate (CTTX's own field engineering rate — not a supplier rate)
+- [ ] Assessment fee pricing (beyond the R3,500 site survey figure already used in templates)
 - [ ] Discount/volume rules
-- [ ] Payment terms and conditions
-
-**Supplier Relationships:**
-- [ ] Varrucom reseller agreement details
-- [ ] Rate cards and pricing (if locked in)
-- [ ] Volume commitments or targets
-- [ ] Territory exclusivity
-- [ ] Support/SLA terms with each supplier
+- [ ] Formal payment terms document
 
 **Operational:**
 - [ ] CTTX company registration / tax details
 - [ ] Formal service level agreement (SLA) template
-- [ ] Standard installation/support rates
 - [ ] Warranty claim procedure
 - [ ] Escalation procedures for customer issues
 
-**Where to find:** Director to specify authoritative location (Notion database, spreadsheet, supplier contracts, etc.)
+**Known-but-unresolved (flag, don't invent):**
+- [ ] Two conflicting Vodacom rate card pages in Notion (see above) — director to archive the superseded one
+- [ ] No central Direct Clients Index (Paratus has one, direct opportunities don't) — director decision on whether to create `Desktop\CTTX Company docs\00_DIRECT_CLIENTS_INDEX.md`
+- [ ] No signed CTTX RF survey / design day rate on disk (rate card dated 24 May 2026 has no signed hourly rate; Mjimaro quote used an unsigned R895/hour from the NTT matrix)
 
 ---
 

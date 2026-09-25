@@ -15,21 +15,53 @@
 **Vodacom Business (PRIMARY CONNECTIVITY RESELLER)**
 
 ```
-STATUS: CORE COMPONENT OF CTTX HYBRID NETWORK
+STATUS: FOUND — AUTHORITATIVE SOURCE IS NOTION (not this repo)
 
-This is the primary upstream connectivity for CTTX Hybrid Network model.
+Do NOT copy the full rate card into this file. Retrieve it live from Notion
+each time — Vodacom pricing changes (promotions expire, rates get revised).
 
-Required Information:
-  ☐ LTE Business package tiers and monthly recurring rates
-  ☐ Setup/activation fees and equipment costs
-  ☐ SLA terms and response times
-  ☐ Support and escalation procedures
-  ☐ CTTX reseller status, discount, and margin allowance
-  ☐ Volume commitments or targets (if applicable)
-  ☐ Contract terms and minimum commitments
+AUTHORITATIVE LOCATION:
+  Primary (current): "💰 Vodacom Products & Pricing"
+  https://app.notion.com/p/380ab0d207a781f9bd0dc1f234632915
+  Last updated: 15 June 2026
+  Under: 🏢 CTTX Services — Master Workspace / 📡 Vodacom Reseller — Lead Intake & Quote System
 
-Source: Vodacom Business reseller agreement
-Location: [TBD — Director to specify]
+  Channel Manager: Duane Forlee — Duane.Forlee@vodacom.co.za
+  (confirms site-specific cost/feasibility — rate card is the general guide,
+  actual cost is confirmed per deal)
+
+⚠️ CONFLICT FLAGGED — NOT SILENTLY RESOLVED:
+  A second, older page exists: "CTTX Vodacom Reseller — Business Connectivity
+  Sales" (created 31 May 2026) — https://app.notion.com/p/371ab0d207a781288360c5c97408c3e1
+  It states a FLAT 20% markup on all products, with different cost figures
+  (e.g. Business Connect 100Mbps cost R6,082 incl VAT @ 24mo vs R5,682 ex VAT
+  on the newer page). The newer page's TIERED markup policy (20-30% by
+  product/bandwidth) is corroborated by:
+    - "Solo Sales Machine — Master Playbook" (R8,168/month for 100Mbps = exact
+      match to newer page's client price)
+    - Lynco Projects real deal (cost R5,235.36 ex VAT × 1.25 = R6,544.20 —
+      confirms 25% markup actually applied on 100Mbps, not 20%)
+  CONCLUSION: Treat the 15 June 2026 page as current. The 31 May 2026 page
+  appears superseded but has not been archived — flag to director for cleanup.
+
+MARKUP POLICY (tiered, per newer page — do not apply flat 20% to everything):
+  Business Internet LTE:              20%
+  Business Internet 5G (≤100Mbps):    20-22%
+  Business Internet 5G (Unrestricted): 25%
+  Business Internet Wireless (10-40):  20-25%
+  Business Internet Wireless (80):     30%
+  Business Connect (10-30 Mbps):       20%
+  Business Connect (50-100 Mbps):      22-25%
+  Business Connect (200-500 Mbps):     27-30%
+
+REFERENCE POINT USED FOR ELEPHANT BAREFOOT (Business Connect 100 Mbps):
+  CTTX Cost: R5,682 ex VAT (retrieved 2026-09-25 from Notion — reconfirm with
+  Duane Forlee before final quote, cost may vary by site)
+  Markup: 25%
+  Client Price: R7,103 ex VAT / R8,168 incl VAT (monthly recurring)
+  NRC (once-off connection): R2,608 cost → 20% markup → R3,130 ex VAT / R3,599 incl VAT
+
+Minimum qualifying deal: R1,600/month. Target deal: R6,000-R14,000/month (1:1).
 ```
 
 **Varrucom (ALTERNATIVE WIRELESS RESELLER)**
