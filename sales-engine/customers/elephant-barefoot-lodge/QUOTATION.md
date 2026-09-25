@@ -60,36 +60,48 @@ NOTE: 50% of survey fee credited to first month's service
 *(20-30 concurrent users / guest lodge)*
 
 ```
+⚠ PRICING STATUS: AWAITING DIRECTOR AUTHORIZATION
+(Prices below are PLACEHOLDERS pending commercial rules confirmation)
+
 Primary Wireless Link: Varrucom 20/20 Mbps
-├─ Varrucom ODU (Outdoor Unit)                R 8,500.00
-├─ Varrucom IDU (Indoor Unit)                 R 3,200.00
-├─ Antenna (20dBi directional)                R 2,100.00
+├─ Varrucom ODU (Outdoor Unit)                [REQUIRES VARRUCOM RATE CARD]
+├─ Varrucom IDU (Indoor Unit)                 [REQUIRES VARRUCOM RATE CARD]
+├─ Antenna (20dBi directional)                [REQUIRES EQUIPMENT PRICING]
 
 Secondary Failover: LTE Business Backup
-├─ LTE Modem (Business Grade)                 R 4,500.00
-├─ LTE Antenna Kit                            R 1,200.00
+├─ LTE Modem (Business Grade)                 [REQUIRES SUPPLIER PRICING]
+├─ LTE Antenna Kit                            [REQUIRES SUPPLIER PRICING]
 
 Gateway & Integration
-├─ Dual-Modem Gateway Device                  R 6,800.00
-├─ Installation Cabling & Connectors          R 1,500.00
-├─ Roof Mounting Hardware                     R 1,200.00
-├─ PoE Injectors & Power Distribution         R 800.00
+├─ Dual-Modem Gateway Device                  [REQUIRES EQUIPMENT PRICING]
+├─ Installation Cabling & Connectors          [REQUIRES SUPPLY COST]
+├─ Roof Mounting Hardware                     [REQUIRES SUPPLY COST]
+├─ PoE Injectors & Power Distribution         [REQUIRES SUPPLY COST]
 
 Labor & Installation
-├─ Installation Labor (1.5 days)              R 3,600.00
-├─ Configuration & Testing                    R 1,500.00
-├─ Staff Training (brief)                     R 500.00
+├─ Installation Labor (1.5 days)              [REQUIRES LABOR RATE - TBD]
+├─ Configuration & Testing                    [REQUIRES LABOR RATE - TBD]
+├─ Staff Training (brief)                     [REQUIRES LABOR RATE - TBD]
 
-SUBTOTAL (A.2 - Option A):                   R 35,300.00
+SUBTOTAL (A.2 - Option A):                   [CALCULATION PENDING]
 
 Configuration A Total (with survey):
-Site Survey:                                  R 3,500.00
-Hardware & Installation:                      R 35,300.00
-SUBTOTAL:                                     R 38,800.00
-VAT (15%):                                    R 5,820.00
+Site Survey:                                  R 3,500.00 (CTTX standard)
+Hardware & Installation:                      [PENDING PRICING]
+SUBTOTAL:                                     [PENDING]
+VAT (15%):                                    [PENDING]
 ───────────────────────────────────────
-TOTAL (Configuration A):                      R 44,620.00
+TOTAL (Configuration A):                      [AWAITING COMMERCIAL RULES]
 ```
+
+**PRICING DEPENDENCIES:**
+- Requires: Varrucom rate card (ODU/IDU/services)
+- Requires: LTE equipment/service pricing (vendor TBD)
+- Requires: CTTX installation labor rates (R/day, R/task)
+- Requires: CTTX markup rules (% on equipment, labor)
+- Requires: Approval of configuration specification for final BOM
+
+**Approval:** Director to provide commercial rules and authorize pricing before customer presentation
 
 ---
 
@@ -97,39 +109,44 @@ TOTAL (Configuration A):                      R 44,620.00
 *(50-70 concurrent users / lodge + light CCTV)*
 
 ```
+⚠ PRICING STATUS: AWAITING DIRECTOR AUTHORIZATION
+(Prices below are PLACEHOLDERS pending commercial rules confirmation)
+
 Primary Wireless Link: Varrucom 50/50 Mbps
-├─ Varrucom ODU (Outdoor Unit)                R 12,500.00
-├─ Varrucom IDU (Indoor Unit)                 R 4,500.00
-├─ Antenna (24dBi directional)                R 3,200.00
+├─ Varrucom ODU (Outdoor Unit)                [REQUIRES VARRUCOM RATE CARD]
+├─ Varrucom IDU (Indoor Unit)                 [REQUIRES VARRUCOM RATE CARD]
+├─ Antenna (24dBi directional)                [REQUIRES EQUIPMENT PRICING]
 
 Secondary Failover: Secondary Varrucom 10/10 Mbps
-├─ Second Varrucom ODU                        R 8,500.00
-├─ Second Varrucom IDU                        R 3,200.00
-├─ Antenna (20dBi omnidirectional)            R 2,100.00
+├─ Second Varrucom ODU                        [REQUIRES VARRUCOM RATE CARD]
+├─ Second Varrucom IDU                        [REQUIRES VARRUCOM RATE CARD]
+├─ Antenna (20dBi omnidirectional)            [REQUIRES EQUIPMENT PRICING]
 
 Gateway & Integration
-├─ Dual-Modem Gateway Device (Enterprise)     R 9,500.00
-├─ Failover Controller                        R 2,500.00
-├─ Installation Cabling & Connectors          R 2,200.00
-├─ Roof Mounting Hardware (dual)              R 2,000.00
-├─ PoE Injectors & Power Distribution         R 1,200.00
-├─ UPS Backup Power (4-hour)                  R 3,500.00
+├─ Dual-Modem Gateway Device (Enterprise)     [REQUIRES EQUIPMENT PRICING]
+├─ Failover Controller                        [REQUIRES EQUIPMENT PRICING]
+├─ Installation Cabling & Connectors          [REQUIRES SUPPLY COST]
+├─ Roof Mounting Hardware (dual)              [REQUIRES SUPPLY COST]
+├─ PoE Injectors & Power Distribution         [REQUIRES SUPPLY COST]
+├─ UPS Backup Power (4-hour)                  [REQUIRES EQUIPMENT PRICING]
 
 Labor & Installation
-├─ Installation Labor (2 days)                R 4,800.00
-├─ Configuration & Testing                    R 2,000.00
-├─ Staff Training (comprehensive)             R 1,000.00
+├─ Installation Labor (2 days)                [REQUIRES LABOR RATE - TBD]
+├─ Configuration & Testing                    [REQUIRES LABOR RATE - TBD]
+├─ Staff Training (comprehensive)             [REQUIRES LABOR RATE - TBD]
 
-SUBTOTAL (A.2 - Option B):                   R 56,400.00
+SUBTOTAL (A.2 - Option B):                   [CALCULATION PENDING]
 
 Configuration B Total (with survey):
-Site Survey:                                  R 3,500.00
-Hardware & Installation:                      R 56,400.00
-SUBTOTAL:                                     R 59,900.00
-VAT (15%):                                    R 8,985.00
+Site Survey:                                  R 3,500.00 (CTTX standard)
+Hardware & Installation:                      [PENDING PRICING]
+SUBTOTAL:                                     [PENDING]
+VAT (15%):                                    [PENDING]
 ───────────────────────────────────────
-TOTAL (Configuration B):                      R 68,885.00
+TOTAL (Configuration B):                      [AWAITING COMMERCIAL RULES]
 ```
+
+**PRICING DEPENDENCIES:** Same as Option A, plus dual Varrucom link costs
 
 ---
 
@@ -137,41 +154,46 @@ TOTAL (Configuration B):                      R 68,885.00
 *(100+ concurrent users / resort + full CCTV system)*
 
 ```
+⚠ PRICING STATUS: AWAITING DIRECTOR AUTHORIZATION
+(Prices below are PLACEHOLDERS pending commercial rules confirmation)
+
 Primary Wireless Link: Varrucom 100/100 Mbps
-├─ Varrucom ODU (High-capacity)               R 18,000.00
-├─ Varrucom IDU                               R 6,500.00
-├─ Antenna (30dBi directional, hi-gain)       R 4,500.00
+├─ Varrucom ODU (High-capacity)               [REQUIRES VARRUCOM RATE CARD]
+├─ Varrucom IDU                               [REQUIRES VARRUCOM RATE CARD]
+├─ Antenna (30dBi directional, hi-gain)       [REQUIRES EQUIPMENT PRICING]
 
 Dual Backup System
-├─ Secondary Varrucom 50/50 Mbps (full kit)  R 24,200.00
-├─ VSAT Terminal (emergency backup)           R 16,000.00
-├─ VSAT Antenna (1.8m)                        R 8,000.00
+├─ Secondary Varrucom 50/50 Mbps (full kit)  [REQUIRES VARRUCOM RATE CARD]
+├─ VSAT Terminal (emergency backup)           [REQUIRES VSAT SUPPLIER PRICING]
+├─ VSAT Antenna (1.8m)                        [REQUIRES VSAT SUPPLIER PRICING]
 
 Gateway & Integration
-├─ Enterprise Gateway (quad-modem capable)    R 15,000.00
-├─ Advanced Failover Controller               R 4,000.00
-├─ Installation Cabling & Connectors          R 3,500.00
-├─ Roof Mounting Hardware (triple)            R 3,500.00
-├─ PoE Injectors & Power Distribution         R 2,000.00
-├─ UPS Backup Power (8-hour enterprise)       R 8,000.00
-├─ Network Switch (managed, PoE)              R 5,000.00
+├─ Enterprise Gateway (quad-modem capable)    [REQUIRES EQUIPMENT PRICING]
+├─ Advanced Failover Controller               [REQUIRES EQUIPMENT PRICING]
+├─ Installation Cabling & Connectors          [REQUIRES SUPPLY COST]
+├─ Roof Mounting Hardware (triple)            [REQUIRES SUPPLY COST]
+├─ PoE Injectors & Power Distribution         [REQUIRES SUPPLY COST]
+├─ UPS Backup Power (8-hour enterprise)       [REQUIRES EQUIPMENT PRICING]
+├─ Network Switch (managed, PoE)              [REQUIRES EQUIPMENT PRICING]
 
 Labor & Installation
-├─ Installation Labor (3 days)                R 7,200.00
-├─ Configuration & Testing                    R 3,500.00
-├─ Site Optimization & Tuning                 R 2,000.00
-├─ Staff Training (comprehensive + live)      R 2,000.00
+├─ Installation Labor (3 days)                [REQUIRES LABOR RATE - TBD]
+├─ Configuration & Testing                    [REQUIRES LABOR RATE - TBD]
+├─ Site Optimization & Tuning                 [REQUIRES LABOR RATE - TBD]
+├─ Staff Training (comprehensive + live)      [REQUIRES LABOR RATE - TBD]
 
-SUBTOTAL (A.2 - Option C):                   R 121,400.00
+SUBTOTAL (A.2 - Option C):                   [CALCULATION PENDING]
 
 Configuration C Total (with survey):
-Site Survey:                                  R 3,500.00
-Hardware & Installation:                      R 121,400.00
-SUBTOTAL:                                     R 124,900.00
-VAT (15%):                                    R 18,735.00
+Site Survey:                                  R 3,500.00 (CTTX standard)
+Hardware & Installation:                      [PENDING PRICING]
+SUBTOTAL:                                     [PENDING]
+VAT (15%):                                    [PENDING]
 ───────────────────────────────────────
-TOTAL (Configuration C):                      R 143,635.00
+TOTAL (Configuration C):                      [AWAITING COMMERCIAL RULES]
 ```
+
+**PRICING DEPENDENCIES:** Option A + dual Varrucom + VSAT costs
 
 ---
 
@@ -180,89 +202,92 @@ TOTAL (Configuration C):                      R 143,635.00
 ### **OPTION A: Small Lodge** - Monthly Service
 
 ```
+⚠ PRICING STATUS: AWAITING DIRECTOR AUTHORIZATION
+
 Service Component                             Monthly Cost
 ────────────────────────────────────────────────────────
-Varrucom Primary Link (20/20 Mbps)           R 1,600.00
-LTE Backup Link (pay-as-you-use)             R 200.00
-Managed Service (24/7 monitoring)            R 1,500.00
-CTTX Support & Maintenance                   R 500.00
+Varrucom Primary Link (20/20 Mbps)           [REQUIRES VARRUCOM RATE]
+LTE Backup Link                              [REQUIRES SUPPLIER RATE]
+Managed Service (24/7 monitoring)            [REQUIRES CTTX SERVICE RATE]
+CTTX Support & Maintenance                   [REQUIRES CTTX RATE]
 ────────────────────────────────────────────────────────
-MONTHLY TOTAL (excl. VAT):                   R 3,800.00
-VAT (15%):                                   R 570.00
+MONTHLY TOTAL (excl. VAT):                   [PENDING]
+VAT (15%):                                   [PENDING]
 ────────────────────────────────────────────────────────
-MONTHLY TOTAL (incl. VAT):                   R 4,370.00
+MONTHLY TOTAL (incl. VAT):                   [AWAITING COMMERCIAL RULES]
 ```
 
-**24-Month Commitment:**
-- Monthly cost (incl. VAT): R 4,370.00
-- 24-month total (incl. VAT): R 104,880.00
+**24-Month Commitment:** [CALCULATION PENDING]
 
 ---
 
 ### **OPTION B: Medium Lodge** - Monthly Service
 
 ```
+⚠ PRICING STATUS: AWAITING DIRECTOR AUTHORIZATION
+
 Service Component                             Monthly Cost
 ────────────────────────────────────────────────────────
-Varrucom Primary Link (50/50 Mbps)           R 2,800.00
-Varrucom Secondary Link (10/10 Mbps)         R 600.00
-Managed Service (24/7 monitoring)            R 1,500.00
-CTTX Support & Maintenance                   R 750.00
+Varrucom Primary Link (50/50 Mbps)           [REQUIRES VARRUCOM RATE]
+Varrucom Secondary Link (10/10 Mbps)         [REQUIRES VARRUCOM RATE]
+Managed Service (24/7 monitoring)            [REQUIRES CTTX SERVICE RATE]
+CTTX Support & Maintenance                   [REQUIRES CTTX RATE]
 ────────────────────────────────────────────────────────
-MONTHLY TOTAL (excl. VAT):                   R 5,650.00
-VAT (15%):                                   R 847.50
+MONTHLY TOTAL (excl. VAT):                   [PENDING]
+VAT (15%):                                   [PENDING]
 ────────────────────────────────────────────────────────
-MONTHLY TOTAL (incl. VAT):                   R 6,497.50
+MONTHLY TOTAL (incl. VAT):                   [AWAITING COMMERCIAL RULES]
 ```
 
-**24-Month Commitment:**
-- Monthly cost (incl. VAT): R 6,497.50
-- 24-month total (incl. VAT): R 155,940.00
+**24-Month Commitment:** [CALCULATION PENDING]
 
 ---
 
 ### **OPTION C: Large Resort** - Monthly Service
 
 ```
+⚠ PRICING STATUS: AWAITING DIRECTOR AUTHORIZATION
+
 Service Component                             Monthly Cost
 ────────────────────────────────────────────────────────
-Varrucom Primary Link (100/100 Mbps)         R 4,500.00
-Varrucom Secondary Link (50/50 Mbps)         R 2,800.00
-VSAT Emergency Backup (minimal data)         R 1,200.00
-Managed Service (enterprise 24/7)            R 2,500.00
-CTTX Support & Maintenance (priority)        R 1,200.00
+Varrucom Primary Link (100/100 Mbps)         [REQUIRES VARRUCOM RATE]
+Varrucom Secondary Link (50/50 Mbps)         [REQUIRES VARRUCOM RATE]
+VSAT Emergency Backup                        [REQUIRES VSAT SUPPLIER RATE]
+Managed Service (enterprise 24/7)            [REQUIRES CTTX SERVICE RATE]
+CTTX Support & Maintenance (priority)        [REQUIRES CTTX RATE]
 ────────────────────────────────────────────────────────
-MONTHLY TOTAL (excl. VAT):                   R 12,200.00
-VAT (15%):                                   R 1,830.00
+MONTHLY TOTAL (excl. VAT):                   [PENDING]
+VAT (15%):                                   [PENDING]
 ────────────────────────────────────────────────────────
-MONTHLY TOTAL (incl. VAT):                   R 14,030.00
+MONTHLY TOTAL (incl. VAT):                   [AWAITING COMMERCIAL RULES]
 ```
 
-**24-Month Commitment:**
-- Monthly cost (incl. VAT): R 14,030.00
-- 24-month total (incl. VAT): R 336,720.00
+**24-Month Commitment:** [CALCULATION PENDING]
 
 ---
 
 ## SECTION C: TOTAL COST OF OWNERSHIP
+
+⚠ **ALL TCO CALCULATIONS AWAITING COMMERCIAL RULES AUTHORIZATION**
 
 ### **OPTION A: Small Lodge (24-Month TCO)**
 
 ```
 Setup Costs (One-time):
   Site Survey                          R 3,500.00
-  Hardware & Installation              R 35,300.00
-  Subtotal                            R 38,800.00
-  VAT (15%)                           R 5,820.00
-  Setup Total (incl. VAT)             R 44,620.00
+  Hardware & Installation              [AWAITING PRICING]
+  Subtotal                            [PENDING]
+  VAT (15%)                           [PENDING]
+  Setup Total (incl. VAT)             [PENDING]
 
-Monthly Recurring (R 4,370.00 × 24):  R 104,880.00
+Monthly Recurring:                     [AWAITING PRICING] × 24 months
+                                       [PENDING]
 
 ────────────────────────────────────────────
-24-MONTH TOTAL COST OF OWNERSHIP:      R 149,500.00
+24-MONTH TOTAL COST OF OWNERSHIP:      [AWAITING COMMERCIAL RULES]
 ────────────────────────────────────────────
 
-Monthly Average Cost: R 6,229.17
+Monthly Average Cost: [PENDING]
 ```
 
 ---
@@ -272,18 +297,19 @@ Monthly Average Cost: R 6,229.17
 ```
 Setup Costs (One-time):
   Site Survey                          R 3,500.00
-  Hardware & Installation              R 56,400.00
-  Subtotal                            R 59,900.00
-  VAT (15%)                           R 8,985.00
-  Setup Total (incl. VAT)             R 68,885.00
+  Hardware & Installation              [AWAITING PRICING]
+  Subtotal                            [PENDING]
+  VAT (15%)                           [PENDING]
+  Setup Total (incl. VAT)             [PENDING]
 
-Monthly Recurring (R 6,497.50 × 24):  R 155,940.00
+Monthly Recurring:                     [AWAITING PRICING] × 24 months
+                                       [PENDING]
 
 ────────────────────────────────────────────
-24-MONTH TOTAL COST OF OWNERSHIP:      R 224,825.00
+24-MONTH TOTAL COST OF OWNERSHIP:      [AWAITING COMMERCIAL RULES]
 ────────────────────────────────────────────
 
-Monthly Average Cost: R 9,368.00
+Monthly Average Cost: [PENDING]
 ```
 
 ---
@@ -293,18 +319,19 @@ Monthly Average Cost: R 9,368.00
 ```
 Setup Costs (One-time):
   Site Survey                          R 3,500.00
-  Hardware & Installation              R 121,400.00
-  Subtotal                            R 124,900.00
-  VAT (15%)                           R 18,735.00
-  Setup Total (incl. VAT)             R 143,635.00
+  Hardware & Installation              [AWAITING PRICING]
+  Subtotal                            [PENDING]
+  VAT (15%)                           [PENDING]
+  Setup Total (incl. VAT)             [PENDING]
 
-Monthly Recurring (R 14,030.00 × 24):  R 336,720.00
+Monthly Recurring:                     [AWAITING PRICING] × 24 months
+                                       [PENDING]
 
 ────────────────────────────────────────────
-24-MONTH TOTAL COST OF OWNERSHIP:      R 480,355.00
+24-MONTH TOTAL COST OF OWNERSHIP:      [AWAITING COMMERCIAL RULES]
 ────────────────────────────────────────────
 
-Monthly Average Cost: R 20,015.00
+Monthly Average Cost: [PENDING]
 ```
 
 ---
