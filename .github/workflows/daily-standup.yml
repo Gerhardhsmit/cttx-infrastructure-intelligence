@@ -1,0 +1,87 @@
+name: Daily Solution Architect Standup
+
+on:
+  schedule:
+    # Every weekday at 07:00 UTC (08:00 SAST)
+    - cron: '0 7 * * 1-5'
+  workflow_dispatch: # Can trigger manually
+
+jobs:
+  standup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate daily standup
+        run: |
+          cat > /tmp/standup.md << 'EOF'
+          # 🚀 CTTX Solution Architect Daily Standup
+
+          **Date:** $(date '+%A, %B %d, %Y')
+          **Time:** 08:00 SAST
+
+          ## ✅ Your Daily Tasks
+
+          1. Open Notion → **Active Projects** view
+          2. Check current phase for each project
+          3. Complete assigned tasks
+          4. Export Link Planner designs if in Phase 2
+          5. Log costs if quotes received
+
+          ## 📊 Project Status
+
+          See live status: [Clients Database](https://app.notion.com/p/4547a667409a4d46a0e20409442f3f5f)
+
+          ### Quick Links
+          - [Active Projects View](https://app.notion.com/p/4547a667409a4d46a0e20409442f3f5f?v=view)
+          - [Cost Forms](https://app.notion.com/p/7d1d564dd7374647afc867394cf3206a)
+          - [OneDrive /Clients](onedrive://clients)
+          - [Link Planner](http://localhost:5000/link-planner)
+
+          ## 🎯 This Week's Focus
+
+          1. **Phase 2 projects:** Export designs to Notion
+          2. **Phase 3 projects:** Schedule field visits
+          3. **Phase 4 projects:** Reconcile costs vs budget
+          4. **Phase 5 projects:** Track installation progress
+
+          ---
+
+          **Questions?** See [SOLUTION_ARCHITECT_WORKFLOW.md](https://github.com/Gerhardhsmit/cttx-infrastructure-intelligence/blob/main/SOLUTION_ARCHITECT_WORKFLOW.md)
+          EOF
+          cat /tmp/standup.md
+
+      - name: Send email notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: "🚀 CTTX Daily Standup - $(date '+%A')"
+          to: gerhardcttx@gmail.com
+          from: 'CTTX CI <noreply@cttx.co.za>'
+          body: |
+            Good morning Brandon,
+
+            Here's your CTTX Solution Architect daily checklist:
+
+            1. Open Notion → Active Projects view
+            2. Check which phase each project is in
+            3. Complete assigned tasks for that phase
+            4. Export Link Planner designs if in Phase 2
+            5. Log costs if new quotes received
+
+            **Quick Links:**
+            - Clients DB: https://app.notion.com/p/4547a667409a4d46a0e20409442f3f5f
+            - Cost Forms: https://app.notion.com/p/7d1d564dd7374647afc867394cf3206a
+            - Link Planner: http://localhost:5000/link-planner
+
+            ---
+            Automated by CTTX CI
+
+      - name: Log standup
+        run: |
+          echo "Standup sent at $(date)"
+          echo "Next standup: $(date -d 'tomorrow 08:00 SAST')" || echo "Next standup: tomorrow at 08:00 SAST"
