@@ -71,12 +71,16 @@ Check for prior engagement:
 
 By opportunity type, retrieve:
 
-**HYBRID:**
-- Hybrid solution templates and reference examples
-- Varrucom reseller relationship context
-- Failover architecture patterns
-- BOM templates for hybrid solutions
+**HYBRID (CTTX Hybrid Infrastructure Model):**
+- THIS IS CTTX'S PRIMARY BUSINESS MODEL
+- Core principle: Carrier connectivity (Vodacom) + CTTX private infrastructure = property-wide communications backbone
+- Carrier entry point definition
+- Private infrastructure (backbone, distribution, power, switching)
+- Three business drivers (guest experience, staff comms, security/operations)
+- Evidence-based positioning (use customer-reported incidents, not invented scenarios)
+- Financial case structure (CAPEX → recurring saving → payback)
 - Previous hybrid proposals as reference
+- Elephant Barefoot as reference (incident evidence: "elephants broke out, no staff communication")
 
 **PRIVATE INFRASTRUCTURE:**
 - Network architecture rules (CTTX_CRITICAL_DECISIONS.md)
@@ -187,6 +191,24 @@ ACTION: Cannot finalize quotation until rate card is confirmed
 ```
 
 Mark as MISSING → REQUIRES DIRECTOR DECISION (see CLAUDE.md section)
+
+### Step 7b: AUTOMATIC HYBRID DETECTION
+
+**Critical Rule:** If opportunity context = **Lodge / Reserve / Farm / Rural Property + Connectivity Requirement**
+
+→ AUTOMATICALLY consider: **HYBRID INFRASTRUCTURE OPPORTUNITY**
+
+Do NOT default to: "Buy internet → Add Wi-Fi → Quote"
+
+**Ask instead:**
+- What connectivity is required?
+- Where does carrier connectivity enter the property?
+- How is it distributed across operational areas?
+- What private infrastructure is needed for reliable property-wide communications?
+- What are the three business drivers? (guest experience, staff comms, security/operations)
+
+**This automatically elevates from:** "Buy cheaper internet"  
+**To:** "Build private infrastructure with carrier integration"
 
 ### Step 8: Route to Workflow
 

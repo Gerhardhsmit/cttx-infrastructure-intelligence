@@ -12,38 +12,43 @@
 
 ## PART 1: SUPPLIER PRICING & RATE CARDS
 
-**Varrucom (Primary Wireless Reseller)**
+**Vodacom Business (PRIMARY CONNECTIVITY RESELLER)**
 
 ```
-STATUS: AUTHORITATIVE RATE CARD REQUIRED
+STATUS: CORE COMPONENT OF CTTX HYBRID NETWORK
+
+This is the primary upstream connectivity for CTTX Hybrid Network model.
+
+Required Information:
+  ☐ LTE Business package tiers and monthly recurring rates
+  ☐ Setup/activation fees and equipment costs
+  ☐ SLA terms and response times
+  ☐ Support and escalation procedures
+  ☐ CTTX reseller status, discount, and margin allowance
+  ☐ Volume commitments or targets (if applicable)
+  ☐ Contract terms and minimum commitments
+
+Source: Vodacom Business reseller agreement
+Location: [TBD — Director to specify]
+```
+
+**Varrucom (ALTERNATIVE WIRELESS RESELLER)**
+
+```
+STATUS: OPTIONAL UPSTREAM (IF CUSTOMER PREFERENCE)
+
+Alternative connectivity source where Vodacom is unavailable or customer prefers.
 
 Required Information:
   ☐ ODU (Outdoor Unit) pricing for 20/20, 50/50, 100/100 Mbps tiers
   ☐ IDU (Indoor Unit) pricing
   ☐ Antenna and mounting hardware pricing
-  ☐ Installation and commissioning costs (if separate)
   ☐ Monthly recurring service rates for each tier
+  ☐ Installation and commissioning costs (if separate)
   ☐ SLA terms and response times
-  ☐ Support and maintenance models
-  ☐ Volume discounts or commitments
+  ☐ CTTX reseller status, discount, and margin allowance
 
 Source: Varrucom reseller agreement / rate card
-Location: [TBD — Director to specify]
-```
-
-**Vodacom Business (Secondary Carrier)**
-
-```
-STATUS: PRICING FROM PUBLIC RATE CARD (or reseller agreement if exists)
-
-Required Information:
-  ☐ LTE Business package tiers and pricing
-  ☐ VSAT backup service rates (if offered)
-  ☐ Setup/activation fees
-  ☐ SLA terms
-  ☐ CTTX reseller status and margin allowance (if applicable)
-
-Source: Vodacom Business public rates or reseller agreement
 Location: [TBD]
 ```
 

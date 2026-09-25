@@ -15,6 +15,45 @@
 **Market:** Rural/remote reserve and farm infrastructure (South Africa)  
 **Core Positioning:** Trusted infrastructure advisor, NOT a commodity connectivity reseller
 
+**Primary Business Model: CTTX Hybrid Infrastructure**
+
+CTTX does NOT merely resell connectivity.
+
+CTTX builds telecommunications infrastructure.
+
+**The Model:**
+1. Carrier (Vodacom) supplies connectivity to the property entry point
+2. CTTX designs and builds private infrastructure that distributes reliable communications across the property
+3. Result: Property gains an owned, controlled communications backbone
+
+**What This Includes:**
+- Carrier handoff and integration
+- Private wireless backbone and distribution
+- Fiber or point-to-point links where applicable
+- Masts, poles, mounting infrastructure
+- Switching, routing, network management
+- Power systems (solar, batteries, UPS) where required
+- Wi-Fi access and guest services
+- Security communications infrastructure
+- Redundancy and failover
+- Installation, commissioning, ongoing managed service
+
+**Core Proposition:**
+"The objective is not simply to purchase another internet connection. The objective is to establish a reliable communications backbone for the property that supports its actual operational requirements."
+
+**Customer Value Comparison:**
+| Existing Model | CTTX Hybrid Model |
+|---|---|
+| Customer pays for connectivity/service | Customer obtains carrier + private infrastructure |
+| Dependent on provider's coverage/reliability | Property gains owned infrastructure asset |
+| Operational limitations may remain | Infrastructure designed around actual requirements |
+| Recurring cost only | CAPEX investment → recurring saving/operational benefit |
+
+**Three Business Success Drivers (for lodges/reserves/farms):**
+1. **Guest/Client Experience:** Reliable connectivity = better guest experience, reputation, service capability
+2. **Staff Communication:** Reliable internal communications (lodge, field, remote areas, security, incident response)
+3. **Security/Operational Continuity:** Network must support security systems, incident response, emergency communication
+
 **Authoritative Documents:**
 - **Network Architecture Rules:** `CTTX_CRITICAL_DECISIONS.md`
 - **Strategic Positioning:** `references/cttx-strategic-positioning.md`
@@ -40,15 +79,27 @@ Before asking the user for information:
 
 **Recognize these types.** Single opportunity may contain multiple:
 
-- **Assessment** — GIS feasibility, design, RF analysis, cost estimate
-- **Resell** — Straightforward product/service resale (Vodacom, supplier goods)
-- **Carrier** — Connectivity opportunity (Varrucom wireless, VSAT, fiber)
-- **Private Infrastructure** — CTTX designs/builds property network (backbone, high sites, distribution)
-- **Hybrid** — CTTX infrastructure + carrier connectivity  
-- **PSI** — Private Spectrum Infrastructure (property-wide comms)
+- **Assessment** — GIS feasibility, design, RF analysis, cost estimate, business case
+- **Resell** — Straightforward product/service resale (Vodacom packages, equipment)
+- **Carrier** — Connectivity-only opportunity (no private infrastructure)
+- **Private Infrastructure** — CTTX designs/builds property network (backbone, high sites, distribution, power, switching)
+- **Hybrid** — CTTX infrastructure + carrier connectivity (Vodacom primary model)
+- **PSI** — Private Spectrum Infrastructure (property-wide radio/dispatch comms)
 - **Project** — Approved opportunity in delivery phase
 
-**Reference:** See opportunity classification workflow in new-opportunity skill (when implemented)
+**AUTOMATIC CLASSIFICATION RULE:**
+
+When opportunity type = **Lodge / Reserve / Farm / Property + Connectivity Requirement**
+
+→ Automatically consider: **HYBRID INFRASTRUCTURE OPPORTUNITY**
+
+Do NOT default to: "Buy internet → Add Wi-Fi → Quote"
+
+**Instead ask:** "What infrastructure does this property need to operate reliably?"
+
+The private infrastructure (carrier entry point, backbone, distribution, power, security comms) is the core product. Carrier connectivity is one component of the solution.
+
+**Reference:** See new-opportunity skill intake workflow
 
 ---
 
@@ -93,11 +144,11 @@ Customer → Requirement → Assessment → Architecture → Carrier (if applica
 
 | Supplier | Products | Status | Notes |
 |----------|----------|--------|-------|
-| Varrucom | Wireless connectivity, point-to-point links, backhaul | PRIMARY | Preferred upstream for hybrid solutions |
-| Vodacom Business | LTE Business, VSAT, connectivity packages | SECONDARY | Backup links, failover, secondary carrier |
-| Cambium Networks | 5.8 GHz wireless radios, cnMaestro management | STANDARD STACK | Specified in all designs (CTTX_CRITICAL_DECISIONS.md) |
-| Victron Energy | MPPT, inverters, monitoring systems | STANDARD STACK | All off-grid power designs; remote monitoring required |
-| Hubble Lithium | Lithium battery packs, battery management | STANDARD STACK | All energy storage; integrated Victron monitoring |
+| Vodacom Business | LTE Business, connectivity packages, upstream link | PRIMARY RESELLER | Core component of CTTX Hybrid Network model |
+| Varrucom | Wireless connectivity, point-to-point links, backhaul | ALTERNATIVE | Optional upstream for hybrid solutions (if preferred) |
+| Cambium Networks | 5.8 GHz wireless radios, cnMaestro management | STANDARD STACK | Private network infrastructure (CTTX_CRITICAL_DECISIONS.md) |
+| Victron Energy | MPPT, inverters, monitoring systems | STANDARD STACK | Private network power systems; remote monitoring required |
+| Hubble Lithium | Lithium battery packs, battery management | STANDARD STACK | Private network energy storage; integrated Victron monitoring |
 
 **Where to find:** Rate cards, pricing, and specific commercial terms → Retrieve from authoritative source (to be confirmed with director)
 
@@ -116,6 +167,34 @@ Key rules:
 - Design for min 98–99% availability
 - BER-first (low error rate) not speed-first design
 - Application profiles drive network design (PTZ cameras, VoIP, IoT, guest WiFi, payment systems, access control)
+
+---
+
+## PROPOSAL STRUCTURE FOR HYBRID INFRASTRUCTURE OPPORTUNITIES
+
+**For lodge/reserve/farm/property opportunities, structure around:**
+
+1. **Executive Summary** — What the property needs and why
+2. **Current Situation** — Existing connectivity, documented operational problems, evidence of failures
+3. **Three Business Drivers**
+   - Guest/client experience impact
+   - Staff communication requirement (lodge → field → remote areas)
+   - Security/operational continuity (incident response, emergency comms)
+4. **Architecture** — Where carrier enters, how CTTX distributes across property
+5. **Infrastructure** — Equipment, links, masts, power, switching, Wi-Fi, security, redundancy
+6. **Commercial Model** — CAPEX, recurring carrier cost, CTTX services
+7. **Financial Case**
+   - Current recurring cost
+   - Proposed recurring cost
+   - Monthly/annual saving (if applicable)
+   - CAPEX investment
+   - Simple payback period (calculated from actual numbers only)
+   - Long-term operational value
+8. **Operational Outcome** — What the property can reliably do (with evidence connection)
+9. **Assumptions & Exclusions** — Clearly documented
+10. **Next Steps** — Assessment, approval, implementation, or as appropriate
+
+**Critical:** Use customer-reported evidence, not invented scenarios. (E.g., Elephant Barefoot: "Elephants broke out after 21:00 and staff had no effective communication" → Solution requirement: "Network must provide dependable communications beyond normal hours and across operational areas where incident response may occur.")
 
 ---
 
