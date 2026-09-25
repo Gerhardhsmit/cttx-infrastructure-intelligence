@@ -14,8 +14,10 @@
 This proposal outlines a comprehensive wireless infrastructure upgrade for Barefoot Elephant Lodge, designed to deliver enterprise-grade connectivity throughout the property. The solution combines industry-leading point-to-point and point-to-multipoint wireless technology with reliable local network infrastructure, enabling seamless guest connectivity, operational efficiency, and future scalability.
 
 **Equipment Investment (Incl. VAT):** R161,326.60  
-**Infrastructure Investment (TBD):** Mast, Cabinet, Solar, Brackets — Pending Quotes  
-**Total Investment (TBD):** To be confirmed  
+**Mast Investment (9m + Plinth):** R44,505.00 (Incl. VAT)  
+**Equipment + Mast Total (Incl. VAT):** R205,831.60  
+**Remaining Infrastructure (TBD):** Cabinet, Solar, Brackets — Pending Quotes  
+**Grand Total (Incl. All):** R205,831.60 + TBD  
 *(Cost Saving: R20,730 excluded for surge suppressors — using proper earthing instead)*  
 **Currency:** South African Rand  
 **Delivery:** Stock available; selected items ETA mid-November 2026
@@ -110,7 +112,7 @@ The CTTX infrastructure solution leverages a hybrid wireless network architectur
 | **Outdoor Access Points** | DuxNet Outdoor Dual-Band WI-FI 6 | 2 | 1Gb LAN, weather-resistant |
 | **Network Switches** | DuxNet 8-Port PoE+ L2 Cloud | 4 | Gigabit, 2x SFP uplinks, cloud managed |
 | **Grounding & Earthing** | Comprehensive Earthing System | 1 | Protects all nodes via proper ground design |
-| **Outdoor Mast** | Galvanized Steel Tower | TBD | RF-optimized height, wind rating (Quote TBD) |
+| **Outdoor Mast** | 9m Galvanized Steel Tower with Plinth | 1 | Height: 9m, Pre-installed concrete foundation, CTTX certified |
 | **Equipment Cabinet** | Weather-Sealed Outdoor Enclosure | 1 | Backhaul radios, switches, surge protection, climate control (Quote TBD) |
 | **Solar Power System** | Grid-Independent Power Solution | 1 | Panels, battery bank, charge controller, inverter (Quote TBD) |
 | **Mounting Hardware** | Radio Brackets & Mounts | TBD | Stainless steel, vibration-dampened, UV-resistant (Quote TBD) |
@@ -158,7 +160,7 @@ The CTTX infrastructure solution leverages a hybrid wireless network architectur
 | | DuxNet Outdoor Dual-Band APs | 2 | R1,885 | R3,770 |
 | | DuxNet Gigabit PoE+ L2 Switches | 4 | R1,899 | R7,596 |
 | **Grounding & Protection** | Comprehensive Earthing System | 1 | — | Included |
-| **Outdoor Infrastructure** | Outdoor Mast (Steel Tower) | 1 | TBD | **TBD** |
+| **Outdoor Infrastructure** | 9m Steel Mast with Plinth (CTTX) | 1 | R38,700 | **R38,700** |
 | | Weather-Sealed Cabinet | 1 | TBD | **TBD** |
 | | Solar Power System | 1 | TBD | **TBD** |
 | | Mounting Brackets & Hardware | TBD | TBD | **TBD** |
@@ -167,11 +169,12 @@ The CTTX infrastructure solution leverages a hybrid wireless network architectur
 | **Equipment VAT (15%)** | | | | **R21,042.60** |
 | **Equipment TOTAL (Incl. VAT)** | | | | **R161,326.60** |
 | | | | | |
-| **Infrastructure SUBTOTAL (Excl. VAT)** | *Mast + Cabinet + Solar + Brackets* | | | **TBD** |
-| **Infrastructure VAT (15%)** | | | | **TBD** |
-| **Infrastructure TOTAL (Incl. VAT)** | | | | **TBD** |
+| **Infrastructure SUBTOTAL (Excl. VAT)** | *Mast (R38,700) + Cabinet + Solar + Brackets* | | | **R38,700 + TBD** |
+| **Infrastructure VAT (15%)** | | | | **R5,805 + TBD** |
+| **Infrastructure TOTAL (Incl. VAT)** | | | | **R44,505 + TBD** |
 | | | | | |
-| **GRAND TOTAL (Equipment + Infrastructure, Incl. VAT)** | | | | **TBD** |
+| **EQUIPMENT + MAST TOTAL (Incl. VAT)** | *(Equipment + 9m Mast with Plinth)* | | | **R205,831.60** |
+| **GRAND TOTAL (+ Cabinet + Solar + Brackets)** | *(Final - Pending Cabinet/Solar Quotes)* | | | **R205,831.60 + TBD** |
 
 ### Additional Costs (If Required)
 
