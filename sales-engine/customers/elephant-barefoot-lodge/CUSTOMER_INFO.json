@@ -1,0 +1,39 @@
+{
+  "customer": {
+    "name": "Elephant Barefoot Lodge (Pty) Ltd",
+    "type": "Lodge/Hospitality",
+    "location": "TBD - See KMZ file for coordinates",
+    "segment": "Reserve/Lodge",
+    "industry": "Hospitality & Tourism"
+  },
+  "opportunity": {
+    "type": "Hybrid",
+    "carrier": "Varrucom reseller connection confirmed",
+    "status": "Proposal Stage",
+    "created": "2026-09-25",
+    "decision_maker": "TBD",
+    "contact_phone": "TBD",
+    "contact_email": "TBD"
+  },
+  "infrastructure": {
+    "design_supplied": true,
+    "design_type": "Client network design (supplied)",
+    "mapping": "KMZ file available",
+    "coverage_planning": "Link Planner output available",
+    "existing_network": "TBD - See client information"
+  },
+  "pain_points": [
+    "TBD - To be extracted from client network design",
+    "Likely: Guest WiFi reliability",
+    "Likely: Operations connectivity",
+    "Likely: Security camera backhaul"
+  ],
+  "next_steps": [
+    "Obtain and analyze KMZ file for site coordinates and terrain",
+    "Review Link Planner output for RF propagation analysis",
+    "Examine existing client network documentation",
+    "Determine hybrid solution architecture",
+    "Calculate capacity requirements",
+    "Prepare technical specifications"
+  ]
+}
