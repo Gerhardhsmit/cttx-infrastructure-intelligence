@@ -1,49 +1,51 @@
 {
  "reserve": "Amakhala Game Reserve",
  "date": "2026-09-27",
- "imagery_date": "7 September 2026",
+ "imagery_date": "17 October 2025 to 5 August 2026",
  "epsg": 32735,
- "coverage_pct": 65.50314465408805,
- "area_km2": 128.79,
+ "coverage_pct": 65.40635598542896,
+ "area_km2": 128.9682,
  "lodges_total": 8,
  "lodges_clear": 8,
+ "unlocated": [],
+ "area_mode": false,
  "uplink": {
   "label": "Paterson high ground",
   "latlon": [
-   -33.41625,
-   25.95175
+   -33.41615,
+   25.95182
   ],
   "to": "High Site North",
-  "km": 17.11906831576999
+  "km": 17.14026837596191
  },
  "sites": [
   {
    "name": "High Site South",
    "kind": "high",
-   "elev": 409.50970458984375,
+   "elev": 409.61279296875,
    "latlon": [
-    -33.56661,
-    26.07792
+    -33.56678,
+    26.07767
    ],
    "feed": null
   },
   {
    "name": "High Site North",
    "kind": "high",
-   "elev": 352.9258117675781,
+   "elev": 353.056640625,
    "latlon": [
-    -33.52632,
-    26.08093
+    -33.52649,
+    26.081
    ],
    "feed": null
   },
   {
    "name": "Safari relay",
    "kind": "relay",
-   "elev": 311.08721923828125,
+   "elev": 311.2200012207031,
    "latlon": [
-    -33.49751,
-    26.0286
+    -33.49741,
+    26.02867
    ],
    "feed": "High Site South"
   }
@@ -53,64 +55,64 @@
    "a": "Carrier uplink",
    "b": "High Site North",
    "kind": "uplink",
-   "km": 17.11906831576999,
-   "fresnel_ratio": 4.973210718201378
+   "km": 17.14026837596191,
+   "fresnel_ratio": 4.963072351941448
   },
   {
    "a": "High Site North",
    "b": "High Site South",
    "kind": "backbone",
-   "km": 4.476438316340348,
-   "fresnel_ratio": 4.835174521109203
+   "km": 4.478146938187714,
+   "fresnel_ratio": 4.969636550619239
   },
   {
    "a": "Safari relay",
    "b": "High Site South",
    "kind": "backbone",
-   "km": 8.926751928893285,
-   "fresnel_ratio": 1.144017958175261
+   "km": 8.936828296437165,
+   "fresnel_ratio": 1.2322521891871363
   }
  ],
  "lodges": {
   "Safari Lodge": {
    "frm": "Safari relay",
-   "km": 0.6687700321820133,
-   "fresnel_ratio": 2.5992117231519707
+   "km": 0.6797902973405255,
+   "fresnel_ratio": 2.3549362590739373
   },
   "Bush Lodge": {
    "frm": "High Site North",
-   "km": 4.536666295259713,
-   "fresnel_ratio": 2.150813407886745
+   "km": 4.536802645613765,
+   "fresnel_ratio": 2.0198278366137683
   },
   "Leeuwenbosch": {
    "frm": "High Site North",
-   "km": 1.63060368656747,
-   "fresnel_ratio": 4.068073082249563
+   "km": 1.6223825723766865,
+   "fresnel_ratio": 4.07021267346593
   },
   "Bukela Game Lodge": {
    "frm": "High Site South",
-   "km": 3.6193320210960667,
-   "fresnel_ratio": 3.3094491892202287
+   "km": 3.6420571113019076,
+   "fresnel_ratio": 3.4183231701254027
   },
   "Hlosi Game Lodge": {
    "frm": "High Site South",
-   "km": 3.1142405313774986,
-   "fresnel_ratio": 0.6737468093537164
+   "km": 3.143936651892051,
+   "fresnel_ratio": 0.6318210610119485
   },
   "Quatermain's Camp": {
    "frm": "High Site North",
-   "km": 4.314010119240166,
-   "fresnel_ratio": 4.871141240870797
+   "km": 4.320708925790404,
+   "fresnel_ratio": 4.8449492572532025
   },
   "HillsNek Safari Camp": {
    "frm": "High Site North",
-   "km": 5.841764942649389,
-   "fresnel_ratio": 5.073629752731864
+   "km": 5.840314522107911,
+   "fresnel_ratio": 4.919994543529124
   },
   "Woodbury Lodge": {
    "frm": "High Site South",
-   "km": 9.524183924165783,
-   "fresnel_ratio": 0.7940661931604867
+   "km": 9.553787503292908,
+   "fresnel_ratio": 0.8307352965517726
   }
  }
 }
