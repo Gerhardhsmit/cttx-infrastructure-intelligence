@@ -6,7 +6,7 @@
 
 ## Steps
 1. **Context.** Check Notion CTTX Pipeline and `sales-engine/customers/` for the prospect. Identify the named contact.
-2. **Lodge coordinates.** Find published GPS coordinates for every lodge or camp (lodge sites, directory pages). Record conflicts, pick the better-sourced one, and flag it.
+2. **Lodge coordinates.** Find published GPS coordinates for every lodge or camp (lodge sites, directory pages). Record conflicts, pick the better-sourced one, and flag it. Never estimate a position. Where lodges have none, add the reserve `area` from a published reserve point and its size. If neither exists (e.g. only a jetty or reception address), don't build a study: put the prospect on the call list and ask for a KMZ or marked map.
 3. **Uplink.** Use a known Vodacom site if Notion or Duane Forlee has one (`known_site`). Otherwise use the nearest town's high ground (`town_high_ground`) and say it is a candidate.
 4. **Config.** Write `sales-engine/terrain-study/reserves/<slug>.json`. The `today`, `context` and `security_note` fields come from evidence, never invented scenarios.
 5. **Run.** `python3 sales-engine/terrain-study/engine.py sales-engine/terrain-study/reserves/<slug>.json`. If a lodge shows "Needs survey", say so rather than forcing a link.

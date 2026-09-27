@@ -16,12 +16,19 @@ cp sales-engine/terrain-study/reserves/amakhala.json sales-engine/terrain-study/
 python3 sales-engine/terrain-study/engine.py sales-engine/terrain-study/reserves/<slug>.json
 ```
 
+## How the engine handles gaps (built in)
+- **Lodges without published positions:** give the reserve `area` (`lat`, `lon`, `radius_km`, `source`) from a published reserve point and its size. The engine picks high sites for the best coverage of the area, still links every lodge that has a position, and lists the others as "Position to confirm". If there is no area and no lodge positions, there is no study; the prospect goes on the call list and gets asked for a KMZ.
+- **Clouds:** imagery is built from the clearest passes in the last 12 months, judged over the study area itself. A pass is used only if its local cloud is 1% or less, and gaps are filled pass by pass until the whole window is covered.
+- **Cost figures:** the engine refuses to build if a rand amount appears in the study.
+- **Filenames:** made safe (letters, digits and `_` only).
+
 ## Reserve config
 | Field | Meaning |
 |---|---|
 | `slug`, `reserve`, `short` | Folder name, full name, short name used in the title |
 | `prepared_for` | "First name, Reserve" |
-| `lodges[]` | `name`, `lat`, `lon`. Use published GPS coordinates only, and note any that conflict |
+| `lodges[]` | `name`, `lat`, `lon` (null if not published), `units`, `wifi_today` (`public`/`all_rooms`/`unknown`), `coord_source`. Published coordinates only; never estimate. |
+| `area` | Optional: `{"lat","lon","radius_km","source"}` for the reserve extent (a published reserve point, radius from the hectares) |
 | `uplink` | `{"mode":"town_high_ground","town","lat","lon","radius_m"}`: highest ground near a town. Or `{"mode":"known_site","label","lat","lon"}` once Vodacom confirms a tower |
 | `today[]` | 3–4 bullets on the current state, from **evidence only** (published listings, the customer's own words) |
 | `context`, `security_note` | One paragraph each, reserve-specific, evidence-based |
