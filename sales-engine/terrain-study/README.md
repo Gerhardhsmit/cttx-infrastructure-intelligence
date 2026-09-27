@@ -30,6 +30,7 @@ python3 sales-engine/terrain-study/engine.py sales-engine/terrain-study/reserves
 - `brand.json`: every colour and font (HTML, PDF, map and profile images). Taken from the Barefoot Addo Network Proposal (26 Sep 2026): near-black #0A0A0B, lime #CCFF00, alert #FF3B30; Inter Tight, Inter, Roboto Mono.
 - `evidence.json`: customer proof points. Name a customer only with recorded permission. No pricing.
 - `template.html`: page layout.
+- `payback_model.json`: **internal** assumptions for the payback table (only months/years are shown). Conservative: excludes the top spend band and deducts running costs. The claim is capped at "typically under three years".
 
 ## Rules
 - No pricing in this document. Internal quotes stay in `INTERNAL_*` files.

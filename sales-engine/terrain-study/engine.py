@@ -457,6 +457,25 @@ def build_html(cfg, brand, ev, m, work):
                       f"<p>{e(u['text'])}</p><cite>{e(u['label'])}</cite></div>" for u in ev["unnamed"])
     drivers = "".join(f"<div class='driver-card'><div class='driver-label'>{e(d['name'])}</div><p>{e(d['text'])}</p></div>" for d in ev["model"]["drivers"])
     today = "".join(f"<li>{e(t)}</li>" for t in cfg.get("today", []))
+    pm = json.loads((HERE / "payback_model.json").read_text())
+    pay_head = "".join(f"<th>R{v:,} / lodge / month<small>{e(l)}</small></th>".replace(",", " ")
+                       for v, l in zip(pm["spend_per_lodge_incl_vat"], pm["spend_labels"]))
+    pay_rows = ""
+    for n in pm["lodge_counts"]:
+        capex = pm["capex_base_incl_vat"] + pm["capex_per_lodge_incl_vat"] * n
+        mrc = (pm["carrier_monthly_incl_vat"]["large" if n >= pm["carrier_monthly_incl_vat"]["large_from_lodges"] else "small"]
+               + pm.get("owned_running_monthly_incl_vat", 0))
+        cells = ""
+        for sp in pm["spend_per_lodge_incl_vat"]:
+            sav = n * sp - mrc
+            yrs = capex / sav / 12 if sav > 0 else None
+            if yrs is None or yrs * 12 > pm["cap_months"]:
+                cells += "<td class='yr'>5+ yrs</td>"
+            else:
+                good = " good" if yrs * 12 <= pm["threshold_months"] else ""
+                label = "under 1 yr" if yrs < 1 else f"{yrs:.1f} yrs"
+                cells += f"<td class='yr{good}'>{label}</td>"
+        pay_rows += f"<tr><td>{n} lodges</td>{cells}</tr>"
     positions = "; ".join(f"{s['name']} {s['latlon'][0]:.5f}, {s['latlon'][1]:.5f}" for s in sites)
     rep = {
         "TITLE": f"{e(cfg['short'])} Reserve Network",
@@ -478,7 +497,7 @@ def build_html(cfg, brand, ev, m, work):
         "PROOF_NAME": e(named["name"]), "PROOF_SCALE": e(named["scale"]),
         "PROOF_BEFORE": e(named["before"]), "PROOF_AFTER": e(named["after"]), "PROOF_ROWS": proof_rows,
         "UNNAMED": unnamed, "MODEL_HEAD": e(ev["model"]["headline"]), "MODEL_PRINCIPLE": e(ev["model"]["principle"]),
-        "DRIVERS": drivers, "POSITIONS": e(positions), "UPLL": f"{m['uplink']['latlon'][0]:.5f}, {m['uplink']['latlon'][1]:.5f}",
+        "DRIVERS": drivers, "PAY_HEAD": pay_head, "PAY_ROWS": pay_rows, "POSITIONS": e(positions), "UPLL": f"{m['uplink']['latlon'][0]:.5f}, {m['uplink']['latlon'][1]:.5f}",
         "CO_NAME": e(brand["company"]["name"]), "CO_CONTACT": e(brand["company"]["contact"]),
         "CO_EMAIL": e(brand["company"]["email"]), "CO_PHONE": e(brand["company"]["phone"]), "CO_WEB": e(brand["company"].get("web", "")),
     }

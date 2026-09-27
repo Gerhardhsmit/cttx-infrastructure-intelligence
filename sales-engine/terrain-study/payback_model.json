@@ -1,0 +1,29 @@
+{
+  "_note": "INTERNAL assumptions behind the 'find your row' payback table. The study shows months only, never these rand figures. Grounding: Barefoot Addo approved quote 25 Sep 2026 (Herotel invoice R18,106/mo incl VAT, break-even 34 months without managed retainer); Amakhala indicative Phase 1 (R492k incl VAT, 8 lodges); Vodacom rate card (Notion, 15 Jun 2026); market ranges (mybroadband, mwcom, whichvoip 2026). Payback is on connectivity spend replaced only, excluding the optional managed-service retainer. Treat as illustrative, never as a quote. Owned-network running cost (power upkeep, spares, monitoring) of R1,500/month is deducted from savings to keep the table conservative.",
+  "capex_base_incl_vat": 300000,
+  "capex_per_lodge_incl_vat": 25000,
+  "carrier_monthly_incl_vat": {
+    "small": 8767,
+    "large": 11437,
+    "large_from_lodges": 6
+  },
+  "lodge_counts": [
+    4,
+    6,
+    8,
+    11
+  ],
+  "spend_per_lodge_incl_vat": [
+    2500,
+    4000,
+    6000
+  ],
+  "spend_labels": [
+    "Entry wireless or LTE",
+    "Business wireless",
+    "Business link and rented Wi-Fi"
+  ],
+  "threshold_months": 36,
+  "cap_months": 60,
+  "owned_running_monthly_incl_vat": 1500
+}

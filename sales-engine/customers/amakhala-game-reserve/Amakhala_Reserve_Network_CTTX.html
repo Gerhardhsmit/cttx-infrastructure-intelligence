@@ -148,7 +148,7 @@ tr:last-child td{border-bottom:0}
 
 .ba{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media (max-width:640px){.ba{grid-template-columns:1fr}}
-.proof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.proof-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .proof{background:var(--surface-2);padding:18px 20px;display:flex;flex-direction:column;gap:8px}
 .proof .tag{font:400 11px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
 .proof p{font-size:14px}
@@ -177,7 +177,10 @@ footer .role{color:var(--muted);font-size:14px;margin-bottom:18px}
 footer .contact{display:flex;justify-content:center;gap:10px 24px;flex-wrap:wrap;font-size:14px}
 footer .contact span{color:var(--muted);margin-right:6px}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-@media (max-width:640px){.cover{padding:44px 16px 36px}.wrap{padding-inline:16px}section{padding:40px 0}}
+@media (max-width:640px){.proof-grid{grid-template-columns:1fr}.cover{padding:44px 16px 36px}.wrap{padding-inline:16px}section{padding:40px 0}}
+table.payback td.yr{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+table.payback td.yr.good{color:var(--accent);font-weight:700}
+table.payback th small{display:block;text-transform:none;letter-spacing:0;font-family:var(--body);color:var(--muted);font-size:11px;margin-top:3px}
 </style>
 <style>@page{size:A4;margin:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}@media print{html,body{background:var(--bg)}.driver-card,.callout,.stat-grid,.proof-grid,.lens,figure,.tablewrap,.steps li{break-inside:avoid}.section-head{break-after:avoid}}</style></head><body>
 <div class="cover">
@@ -256,11 +259,23 @@ footer .contact span{color:var(--muted);margin-right:6px}
       <div class="callout win"><span class="callout-label">After</span><p>A Vodacom-backed 100 Mbps symmetrical link into the reserve, a CTTX-built main mast and two secondary masts, solar and lithium power, all monitored remotely.</p></div>
     </div>
     <div class="proof-grid"><div class='proof'><span class='tag'>Guest experience</span><p>HD sport streams live at the lodges. Guest connectivity is no longer something the lodges think about.</p></div><div class='proof'><span class='tag'>Staff communication</span><p>Over 800 Mbps measured across the reserve&#x27;s own backbone, linking the main lodge, Mountain Retreat and Samar.</p></div><div class='proof'><span class='tag'>Security and operations</span><p>Daily provider callouts went to zero. Every fault used to need a vehicle and a person; now the network is monitored remotely.</p></div><div class='proof'><span class='tag'>Ownership</span><p>The reserve keeps adding systems on top of the backbone. In the client&#x27;s words, they stopped doing speed tests.</p></div></div>
-    <div class='callout alert'><span class='callout-label'>When the network goes quiet after hours</span><p>Elephants broke out after 21:00 and staff had no effective way to coordinate. The requirement that came out of it: dependable communications after hours, across the areas where an incident can happen.</p><cite>An Eastern Cape lodge near Addo</cite></div><div class='callout win'><span class='callout-label'>Owning the network pays for itself</span><p>Replacing a rented, contended service and rented access points with a lodge-owned network roughly halves the monthly connectivity bill. Payback is modelled at about 14 months, and the network then covers areas the old setup never reached, including the spa.</p><cite>The same lodge, modelled business case (26 Sep 2026)</cite></div>
+    <div class='callout alert'><span class='callout-label'>When the network goes quiet after hours</span><p>Elephants broke out after 21:00 and staff had no effective way to coordinate. The requirement that came out of it: dependable communications after hours, across the areas where an incident can happen.</p><cite>An Eastern Cape lodge near Addo</cite></div><div class='callout win'><span class='callout-label'>Owning the network pays for itself</span><p>Replacing a rented, contended service and rented Wi-Fi with a lodge-owned network breaks even in under three years on connectivity savings alone. It also connects areas the old setup never reached, including the spa.</p><cite>The same lodge, business case from its own invoices (Sep 2026)</cite></div>
   </section>
 
   <section>
-    <div class="section-head"><span class="section-num">06</span><h2>What changes when the reserve owns it</h2></div>
+    <div class="section-head"><span class="section-num">06</span><h2>What it pays back</h2></div>
+    <p class="lede">On connectivity spend alone, a reserve that replaces rented services at each lodge with one owned backbone typically recovers its investment in under three years. Everything else in this document comes on top of that.</p>
+    <div class="tablewrap"><table class="payback">
+      <thead><tr><th>Lodges on the reserve</th><th>R2 500 / lodge / month<small>Entry wireless or LTE</small></th><th>R4 000 / lodge / month<small>Business wireless</small></th><th>R6 000 / lodge / month<small>Business link and rented Wi-Fi</small></th></tr></thead>
+      <tbody><tr><td>4 lodges</td><td class='yr'>5+ yrs</td><td class='yr'>5+ yrs</td><td class='yr good'>2.4 yrs</td></tr><tr><td>6 lodges</td><td class='yr'>5+ yrs</td><td class='yr'>3.4 yrs</td><td class='yr good'>1.6 yrs</td></tr><tr><td>8 lodges</td><td class='yr'>5+ yrs</td><td class='yr good'>2.2 yrs</td><td class='yr good'>1.2 yrs</td></tr><tr><td>11 lodges</td><td class='yr'>3.3 yrs</td><td class='yr good'>1.5 yrs</td><td class='yr good'>under 1 yr</td></tr></tbody>
+    </table></div>
+    <p class="caption">Years to recover the backbone investment, by what each lodge spends on connectivity today. Illustrative, based on typical Eastern Cape lodge connectivity costs and a typical CTTX reserve backbone, with running costs deducted. Lime cells are under three years.</p>
+    <div class="callout win"><span class="callout-label">Your number, not ours</span><p>Send us each lodge's latest connectivity invoice, or just the monthly totals, and we will put Amakhala on this table with your actual payback. It takes us a day.</p></div>
+    <div class="callout"><span class="callout-label">Built to be forwarded</span><p>If infrastructure decisions sit with someone else, please pass this on. Owners will find the payback and ownership case, the reserve manager the security and operations case, and lodge managers the guest experience case.</p></div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">07</span><h2>What changes when the reserve owns it</h2></div>
     <div class="compare">
       <div class="callout alert"><span class="callout-label">Today</span><ul><li>Each lodge buys and manages its own service</li><li>Wi-Fi is listed for the public areas by the main lodge</li><li>Security, ecology and maintenance teams are not on a shared network</li><li>Nothing links the gates, water points or fences</li></ul></div>
       <div class="callout win"><span class="callout-label">With a reserve backbone</span><ul><li>One uncontended carrier feed shared across the reserve</li><li>Lodges, HQ, the anti-poaching base and gates on one private network</li><li>Coverage out into the field, day and night</li><li>An owned asset that takes cameras and sensors without new towers</li></ul></div>
@@ -274,9 +289,9 @@ footer .contact span{color:var(--muted);margin-right:6px}
   </section>
 
   <section>
-    <div class="section-head"><span class="section-num">07</span><h2>Next steps</h2></div>
+    <div class="section-head"><span class="section-num">08</span><h2>Next steps</h2></div>
     <ul class="steps">
-      <li><div class="step-title">30-minute call</div><div class="step-desc">Your peak usage, the incidents that were hardest to coordinate, and what currently needs a vehicle trip to check.</div></li>
+      <li><div class="step-title">30-minute call</div><div class="step-desc">Your lodges' current connectivity costs, your peak usage, the incidents that were hardest to coordinate, and what currently needs a vehicle trip to check.</div></li>
       <li><div class="step-title">Confirm the sites</div><div class="step-desc">A marked map of HQ, the anti-poaching base and the gates. We add them to the model and rerun the link plan.</div></li>
       <li><div class="step-title">One day on the reserve</div><div class="step-desc">We walk the high sites and relay points, and confirm the carrier uplink with Vodacom.</div></li>
       <li><div class="step-title">Design and proposal</div><div class="step-desc">A final design in Cambium LINKPlanner, with equipment, power, a phased plan and the investment case.</div></li>
