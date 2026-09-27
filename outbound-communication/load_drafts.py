@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+r"""
 Load the daily routine's .eml drafts into Outlook Drafts. DRAFTS ONLY.
 
 The "CTTX daily prospect drafts" routine writes .eml files to
@@ -55,6 +55,22 @@ def is_generic(address: str) -> bool:
     return local in GENERIC_LOCAL_PARTS
 
 
+def reflow(text: str) -> str:
+    """Join hard-wrapped lines back into paragraphs so Outlook shows clean text.
+    Short lines (greeting, signature, URLs) are kept as they are."""
+    out = []
+    for para in text.replace("\r\n", "\n").split("\n\n"):
+        lines = para.split("\n")
+        merged = lines[0]
+        for prev, line in zip(lines, lines[1:]):
+            if len(prev.rstrip()) >= 55 and line.strip():
+                merged = merged.rstrip() + " " + line.strip()
+            else:
+                merged += "\n" + line
+        out.append(merged)
+    return "\n\n".join(out)
+
+
 def parse_eml(path: Path):
     msg = BytesParser(policy=policy.default).parse(path.open("rb"))
     to = [addr for _, addr in getaddresses(msg.get_all("To", [])) if addr]
@@ -63,6 +79,8 @@ def parse_eml(path: Path):
     part = msg.get_body(preferencelist=("plain", "html"))
     body = part.get_content() if part else ""
     body_type = "html" if part is not None and part.get_content_subtype() == "html" else "text"
+    if body_type == "text":
+        body = reflow(body)
     attach = [a.strip() for a in str(msg.get("X-CTTX-Attach", "")).split(",") if a.strip()]
     return to, cc, subject, body, body_type, [path.parent / a for a in attach]
 
@@ -229,7 +247,8 @@ def main():
                                                 attachments=attachments)
         if result["success"]:
             extra = f" + {len(attachments)} attachment(s)" if attachments else ""
-            print(f"DRAFT  {path.name} -> {', '.join(to)}{extra}  [{result.get('location', 'Drafts')}]")
+            repl = f" (replaced {result['replaced']} older version)" if result.get("replaced") else ""
+            print(f"DRAFT  {path.name} -> {', '.join(to)}{extra}  [{result.get('location', 'Drafts')}]{repl}")
             loaded += 1
             if args.from_repo:
                 add_to_ledger(folder, repo_key(path))

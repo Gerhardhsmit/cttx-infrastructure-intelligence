@@ -113,6 +113,20 @@ class OutboundWorker:
             outlook = win32com.client.Dispatch("Outlook.Application")
             account, drafts = find_cttx_account(outlook)
 
+            # A newer version replaces an older draft to the same recipient with the
+            # same subject. The old one goes to Deleted Items and can be recovered.
+            replaced = 0
+            want_to = {r.strip().lower() for r in recipient.split(";") if r.strip()}
+            for item in list(drafts.Items):
+                try:
+                    same_subject = (item.Subject or "").strip().lower() == subject.strip().lower()
+                    item_to = {r.Address.lower() for r in item.Recipients if r.Type == 1}
+                except Exception:
+                    continue
+                if same_subject and item_to == want_to:
+                    item.Delete()
+                    replaced += 1
+
             # Create the item directly inside gerhard@cttx.co.za's Drafts folder.
             mail = drafts.Items.Add(0)  # 0 = mailItem
             mail.SendUsingAccount = account  # sets the From account only; nothing is sent
@@ -132,7 +146,7 @@ class OutboundWorker:
 
             # Save as draft. There is deliberately no send call anywhere in this file.
             mail.Save()
-            location = f"{drafts.Parent.Name} \\ {drafts.Name}"
+            location = f"{account.SmtpAddress} \\ {drafts.FolderPath.split(chr(92))[-1] if drafts.FolderPath else drafts.Name}"
 
             self.status['drafts_created'] += 1
             logger.info(f"Draft saved (NOT sent) in {location}: {subject} -> {recipient}")
@@ -143,6 +157,7 @@ class OutboundWorker:
                 'error': None,
                 'draft_info': f"Draft saved: {subject} to {recipient}",
                 'location': location,
+                'replaced': replaced,
             }
         except Exception as e:
             self.status['failed'] += 1
