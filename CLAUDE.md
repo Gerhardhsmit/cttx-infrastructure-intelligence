@@ -138,6 +138,12 @@ Customer → Requirement → Assessment → Architecture → Carrier (if applica
    - Never guess recipient addresses (e.g. `info@<company>.co.za`); use only addresses verified on the prospect's own site
    - `outbound-communication/` is drafts-only; `test_no_send.py` enforces it (27 Sep 2026 incident)
 
+   **Prospect draft rules (set by Gerhard, 27 Sep 2026):**
+   1. **Named decision maker only.** Every draft goes to a real, named person with a direct address verified on the company's own site or via Apollo. Decision-maker roles: reserves — owner, GM, reserve manager; mines — operations manager, IT/ICT manager, security manager; wind/solar farms — O&M site manager, asset manager.
+   2. **No name → no draft.** Never draft to info@, reservations@, bookings@, admin@ or any generic/guessed address. Put the prospect on a call list instead (switchboard number + the role/name to ask for).
+   3. **Priority:** Eastern Cape reserves first → mines → wind/solar farms.
+   4. **Quality over volume:** 3–4 well-researched drafts per day, not bulk batches.
+
 6. **Minimum-Question Principle**
    - Ask only when: can't find in existing knowledge, can't derive from supplied files, materially affects price/solution
    - Format: MISSING → WHY IT MATTERS → QUESTION
