@@ -79,7 +79,7 @@ def main():
 
     for path in files:
         try:
-            to, _cc, subject, body, body_type = parse_eml(path)
+            to, cc, subject, body, body_type = parse_eml(path)
         except Exception as e:
             print(f"FAIL   {path.name}: could not read ({e})")
             failed += 1
@@ -105,7 +105,7 @@ def main():
             loaded += 1
             continue
 
-        result = worker.create_draft_in_outlook("; ".join(to), subject, body, body_type)
+        result = worker.create_draft_in_outlook("; ".join(to), subject, body, body_type, "; ".join(cc))
         if result["success"]:
             print(f"DRAFT  {path.name} -> {', '.join(to)}")
             loaded += 1

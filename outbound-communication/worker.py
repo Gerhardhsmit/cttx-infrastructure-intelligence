@@ -83,7 +83,7 @@ class OutboundWorker:
         """Kept for campaign_assessment.py; there is only one mode."""
         return 'OUTLOOK_DRAFTS_ONLY'
 
-    def create_draft_in_outlook(self, recipient: str, subject: str, body: str, body_type: str = 'html') -> Dict[str, Any]:
+    def create_draft_in_outlook(self, recipient: str, subject: str, body: str, body_type: str = 'html', cc: str = '') -> Dict[str, Any]:
         """
         Save an email into Outlook Drafts. Never sends.
 
@@ -96,6 +96,8 @@ class OutboundWorker:
 
             mail = outlook.CreateItem(0)  # 0 = mailItem
             mail.To = recipient
+            if cc:
+                mail.CC = cc
             mail.Subject = subject
 
             if body_type == 'html':
