@@ -11,12 +11,13 @@
 4. **Config.** Write `sales-engine/terrain-study/reserves/<slug>.json`. The `today`, `context` and `security_note` fields come from evidence, never invented scenarios.
 5. **Run.** `python3 sales-engine/terrain-study/engine.py sales-engine/terrain-study/reserves/<slug>.json`. If a lodge shows "Needs survey", say so rather than forcing a link.
 6. **Look once.** Check the map and the lodge table. Publish `terrain-study/artifact.html` as a private artifact for Gerhard.
-7. **Email.** Draft (never send) a short covering email in the Microsoft 365 connector's Outlook if available, otherwise Gmail. Tell Gerhard to attach the PDF. The email must:
-   - lead with the terrain result (lodges on clear paths, uplink distance, coverage);
-   - allude to payback as "typically under three years on connectivity spend alone", with no rand figures and nothing more aggressive;
-   - offer to calculate *their* payback from each lodge's latest connectivity invoice. This is the hook: whoever holds the bills is the decision-maker;
-   - invite forwarding to whoever signs off infrastructure (owners, reserve manager, lodge managers);
-   - ask for a 30-minute call and include an opt-out line.
+7. **Email.** Follow the `outlook-outreach-drafts` skill and outreach rules on branch `claude/elegant-pascal-1jsjwa` exactly:
+   - The email is a plain-text `.eml` for Gerhard's Outlook (From: Gerhard Smit <gerhard@cttx.co.za>, Cc: gerhard@cttx.co.za, X-Unsent: 1). The filename contains `_Assessment_`. Save it under `sales-engine/outreach/<date>/` on that branch, with the study PDF alongside to attach.
+   - **Never Gmail, never the Microsoft 365 connector, never send.** Gmail is only a read-only check for prior contact.
+   - Named decision-maker only (owner / GM / reserve manager / site manager), verified on the company site or in Apollo. No generic addresses. No name → call list.
+   - Voice: "Gerhard Smit here, CTTX in Gqeberha. We engineer owned networks on lodges, reserves and farms; we don't sell packages." Include one verified paragraph about their operation, point to the attached terrain study (positions are desktop candidates), and offer the half-day assessment: R3,500 ex VAT, credited against the build. Add the invoice hook for actual payback, then "Can I call you for 10 minutes this week?". Use the standard signature (041 371 1089 | 084 550 3281) and a one-line POPI opt-out.
+   - Never invent terrain facts or distances. Only the engine's own results, labelled as a desktop study.
+   - Tell Gerhard to run: `git pull`, `Copy-Item "sales-engine\outreach\<folder>\*.eml" "$env:USERPROFILE\Desktop\CTTX Prospect Drafts\"`, `python outbound-communication\load_drafts.py`.
 8. **Log.** Update the prospect's Notion page (next action, study done, PDF location). Commit the customer folder and the config.
 
 ## Payback rules

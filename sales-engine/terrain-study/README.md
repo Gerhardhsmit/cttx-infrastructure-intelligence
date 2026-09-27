@@ -35,4 +35,4 @@ python3 sales-engine/terrain-study/engine.py sales-engine/terrain-study/reserves
 ## Rules
 - No pricing in this document. Internal quotes stay in `INTERNAL_*` files.
 - High-site and uplink positions are **desktop candidates**. The page says so, and a survey plus Cambium LINKPlanner confirm them.
-- POPI: business contacts only. The covering email goes to drafts, never sent automatically.
+- POPI: business contacts only. The covering email is an Outlook `.eml` draft (see `.claude/skills/reserve-terrain-study.md` step 7), never sent automatically.
