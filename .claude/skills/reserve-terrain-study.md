@@ -17,7 +17,8 @@
    - Named decision-maker only (owner / GM / reserve manager / site manager), verified on the company site or in Apollo. No generic addresses. No name → call list.
    - Voice: "Gerhard Smit here, CTTX in Gqeberha. We engineer owned networks on lodges, reserves and farms; we don't sell packages." Include one verified paragraph about their operation, point to the attached terrain study (positions are desktop candidates), and offer the half-day assessment: R3,500 ex VAT, credited against the build. Add the invoice hook for actual payback, then "Can I call you for 10 minutes this week?". Use the standard signature (041 371 1089 | 084 550 3281) and a one-line POPI opt-out.
    - Never invent terrain facts or distances. Only the engine's own results, labelled as a desktop study.
-   - Tell Gerhard to run: `git pull`, `Copy-Item "sales-engine\outreach\<folder>\*.eml" "$env:USERPROFILE\Desktop\CTTX Prospect Drafts\"`, `python outbound-communication\load_drafts.py`.
+   - Put the study PDF next to the `.eml` and add the header `X-CTTX-Attach: <Short>_Reserve_Network_CTTX.pdf`. The loader attaches it automatically.
+   - Tell Gerhard: double-click **Load CTTX Drafts** on his Desktop. It pulls, loads only new drafts into the gerhard@cttx.co.za Drafts folder, attaches the PDF, and never sends. Never ask him to paste commands, copy files or attach by hand.
 8. **Log.** Update the prospect's Notion page (next action, study done, PDF location). Commit the customer folder and the config.
 
 ## Payback rules
