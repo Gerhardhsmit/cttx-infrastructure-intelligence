@@ -58,6 +58,10 @@ def test_all():
     (out / "C - DRAFT_Missing_Assessment_20260928.eml").write_text(
         EML.format(to="named@example.co.za", extra="X-CTTX-Attach: missing.pdf"), encoding="utf-8")
     desk = Path(tempfile.mkdtemp())
+    # Old-style _loaded folder: an identical copy of B counts as done; a stale copy of A with the
+    # same filename but different content must NOT block the newer A.
+    (desk / "_loaded").mkdir()
+    (desk / "_loaded" / "A - DRAFT_Test_Person_Assessment_20260928.eml").write_text("old version", encoding="utf-8")
 
     run(desk, "--from-repo")
     assert len(FakeWorker.calls) == 1, FakeWorker.calls                   # generic rejected, missing attachment failed

@@ -177,12 +177,13 @@ def main():
         first_run = ledger is None
         if first_run:
             # Anything already loaded the old way (moved to _loaded) counts as done.
-            done_names = {p.name for p in loaded_dir.glob("*.eml")} if loaded_dir.is_dir() else set()
+            # Only an identical file counts: a newer draft may reuse an old filename.
+            done = {p.name: p.read_bytes() for p in loaded_dir.glob("*.eml")} if loaded_dir.is_dir() else {}
             ledger = set()
             for p in sorted(OUTREACH_DIR.rglob("*_Assessment_*.eml")):
                 if "_rejected" in p.parts:
                     continue
-                if p.name in done_names:
+                if done.get(p.name) == p.read_bytes():
                     ledger.add(repo_key(p))
             if not args.dry_run:
                 ledger_path(folder).write_text("".join(k + "\n" for k in sorted(ledger)), encoding="utf-8")
