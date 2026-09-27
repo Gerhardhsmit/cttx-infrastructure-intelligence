@@ -189,3 +189,104 @@ export const linkPlans = mysqlTable("linkPlans", {
 
 export type LinkPlan = typeof linkPlans.$inferSelect;
 export type InsertLinkPlan = typeof linkPlans.$inferInsert;
+
+// CTTX Persistent Outbound Communication Queue
+export const outboundMessages = mysqlTable("outboundMessages", {
+  id: int("id").autoincrement().primaryKey(),
+  messageId: varchar("messageId", { length: 64 }).notNull().unique(),
+  prospectId: varchar("prospectId", { length: 255 }), // Reference to prospect in prospect register
+  accountId: varchar("accountId", { length: 255 }), // Reference to existing customer/account
+  pipelineId: varchar("pipelineId", { length: 255 }), // Reference to CRM pipeline record
+  messageType: varchar("messageType", { length: 64 }).notNull(), // ASSESSMENT_INITIAL, FOLLOW_UP, PROPOSAL_FOLLOW_UP, etc.
+  campaignName: varchar("campaignName", { length: 255 }), // e.g., "Assessment Outreach — Reserves Batch 1"
+  recipient: varchar("recipient", { length: 320 }).notNull(), // Email address
+  recipientName: varchar("recipientName", { length: 255 }), // Display name
+  subject: varchar("subject", { length: 255 }).notNull(),
+  body: text("body"), // HTML or plain text
+  bodyType: mysqlEnum("bodyType", ["html", "text"]).default("html"),
+  attachments: json("attachments"), // Array of {filename, url/path}
+  status: mysqlEnum("status", [
+    "DRAFT", "READY", "APPROVED", "QUEUED", "SENDING", "SENT", "VERIFIED",
+    "FOLLOW_UP_DUE", "RESPONDED", "CLOSED",
+    "RETRY", "BLOCKED", "FAILED", "DEAD_LETTER"
+  ]).default("DRAFT").notNull(),
+  approvedBy: varchar("approvedBy", { length: 255 }), // User/system that approved sending
+  approvedAt: timestamp("approvedAt"),
+  transport: varchar("transport", { length: 64 }), // OUTLOOK, RESEND, GMAIL, etc.
+  providerMessageId: varchar("providerMessageId", { length: 512 }), // ID returned by provider (Outlook messageId, etc.)
+  attemptCount: int("attemptCount").default(0),
+  lastAttemptAt: timestamp("lastAttemptAt"),
+  lastError: text("lastError"), // Last error message if any
+  nextRetryAt: timestamp("nextRetryAt"),
+  sentAt: timestamp("sentAt"), // When delivery was confirmed by transport
+  verifiedAt: timestamp("verifiedAt"), // When delivery was verified (e.g., in Sent Items)
+  verificationMethod: varchar("verificationMethod", { length: 64 }), // HOW_VERIFIED (outlook_sent_items, etc.)
+  followUpDueAt: timestamp("followUpDueAt"), // When follow-up action is due
+  source: varchar("source", { length: 255 }).default("assessment_engine"), // Origin: assessment_engine, sales_engine, manual, etc.
+  metadata: json("metadata"), // Additional metadata (template params, context, etc.)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type OutboundMessage = typeof outboundMessages.$inferSelect;
+export type InsertOutboundMessage = typeof outboundMessages.$inferInsert;
+
+// Outbound Message Attempts (retry tracking)
+export const outboundMessageAttempts = mysqlTable("outboundMessageAttempts", {
+  id: int("id").autoincrement().primaryKey(),
+  messageId: int("messageId").notNull(), // Foreign key to outboundMessages.id
+  attemptNumber: int("attemptNumber").notNull(),
+  status: varchar("status", { length: 64 }).notNull(), // SENDING, SENT, FAILED, RETRYING
+  transport: varchar("transport", { length: 64 }).notNull(),
+  providerResponse: json("providerResponse"), // Full response from provider
+  error: text("error"), // Error message if failed
+  errorCode: varchar("errorCode", { length: 64 }), // Classification: TRANSIENT, PERMANENT, HUMAN_REQUIRED
+  nextRetryAt: timestamp("nextRetryAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type OutboundMessageAttempt = typeof outboundMessageAttempts.$inferSelect;
+export type InsertOutboundMessageAttempt = typeof outboundMessageAttempts.$inferInsert;
+
+// Outbound Receipts (proof of delivery)
+export const outboundReceipts = mysqlTable("outboundReceipts", {
+  id: int("id").autoincrement().primaryKey(),
+  messageId: int("messageId").notNull(), // Foreign key to outboundMessages.id
+  recipient: varchar("recipient", { length: 320 }).notNull(),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  transport: varchar("transport", { length: 64 }).notNull(),
+  providerMessageId: varchar("providerMessageId", { length: 512 }),
+  sentTimestamp: timestamp("sentTimestamp"),
+  verifiedTimestamp: timestamp("verifiedTimestamp"),
+  verificationMethod: varchar("verificationMethod", { length: 64 }), // outlook_sent_items, resend_api, etc.
+  verification: json("verification"), // Full verification data
+  pipelineUpdatedAt: timestamp("pipelineUpdatedAt"), // When pipeline was updated
+  followUpCreatedAt: timestamp("followUpCreatedAt"), // When follow-up was scheduled
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type OutboundReceipt = typeof outboundReceipts.$inferSelect;
+export type InsertOutboundReceipt = typeof outboundReceipts.$inferInsert;
+
+// Dead Letter Queue (permanently failed messages)
+export const deadLetterMessages = mysqlTable("deadLetterMessages", {
+  id: int("id").autoincrement().primaryKey(),
+  messageId: int("messageId"), // Reference to outboundMessages.id if applicable
+  originalMessageId: varchar("originalMessageId", { length: 64 }),
+  prospectId: varchar("prospectId", { length: 255 }),
+  recipient: varchar("recipient", { length: 320 }),
+  subject: varchar("subject", { length: 255 }),
+  failureReason: text("failureReason"),
+  failureClassification: varchar("failureClassification", { length: 64 }), // PERMANENT, HUMAN_REQUIRED, UNKNOWN
+  attemptCount: int("attemptCount"),
+  lastError: text("lastError"),
+  recommendedAction: text("recommendedAction"), // What Gerhard should do
+  resolvedBy: varchar("resolvedBy", { length: 255 }), // Who resolved it
+  resolvedAt: timestamp("resolvedAt"),
+  resolution: varchar("resolution", { length: 255 }), // MANUAL_SEND, SKIP, RETRY, INVALID_DATA, etc.
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type DeadLetterMessage = typeof deadLetterMessages.$inferSelect;
+export type InsertDeadLetterMessage = typeof deadLetterMessages.$inferInsert;
