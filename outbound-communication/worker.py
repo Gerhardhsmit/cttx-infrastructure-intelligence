@@ -106,6 +106,7 @@ class OutboundWorker:
         try:
             import win32com.client
             outlook = win32com.client.Dispatch("Outlook.Application")
+            ns = outlook.GetNamespace("MAPI")
 
             # Create mail item
             mail = outlook.CreateItem(0)  # 0 = mailItem
@@ -116,6 +117,11 @@ class OutboundWorker:
                 mail.HTMLBody = body
             else:
                 mail.Body = body
+
+            # Set the account to ensure it sends (required for Outlook to actually dispatch)
+            accounts = outlook.Session.Accounts
+            if accounts.Count > 0:
+                mail.SendUsingAccount = accounts.Item(1)
 
             # Send the email
             mail.Send()
