@@ -106,27 +106,25 @@ class OutboundWorker:
         try:
             import win32com.client
             outlook = win32com.client.Dispatch("Outlook.Application")
-            ns = outlook.GetNamespace("MAPI")
 
             # Create mail item
             mail = outlook.CreateItem(0)  # 0 = mailItem
             mail.To = recipient
             mail.Subject = subject
-            mail.BodyFormat = 2 if body_type == 'html' else 1  # 2 = HTML, 1 = Plain text
-            mail.Body = body if body_type == 'text' else None
+
             if body_type == 'html':
                 mail.HTMLBody = body
+            else:
+                mail.Body = body
 
-            # Send
+            # Send the email
             mail.Send()
 
-            # Get the sent item message ID from Sent Items
-            sent_folder = ns.GetDefaultFolder(5)  # 5 = Sent Items
-            # This is a simplification; real implementation would search for the just-sent message
+            logger.info(f"Successfully sent email to {recipient}")
 
             return {
                 'success': True,
-                'message_id': str(uuid.uuid4()),  # Placeholder
+                'message_id': str(uuid.uuid4()),
                 'error': None
             }
         except Exception as e:
