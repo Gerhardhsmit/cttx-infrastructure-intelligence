@@ -17,6 +17,7 @@ Usage (Windows). Easiest: double-click "Load CTTX Drafts.bat" in the repo root.
     python load_drafts.py                        # load .eml files from Desktop\CTTX Prospect Drafts
     python load_drafts.py --find Amakhala        # read-only: where are drafts with this subject?
     python load_drafts.py --install-shortcut     # put a "Load CTTX Drafts" shortcut on the Desktop
+    python load_drafts.py --reload amakhala-study  # load a specific repo draft again
 
 Attachments: an .eml may carry "X-CTTX-Attach: file1.pdf, file2.pdf". Paths are
 relative to the .eml's folder. A missing attachment fails that draft loudly.
@@ -130,6 +131,8 @@ def main():
     parser.add_argument("--yes", action="store_true", help="skip the first-run confirmation")
     parser.add_argument("--find", metavar="TEXT", help="read-only: show drafts whose subject contains TEXT")
     parser.add_argument("--install-shortcut", action="store_true")
+    parser.add_argument("--reload", metavar="TEXT",
+                        help="load again the repo drafts whose path contains TEXT (delete the old copy in Outlook first)")
     args = parser.parse_args()
 
     if args.find:
@@ -145,7 +148,13 @@ def main():
     loaded_dir = folder / "_loaded"
     rejected_dir = folder / "_rejected"
     # Only the routine's prospect drafts, never other client correspondence.
-    if args.from_repo:
+    if args.reload:
+        args.from_repo = True
+        files = [p for p in sorted(OUTREACH_DIR.rglob("*_Assessment_*.eml")) if args.reload.lower() in repo_key(p).lower()]
+        print(f"Reloading {len(files)} draft(s) matching '{args.reload}':")
+        for p in files:
+            print("  " + repo_key(p))
+    elif args.from_repo:
         ledger = read_ledger(folder)
         first_run = ledger is None
         if first_run:
