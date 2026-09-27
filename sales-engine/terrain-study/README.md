@@ -30,9 +30,9 @@ python3 sales-engine/terrain-study/engine.py sales-engine/terrain-study/reserves
 - `brand.json`: every colour and font (HTML, PDF, map and profile images). Taken from the Barefoot Addo Network Proposal (26 Sep 2026): near-black #0A0A0B, lime #CCFF00, alert #FF3B30; Inter Tight, Inter, Roboto Mono.
 - `evidence.json`: customer proof points. Name a customer only with recorded permission. No pricing.
 - `template.html`: page layout.
-- `payback_model.json`: **internal** assumptions for the payback table (only months/years are shown). Conservative: excludes the top spend band and deducts running costs. The claim is capped at "typically under three years".
+- `payback_model.json` / `estimate_model.json`: **internal** assumptions for the AP count, the current-cost estimate and the conservative payback. None of it is shown to the customer. The study only says "typically under three years".
 
 ## Rules
-- No pricing in this document. Internal quotes stay in `INTERNAL_*` files.
+- **No cost figures of any kind** in the study: no prices, spend estimates or rand amounts. The engine refuses to build if one appears. The per-lodge AP count and the estimated current (Herotel-style) cost are written to `customers/<slug>/INTERNAL_AP_and_Herotel_Estimate.md`, for Gerhard only.
 - High-site and uplink positions are **desktop candidates**. The page says so, and a survey plus Cambium LINKPlanner confirm them.
 - POPI: business contacts only. The covering email is an Outlook `.eml` draft (see `.claude/skills/reserve-terrain-study.md` step 7), never sent automatically.

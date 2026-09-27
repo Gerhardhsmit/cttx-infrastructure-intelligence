@@ -400,6 +400,12 @@ def run(cfg_path):
     # ------------------------------------------------------------ document
     print("· document")
     page = build_html(cfg, brand, evidence, metrics, work)
+    # First-contact studies never carry cost figures (Gerhard's rule, 28 Sep 2026).
+    text_only = re.sub(r"<[^>]+>|data:[^\"')]+", " ", page)
+    money = re.findall(r"\bR\s?\d{1,3}(?:[\s\u202f,]\d{3})+\b|\bR\s?\d{4,}\b", text_only)
+    if money:
+        sys.exit(f"Refusing to build: the customer-facing study contains cost figures {sorted(set(money))[:5]}. "
+                 "Costs belong in INTERNAL_* files only.")
     stem = f"{cfg['short'].replace(' ', '_')}_Reserve_Network_CTTX"
     standalone = to_standalone(page, brand)
     (out / f"{stem}.html").write_text(standalone)
@@ -482,6 +488,7 @@ def build_html(cfg, brand, ev, m, work):
     fc = EM["full_coverage"]
     wifi_lbl = {"public": "Public areas", "all_rooms": "All rooms", "unknown": "Not published"}
     est_rows, lo_tot, hi_tot, wifi_tot, ap_tot, n_est = "", 0, 0, 0, 0, 0
+    est_md = []
     R = lambda v: "R" + f"{int(round(v)):,}".replace(",", "\u202f")
     for l in list(cfg["lodges"]) + list(cfg.get("other_establishments", [])):
         u = l.get("units")
@@ -494,6 +501,8 @@ def build_html(cfg, brand, ev, m, work):
         tier = next(t for t in EM["uplink_tiers_incl_vat"] if u <= t["max_units"])
         wf = today * EM["per_ap_monthly_incl_vat"]
         lo_tot += tier["low"] + wf; hi_tot += tier["high"] + wf; wifi_tot += wf; ap_tot += today; n_est += 1
+        est_md.append(f"| {l['name']} | {u} | {wifi_lbl.get(l.get('wifi_today', 'unknown'))} | {today} | {full} | "
+                      f"{tier['label']} | R{tier['low']:,}–{tier['high']:,} | R{wf:,} |")
         est_rows += (f"<tr><td>{e(l['name'])}</td><td class='num'>{u}</td><td>{wifi_lbl.get(l.get('wifi_today', 'unknown'))}</td>"
                      f"<td class='num'>{today} <span class='dim'>/ {full}</span></td>"
                      f"<td class='num'>{R(tier['low'])}–{R(tier['high'])[1:]}</td><td class='num'>{R(wf)}</td></tr>")
@@ -516,6 +525,29 @@ def build_html(cfg, brand, ev, m, work):
     <p class="caption">Our estimate from published room counts and a real lodge invoice: rented access points cost about {R(EM['per_ap_monthly_incl_vat'])} each per month, and a lodge uplink {R(EM['uplink_tiers_incl_vat'][0]['low'])}–{R(EM['uplink_tiers_incl_vat'][-1]['high'])[1:]} depending on size. "Needed" is the count for full coverage of rooms, common areas and back of house. Incl. VAT.</p>
     <div class="callout alert"><span class="callout-label">Paid every month, never owned</span><p>{n_est} establishments, {n_est} separate uplinks. Roughly {R(wifi_tot)} a month of that goes on rented Wi-Fi equipment charged per device, which never becomes the reserve's. Over three years that is about {R(wifi_tot * 36)} for equipment the reserve will not own, and it only covers part of each lodge.</p></div>
     <div class="callout win"><span class="callout-label">One backbone instead</span><p>On our conservative estimate, using the low end of today's spend and including CTTX's managed monitoring, one owned backbone for {e(cfg['short'])} recovers its investment in {payback_txt}. After that, the savings, full coverage and security benefits continue.</p></div>"""
+    if n_est:
+        (work.parent / "INTERNAL_AP_and_Herotel_Estimate.md").write_text("\n".join([
+            f"# {cfg['reserve']}: AP count and current-cost estimate (INTERNAL, never send)",
+            "",
+            "Desktop estimate from published room counts. For Gerhard's call preparation only. "
+            "The customer-facing study contains no cost figures. Real figures come from the lodges' invoices.",
+            "",
+            "Method: APs needed = 1 per room/tent + 6 (main areas 3, back of house 2, outdoor 1); camps of 4 units or fewer + 3. "
+            "APs today = 3 where Wi-Fi is listed for public areas only; all needed where listed in all rooms. "
+            f"Rented Wi-Fi = APs today × R{EM['per_ap_monthly_incl_vat']}/month (Barefoot Herotel invoice #8313058: R5,899 for 23 APs). "
+            "Uplink by lodge size, top tier = Herotel 100 Mbps + static IP (R11,706 incl VAT).",
+            "",
+            "| Lodge | Units | Wi-Fi today (published) | APs today | APs needed | Likely uplink | Uplink / month | Rented Wi-Fi / month |",
+            "|---|---|---|---|---|---|---|---|",
+            *est_md,
+            f"| **Total** | | | **{ap_tot}** | | | | **R{wifi_tot:,}** |",
+            "",
+            f"- Estimated reserve spend: **R{lo_tot:,}–{hi_tot:,} / month** incl. VAT across {n_est} establishments.",
+            f"- Rented Wi-Fi, never owned: **R{wifi_tot:,} / month**, about **R{wifi_tot * 36:,}** over three years.",
+            f"- Conservative payback for one owned backbone: **{payback_txt}**. Low spend estimate, 500 Mbps carrier, managed service included.",
+            "",
+            f"Unit counts: {cfg.get('units_source', 'see config')}",
+        ]) + "\n", encoding="utf-8")
     positions = "; ".join(f"{s['name']} {s['latlon'][0]:.5f}, {s['latlon'][1]:.5f}" for s in sites)
     rep = {
         "TITLE": f"{e(cfg['short'])} Reserve Network",

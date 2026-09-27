@@ -21,10 +21,11 @@
    - Tell Gerhard: double-click **Load CTTX Drafts** on his Desktop. It pulls, loads only new drafts into the gerhard@cttx.co.za Drafts folder, attaches the PDF, and never sends. Never ask him to paste commands, copy files or attach by hand.
 8. **Log.** Update the prospect's Notion page (next action, study done, PDF location). Commit the customer folder and the config.
 
-## Payback rules
-- The study shows the "find your row" table (payback in years by lodge count × spend per lodge) from `sales-engine/terrain-study/payback_model.json`. The rand assumptions are internal and never shown.
-- Claim only "typically under three years on connectivity spend alone". The grounded reference is Barefoot Addo's approved quote: 34-month break-even without the managed retainer. Never quote the 14-month figure from the later web proposal.
-- Real payback is calculated only from the prospect's own invoices, after first contact.
+## Cost rules (Gerhard, 28 Sep 2026)
+- **The study never contains cost figures:** no prices, estimated spend, rand amounts or payback tables. The engine enforces this and refuses to build.
+- The only payback wording allowed is "typically recovers the investment in under three years on connectivity costs alone", plus the invoice hook.
+- The AP estimate (rooms → APs today / needed) and the Herotel-style cost estimate (≈R256 per rented AP per month + uplink tier) go to `INTERNAL_AP_and_Herotel_Estimate.md` for call preparation only. Never attach it and never quote it in an email.
+- Real payback is calculated only from the prospect's own invoices.
 
 ## Keep the standard current
 - New customer outcome with permission → add it to `sales-engine/terrain-study/evidence.json`.
