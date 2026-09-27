@@ -1,3 +1,5 @@
+> **INTERNAL ONLY. Do not send.** Gerhard decided on 27 Sep 2026 not to share pricing at first contact. The customer-facing piece is `Amakhala_Reserve_Network_CTTX.pdf`. Keep these numbers for the post-survey quote.
+
 # Amakhala Game Reserve: Reserve Communications Backbone
 ## Desktop Proposal and Indicative Quotation
 

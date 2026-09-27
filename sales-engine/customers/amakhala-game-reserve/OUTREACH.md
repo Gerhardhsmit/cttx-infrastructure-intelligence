@@ -3,30 +3,11 @@
 **Anchor lens:** Executive Risk Reduction + Avoided Loss (APU/rhino programme). Shared-conservancy economics is the secondary angle.
 **POPI:** B2B contact at a published business domain. Legitimate-interest basis. Opt-out in every message.
 
-## 1. Email (Gmail draft created, not sent)
-**To:** richard@amakhala.co.za
-**Subject:** Amakhala: the network on the reserve, in one page
+## 1. Email (Gmail draft updated 27 Sep; no pricing; not sent)
+**To:** richard@amakhala.co.za · **Subject:** Amakhala: the network on the reserve, in one page
+**Attach before sending:** `Amakhala_Reserve_Network_CTTX.pdf`
 
-Hi Richard,
-
-Amakhala has something most reserves don't: an Equine APU, a K9 unit, aerial surveillance and a rhino monitoring programme, all run across 11 independently owned lodges. From what's published, connectivity is still handled lodge by lodge and mostly stops at the main building.
-
-We've done a desktop study of the reserve. In one page:
-
-- The objective: one reliable communications backbone for the whole reserve, rather than another internet connection.
-- How: one uncontended Vodacom Business Connect feed into the reserve, plus two solar-powered ridge high-sites that bring every lodge, the HQ, the APU base, the gates and the ecology team onto one private network. It stays up through load-shedding, with LTE failover.
-- What it enables: gate cameras, fence, water point and pump sensors, and dependable staff comms after hours, when incidents actually happen.
-- Indicative Phase 1: about R428k ex VAT build, and R9,945/month ex VAT for a 1:1 200 Mbps feed with failover. Shared across 11 establishments, that is roughly R904/month each. Subject to feasibility and survey.
-
-The full desktop proposal is ready to send. Would a 30-minute call next week work to check it against what you see on the ground? Specifically, your peak usage, the incidents that were hardest to coordinate, and what currently needs a vehicle trip to check.
-
-If someone else owns infrastructure at Amakhala, I'd appreciate a pointer.
-
-Kind regards,
-Gerhard Smit
-CTTX Services | 084 550 3281 | gerhard@cttx.co.za
-
-If you'd prefer not to hear from us, reply "unsubscribe" and we won't contact you again.
+The email leads with the terrain study: two ridge high-sites plus one relay put all 8 lodges on clear paths, a clear 17 km uplink comes from Paterson high ground, and about two-thirds of the lodge area has line of sight for field teams and sensors. It then asks for a 30-minute call. There is no pricing at first contact (director decision). The full text is in the Gmail draft.
 
 ## 2. LinkedIn DM (Richard Pearse, verify profile first)
 Hi Richard. CTTX builds private communications backbones for reserves: carrier-grade, solar-powered, owned by the reserve. We've done a desktop study of Amakhala (APU, gates, 11 lodges on one network). Could I send you the one-page summary?

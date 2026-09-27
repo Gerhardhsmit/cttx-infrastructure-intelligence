@@ -1,0 +1,164 @@
+<title>Amakhala Reserve Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F3F4EF; --panel:#FFFFFF; --ink:#16211B; --muted:#56635B; --rule:#D3D9D0;
+  --thicket:#2E5641; --amber:#B97A0E; --amber-fill:#E2A42B; --teal:#2B8F85; --chip:#E6ECE4;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--ground:#0F1613;--panel:#16201B;--ink:#E7ECE5;--muted:#9AA79F;--rule:#2A3831;--thicket:#8CC09F;--amber:#F2B233;--amber-fill:#F2B233;--teal:#5FD3C4;--chip:#1E2B24;color-scheme:dark}
+}
+:root[data-theme="dark"]{--ground:#0F1613;--panel:#16201B;--ink:#E7ECE5;--muted:#9AA79F;--rule:#2A3831;--thicket:#8CC09F;--amber:#F2B233;--amber-fill:#F2B233;--teal:#5FD3C4;--chip:#1E2B24;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:16px/1.6 var(--body);padding-inline:20px;padding-block:0 48px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--display);font-weight:600;letter-spacing:.005em;line-height:1.05;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.6rem,6vw,4.4rem);font-weight:700}
+h2{font-size:clamp(1.8rem,3.4vw,2.4rem)}
+h3{font-size:1.35rem}
+p{margin:0;max-width:68ch}
+.eyebrow{font:500 .78rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--thicket)}
+header.top{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;padding-block:22px 0;border-bottom:1px solid var(--rule);padding-bottom:14px}
+.brand{font:700 1.3rem/1 var(--display);letter-spacing:.08em}
+.brand span{color:var(--amber)}
+.meta{font:400 .8rem/1.4 var(--mono);color:var(--muted)}
+.hero{display:flex;flex-direction:column;gap:18px}
+.lede{font-size:1.15rem;color:var(--ink)}
+.lede em{font-style:normal;color:var(--thicket);font-weight:600}
+figure{margin:0;display:flex;flex-direction:column;gap:10px}
+figure img{display:block;width:100%;height:auto;border-radius:4px;border:1px solid var(--rule)}
+.map-fig{position:relative}
+figcaption{font-size:.86rem;color:var(--muted);max-width:none}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font:400 .8rem/1.3 var(--mono);color:var(--muted)}
+.legend i{display:inline-block;width:22px;height:0;border-top:3px solid var(--amber-fill);vertical-align:middle;margin-right:7px}
+.legend i.dash{border-top-style:dashed}
+.legend i.thin{border-top:1.5px solid var(--ink);opacity:.7}
+.legend i.cov{height:11px;border:0;background:#5FD3C4;opacity:.6;width:16px}
+.findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.finding{background:var(--panel);padding:22px 22px 20px;display:flex;flex-direction:column;gap:6px}
+.finding b{font:700 2.6rem/1 var(--display);color:var(--thicket);font-variant-numeric:tabular-nums}
+.finding span{font-size:.92rem;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:18px}
+.layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:28px}
+.layer{display:flex;flex-direction:column;gap:8px;border-top:2px solid var(--thicket);padding-top:12px}
+.layer .tag{font:500 .74rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--amber)}
+.layer p{font-size:.95rem}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.92rem}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule)}
+th{font:500 .72rem/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-block;font:500 .72rem/1 var(--mono);letter-spacing:.06em;padding:5px 8px;border-radius:99px;background:var(--chip);color:var(--thicket)}
+.lenses{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:28px 36px}
+.lens{display:flex;flex-direction:column;gap:6px}
+.lens h3{color:var(--thicket)}
+.lens p{font-size:.95rem}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.compare div{background:var(--panel);padding:18px 20px;display:flex;flex-direction:column;gap:8px}
+.compare h3{font-size:1.15rem}
+.compare ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:.93rem}
+.compare .ours h3{color:var(--thicket)}
+@media (max-width:640px){.compare{grid-template-columns:1fr}}
+.steps{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px}
+.steps li{display:flex;flex-direction:column;gap:6px;border-left:2px solid var(--amber-fill);padding-left:14px}
+.steps li b{font:600 1.15rem/1.2 var(--display)}
+.steps li span{font-size:.93rem;color:var(--muted)}
+.method{font-size:.82rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:18px;display:flex;flex-direction:column;gap:8px}
+.method p{max-width:none}
+.contact{font:500 .95rem/1.5 var(--mono)}
+a{color:var(--thicket)}
+:focus-visible{outline:2px solid var(--amber-fill);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">CTTX<span>.</span> SERVICES</div>
+    <div class="meta">Desktop terrain study · Amakhala Game Reserve · 27 September 2026</div>
+  </header>
+
+  <div class="hero">
+    <div class="eyebrow">Prepared for Richard, Amakhala Game Reserve</div>
+    <h1>One network across the whole reserve.</h1>
+    <p class="lede">We modelled Amakhala's terrain from satellite elevation data and ran every link through a line-of-sight and Fresnel-zone check. The result: <em>two ridge high-sites and one small relay put all eight lodges we could locate on clear radio paths</em>, fed from a carrier uplink on the high ground at Paterson.</p>
+    <figure class="map-fig">
+      <img src="{{MAP}}" alt="Satellite image of Amakhala Game Reserve and Paterson with the proposed uplink, two high sites, the Safari relay and links to eight lodges, over a teal radio-coverage overlay">
+      <div class="legend">
+        <span><i class="dash"></i>Carrier uplink</span>
+        <span><i></i>Private backbone</span>
+        <span><i class="thin"></i>Lodge link</span>
+        <span><i class="cov"></i>Clear line of sight for a 3&nbsp;m field terminal</span>
+      </div>
+      <figcaption>Sentinel-2 imagery, 5 August 2026. The dotted outline is the study area around the lodges; everything outside it is dimmed. Site positions are desktop candidates, to be confirmed on a site visit.</figcaption>
+    </figure>
+  </div>
+
+  <div class="findings" role="list">
+    <div class="finding" role="listitem"><b>8 of 8</b><span>lodges on a clear, Fresnel-zone-clear radio path</span></div>
+    <div class="finding" role="listitem"><b>2 + 1</b><span>ridge high-sites plus one short relay for Safari Lodge in its valley</span></div>
+    <div class="finding" role="listitem"><b>{{COV}}%</b><span>of the {{AREA}} km² study area in line of sight for field teams and sensors</span></div>
+    <div class="finding" role="listitem"><b>{{UPKM}} km</b><span>clear uplink path from Paterson high ground into the reserve</span></div>
+  </div>
+
+  <section>
+    <div class="eyebrow">How it is built</div>
+    <h2>Carrier in, private network out</h2>
+    <p>Most lodges on Amakhala list Wi-Fi in the public areas by the main lodge, with each lodge sorting out its own connection. We propose a single backbone that belongs to the reserve.</p>
+    <div class="layers">
+      <div class="layer"><span class="tag">Layer 1 · Carrier</span><h3>Uplink from Paterson</h3><p>An uncontended business-grade Vodacom service, delivered by CTTX over a {{UPKM}} km link from the high ground at Paterson to High Site North. LTE failover keeps the reserve connected if the carrier path drops.</p></div>
+      <div class="layer"><span class="tag">Layer 2 · Backbone</span><h3>Two ridge high-sites</h3><p>High Site North ({{H2E}} m) and High Site South ({{H1E}} m) sit {{BBKM}} km apart with a clear link between them. Each runs on solar and lithium storage with remote monitoring, so the network stays up through load-shedding.</p></div>
+      <div class="layer"><span class="tag">Layer 3 · Distribution</span><h3>Every lodge and ops site</h3><p>Sector radios on each high site reach the lodges, HQ, the anti-poaching base, ecology, the workshop and the gates. A LoRaWAN gateway on the backbone is ready for fence, water-point, pump and fuel sensors.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Link planning</div>
+    <h2>Every path checked against the terrain</h2>
+    <p>Each profile below shows the ground between two sites (green), the radio path (amber line) and its first Fresnel zone (amber band). We allow for earth curvature and require at least 60% of the Fresnel zone to be clear at every point. A path that fails is not drawn on the map.</p>
+    <figure><img src="{{PROF1}}" alt="Terrain profiles for the carrier uplink, the backbone between the high sites, and the Safari relay, all clear"><figcaption>Backbone and uplink paths. 5.8 GHz, k = 4/3, 30 m uplink tower, 18 m high-site masts.</figcaption></figure>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Lodge</th><th>Served from</th><th>Path length</th><th>Line of sight</th></tr></thead>
+        <tbody>{{ROWS}}</tbody>
+      </table>
+    </div>
+    <figure><img src="{{PROF2}}" alt="Eight terrain profiles, one per lodge, each showing a clear radio path"><figcaption>Lodge paths, with an 8 m receiver mast at each lodge. Lodge positions come from published GPS coordinates.</figcaption></figure>
+  </section>
+
+  <section>
+    <div class="eyebrow">Why own it</div>
+    <h2>What changes when the reserve owns its network</h2>
+    <div class="compare">
+      <div><h3>Today: a connection per lodge</h3><ul><li>Each lodge buys and manages its own service</li><li>Coverage stops at the main building</li><li>Security, ecology and maintenance teams are not on a shared network</li><li>Nothing links the gates, water points or fences</li></ul></div>
+      <div class="ours"><h3>With a reserve backbone</h3><ul><li>One uncontended carrier feed shared across the reserve</li><li>Lodges, HQ, APU base and gates on one private network</li><li>Coverage out into the field, day and night</li><li>An owned asset that takes cameras and sensors without new towers</li></ul></div>
+    </div>
+    <div class="lenses">
+      <div class="lens"><h3>Avoided loss</h3><p>Gate cameras, fence and trigger alarms, and after-hours communication for the Equine APU and K9 unit. When something happens at night, the right people know in minutes.</p></div>
+      <div class="lens"><h3>Operational efficiency</h3><p>Water points, pumps and fuel tanks report their own status, so there are fewer vehicle trips just to check. Maintenance, ecology and lodges share one communications path.</p></div>
+      <div class="lens"><h3>Infrastructure ownership</h3><p>High sites, backbone and power belong to the reserve. The network grows with Amakhala instead of depending on each lodge's separate provider.</p></div>
+      <div class="lens"><h3>Executive risk reduction</h3><p>The reserve manager gets live visibility of the network, cameras and sensors, plus a record of operational diligence for owners, insurers and conservation partners.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Next step</div>
+    <h2>Check it against what you see on the ground</h2>
+    <ol class="steps">
+      <li><b>30-minute call</b><span>Your peak usage, the incidents hardest to coordinate, and what currently needs a vehicle trip to check.</span></li>
+      <li><b>Confirm the sites</b><span>A marked map of HQ, the APU base and the gates. We add them to the model and rerun the link plan.</span></li>
+      <li><b>One day on the reserve</b><span>We walk the two ridges and the Safari relay point and confirm the carrier uplink with Vodacom.</span></li>
+      <li><b>Design and proposal</b><span>A final network design in Cambium LINKPlanner, with equipment, power and a phased plan.</span></li>
+    </ol>
+    <p class="contact">Gerhard Smit · CTTX Services · gerhard@cttx.co.za · 084 550 3281</p>
+  </section>
+
+  <div class="method">
+    <p><b>Method.</b> Terrain: Copernicus DEM GLO-30 (30 m). Imagery: ESA Sentinel-2 L2A true colour, 5 August 2026. Radio model: 5.8 GHz, effective earth radius factor 4/3, 60% first-Fresnel-zone clearance required at every point. Heights: carrier uplink 30 m, high-site masts 18 m, lodge masts 8 m, field terminals 3 m. The DEM does not model trees or buildings. Final paths are confirmed on survey and in Cambium LINKPlanner before anything is built.</p>
+    <p><b>Candidate positions.</b> High sites North {{H2LL}}, South {{H1LL}}, Safari relay {{RLL}}, carrier uplink {{ULL}}. The uplink marks the high ground at Paterson. The exact carrier site is subject to Vodacom feasibility.</p>
+  </div>
+</div>

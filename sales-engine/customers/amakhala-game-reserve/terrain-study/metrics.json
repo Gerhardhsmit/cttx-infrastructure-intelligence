@@ -1,0 +1,107 @@
+{
+ "coverage_pct": 64.92513938482742,
+ "area_km2": 129.3003,
+ "sites": {
+  "High Site South": {
+   "elev": 407.1073913574219,
+   "latlon": [
+    -33.56667,
+    26.08733
+   ]
+  },
+  "High Site North": {
+   "elev": 352.9956970214844,
+   "latlon": [
+    -33.5263,
+    26.08097
+   ]
+  }
+ },
+ "relay": {
+  "elev": 333.5,
+  "latlon": [
+   -33.50363,
+   26.01726
+  ]
+ },
+ "uplink": {
+  "elev": 374.982666015625,
+  "latlon": [
+   -33.41597,
+   25.95211
+  ],
+  "to": "High Site North",
+  "km": 17.11906831576999,
+  "ratio": 4.960738150867751,
+  "minclr": 17.70368217480825
+ },
+ "backbone": {
+  "km": 4.514177665976384,
+  "ratio": 7.12745586327808,
+  "minclr": 17.203767708632597
+ },
+ "relaylink": {
+  "to": "High Site North",
+  "km": 6.429243636437762,
+  "ratio": 2.369945149655215,
+  "minclr": 17.681969634818927
+ },
+ "lodges": {
+  "Safari Lodge": {
+   "frm": "Safari relay",
+   "km": 1.1110825732794227,
+   "ratio": 2.8609151524231446,
+   "clear": true,
+   "minclr": 10.84279605508857
+  },
+  "Bush Lodge": {
+   "frm": "High Site North",
+   "km": 4.540273796399262,
+   "ratio": 1.7103017353330512,
+   "clear": true,
+   "minclr": 8.975432523360098
+  },
+  "Leeuwenbosch": {
+   "frm": "High Site North",
+   "km": 1.634172082703861,
+   "ratio": 4.257318667973921,
+   "clear": true,
+   "minclr": 11.5046254196277
+  },
+  "Bukela Game Lodge": {
+   "frm": "High Site South",
+   "km": 3.5462492862450077,
+   "ratio": 4.773188256686479,
+   "clear": true,
+   "minclr": 10.654919093606054
+  },
+  "Hlosi Game Lodge": {
+   "frm": "High Site South",
+   "km": 2.4529814741921894,
+   "ratio": 5.341331360157444,
+   "clear": true,
+   "minclr": 9.767382581845368
+  },
+  "Quatermain's Camp": {
+   "frm": "High Site North",
+   "km": 4.310374356970411,
+   "ratio": 5.075527121190258,
+   "clear": true,
+   "minclr": 9.280504623704473
+  },
+  "HillsNek Safari Camp": {
+   "frm": "High Site North",
+   "km": 5.838218503462506,
+   "ratio": 4.720830666725498,
+   "clear": true,
+   "minclr": 8.546149588216252
+  },
+  "Woodbury Lodge": {
+   "frm": "High Site South",
+   "km": 8.908393965645297,
+   "ratio": 2.0917323980638445,
+   "clear": true,
+   "minclr": 7.871589343114806
+  }
+ }
+}
