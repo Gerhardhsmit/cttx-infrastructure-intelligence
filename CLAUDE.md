@@ -144,6 +144,10 @@ Customer → Requirement → Assessment → Architecture → Carrier (if applica
    3. **Priority:** Eastern Cape reserves first → mines → wind/solar farms.
    4. **Quality over volume:** 3–4 well-researched drafts per day, not bulk batches.
 
+   **How to find named decision makers (proven 27 Sep 2026):** Apollo connector. People search (free) by `q_organization_domains_list` or keyword tags + `person_locations` (Eastern Cape; George/Knysna/Plett/Mossel Bay/Oudtshoorn) + decision-maker titles + `contact_email_status: verified`; then `apollo_people_bulk_match` by id (1 credit each, 10 per call). Reject shared mailboxes (e.g. `pumbareserve@pehotels.co.za`). Check Gmail for prior contact first. Territory: anything within ~400 km of Gqeberha (East London, Makhanda, Karoo, Garden Route).
+   **Existing clients — never cold-draft:** Safresco (invoiced via Sage), Kwandwe (Angus replied 25 Sep — in conversation).
+   **Drafts produced:** `sales-engine/outreach/2026-09-28*/` (+ `TRACKER_batch2.csv`, `CALL_LIST_20260928.md`).
+
 6. **Minimum-Question Principle**
    - Ask only when: can't find in existing knowledge, can't derive from supplied files, materially affects price/solution
    - Format: MISSING → WHY IT MATTERS → QUESTION
