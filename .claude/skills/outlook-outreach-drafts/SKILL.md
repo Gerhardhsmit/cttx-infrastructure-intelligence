@@ -17,8 +17,8 @@ He does not use Gmail for outreach. Never suggest Gmail as a fallback.
   before. Never create drafts there, never send from it, never put a gmail
   address in From/To/Cc.
 
-## The route that works (proven 27 Sep 2026)
-1. You write each email as a plain-text `.eml` file:
+## The route that works (permanent, 28 Sep 2026)
+1. Write each email as a plain-text `.eml` file:
    ```
    From: Gerhard Smit <gerhard@cttx.co.za>
    To: <Named Person> <their.verified@company.co.za>
@@ -28,25 +28,30 @@ He does not use Gmail for outreach. Never suggest Gmail as a fallback.
    X-Unsent: 1
    MIME-Version: 1.0
    Content-Type: text/plain; charset=utf-8
-   X-CTTX-Note: Attach the one-page assessment PDF. Source of name/address: <URL or "Apollo verified <date>">.
+   X-CTTX-Attach: <file.pdf>[, <file2.pdf>]     (optional; files sit next to the .eml)
+   X-CTTX-Note: Source of name/address: <URL or "Apollo verified <date>">.
 
    <body>
    ```
    Filename must contain `_Assessment_`:
    `<Company> - DRAFT_<First_Last>_Assessment_<YYYYMMDD>.eml`
-2. Save them in the repo under `sales-engine/outreach/<YYYY-MM-DD>/`,
-   commit and push to the working branch. (If this session can write to his
-   PC directly, save to `Desktop\CTTX Prospect Drafts\` instead.)
-3. Tell Gerhard to run, on his PC, one line at a time:
-   ```powershell
-   cd "$env:USERPROFILE\Documents\cttx-infrastructure-intelligence"
-   git pull
-   Copy-Item "sales-engine\outreach\<folder>\*.eml" "$env:USERPROFILE\Desktop\CTTX Prospect Drafts\"
-   python outbound-communication\load_drafts.py
-   ```
-   `load_drafts.py` puts each file into **Outlook Drafts** and prints
-   "Nothing was sent." It rejects info@/reservations@-style addresses.
-4. Gerhard reviews, attaches the PDF, and presses Send himself.
+2. Save them, and any attachment named in `X-CTTX-Attach`, under
+   `sales-engine/outreach/<YYYY-MM-DD>[-label]/` on branch
+   `claude/elegant-pascal-1jsjwa`, then commit and push.
+3. Tell Gerhard: **double-click "Load CTTX Drafts" on the Desktop**, or
+   `Load CTTX Drafts.bat` in the repo root. It pulls the branch and runs
+   `load_drafts.py --from-repo`, which:
+   - loads only drafts not yet in `Desktop\CTTX Prospect Drafts\_ledger.txt`, so there are no duplicates;
+   - saves each draft in the **gerhard@cttx.co.za** mailbox's Drafts, whatever
+     Outlook's default store is, with that account as From;
+   - attaches the `X-CTTX-Attach` files, and fails the draft loudly if one is missing;
+   - rejects generic addresses and prints "Nothing was sent."
+   Never ask him to paste commands, copy files or attach PDFs by hand.
+4. Gerhard reviews each draft and presses Send himself.
+
+Helpers: `python outbound-communication\load_drafts.py --find <text>` (read-only:
+which mailbox's Drafts holds a subject) · `--install-shortcut` (one-time
+Desktop shortcut) · `--from-repo --dry-run` (preview).
 
 ## Hard rules
 - **Never send.** No `.Send()`, no Graph sendMail, no Resend, no Gmail send.

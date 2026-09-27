@@ -14,6 +14,7 @@ Usage:
 """
 
 import json
+import os
 import sys
 import argparse
 import logging
@@ -41,6 +42,23 @@ RECEIPTS_DIR.mkdir(exist_ok=True)
 
 # Outlook OlDefaultFolders.olFolderDrafts
 OL_FOLDER_DRAFTS = 16
+
+# The only mailbox prospect drafts may go into. Outlook's default store can be
+# a different account or data file, so drafts are placed here explicitly.
+CTTX_ACCOUNT = os.environ.get("CTTX_OUTLOOK_ACCOUNT", "gerhard@cttx.co.za").lower()
+
+
+def find_cttx_account(outlook):
+    """Return (account, drafts_folder) for gerhard@cttx.co.za, or raise with the accounts found."""
+    ns = outlook.GetNamespace("MAPI")
+    seen = []
+    for i in range(1, ns.Accounts.Count + 1):
+        acc = ns.Accounts.Item(i)
+        addr = (getattr(acc, "SmtpAddress", "") or "").lower()
+        seen.append(addr or acc.DisplayName)
+        if addr == CTTX_ACCOUNT:
+            return acc, acc.DeliveryStore.GetDefaultFolder(OL_FOLDER_DRAFTS)
+    raise RuntimeError(f"Outlook account {CTTX_ACCOUNT} not found. Accounts in this Outlook profile: {', '.join(seen) or 'none'}")
 
 
 class OutboundWorker:
@@ -83,7 +101,7 @@ class OutboundWorker:
         """Kept for campaign_assessment.py; there is only one mode."""
         return 'OUTLOOK_DRAFTS_ONLY'
 
-    def create_draft_in_outlook(self, recipient: str, subject: str, body: str, body_type: str = 'html', cc: str = '') -> Dict[str, Any]:
+    def create_draft_in_outlook(self, recipient: str, subject: str, body: str, body_type: str = 'html', cc: str = '', attachments=None) -> Dict[str, Any]:
         """
         Save an email into Outlook Drafts. Never sends.
 
@@ -93,8 +111,11 @@ class OutboundWorker:
         try:
             import win32com.client
             outlook = win32com.client.Dispatch("Outlook.Application")
+            account, drafts = find_cttx_account(outlook)
 
-            mail = outlook.CreateItem(0)  # 0 = mailItem
+            # Create the item directly inside gerhard@cttx.co.za's Drafts folder.
+            mail = drafts.Items.Add(0)  # 0 = mailItem
+            mail.SendUsingAccount = account  # sets the From account only; nothing is sent
             mail.To = recipient
             if cc:
                 mail.CC = cc
@@ -105,21 +126,23 @@ class OutboundWorker:
             else:
                 mail.Body = body
 
-            # Save as draft, then move into the Drafts folder explicitly.
-            # There is deliberately no send call anywhere in this file.
+            # Attach files (e.g. the reserve study PDF) so Gerhard doesn't have to.
+            for path in attachments or []:
+                mail.Attachments.Add(str(path))
+
+            # Save as draft. There is deliberately no send call anywhere in this file.
             mail.Save()
-            drafts = outlook.GetNamespace("MAPI").GetDefaultFolder(OL_FOLDER_DRAFTS)
-            if mail.Parent.EntryID != drafts.EntryID:
-                mail = mail.Move(drafts)
+            location = f"{drafts.Parent.Name} \\ {drafts.Name}"
 
             self.status['drafts_created'] += 1
-            logger.info(f"Draft saved (NOT sent): {subject} -> {recipient}")
+            logger.info(f"Draft saved (NOT sent) in {location}: {subject} -> {recipient}")
 
             return {
                 'success': True,
                 'message_id': str(uuid.uuid4()),
                 'error': None,
-                'draft_info': f"Draft saved: {subject} to {recipient}"
+                'draft_info': f"Draft saved: {subject} to {recipient}",
+                'location': location,
             }
         except Exception as e:
             self.status['failed'] += 1

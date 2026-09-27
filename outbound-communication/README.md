@@ -1,3 +1,7 @@
+## Loading drafts (the one-click way)
+Double-click **Load CTTX Drafts** on the Desktop. The first time, run `python outbound-communication\load_drafts.py --install-shortcut` to create the shortcut, or double-click `Load CTTX Drafts.bat` in the repo root.
+It pulls the latest drafts, loads only new ones into the gerhard@cttx.co.za Drafts folder, attaches their PDFs, and never sends. The ledger is `Desktop\CTTX Prospect Drafts\_ledger.txt`: delete a line to load that draft again.
+
 # Outbound communication — DRAFTS ONLY
 
 These scripts save emails into Outlook **Drafts**. They never send.
