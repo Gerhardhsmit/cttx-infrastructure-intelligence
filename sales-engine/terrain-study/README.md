@@ -27,7 +27,7 @@ python3 sales-engine/terrain-study/engine.py sales-engine/terrain-study/reserves
 | `context`, `security_note` | One paragraph each, reserve-specific, evidence-based |
 
 ## Single sources of truth
-- `brand.json`: every colour and font (HTML, PDF, map and profile images). **Status: provisional** until the palette from the Elephant Barefoot proposal is confirmed.
+- `brand.json`: every colour and font (HTML, PDF, map and profile images). Taken from the Barefoot Addo Network Proposal (26 Sep 2026): near-black #0A0A0B, lime #CCFF00, alert #FF3B30; Inter Tight, Inter, Roboto Mono.
 - `evidence.json`: customer proof points. Name a customer only with recorded permission. No pricing.
 - `template.html`: page layout.
 

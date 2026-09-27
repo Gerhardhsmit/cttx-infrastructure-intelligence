@@ -356,22 +356,23 @@ def run(cfg_path):
         g = pr["g"] + pr["bulge"]
         ax.fill_between(d, g.min() - 20, g, color=P["terrain"], alpha=.9, lw=0)
         ax.plot(d, pr["los"], color=P["path"], lw=1.6)
-        ax.fill_between(d, pr["los"] - pr["f1"], pr["los"] + pr["f1"], color=P["fresnel"], alpha=.22, lw=0)
+        ax.fill_between(d, pr["los"] - pr["f1"], pr["los"] + pr["f1"], color=P["fresnel"], alpha=.16, lw=0)
         ax.plot(d, pr["los"] - FRESNEL_CLEAR * pr["f1"], color=P["path"], lw=.8, ls=":")
         ax.set_xlim(0, d[-1]); ax.set_ylim(g.min() - 20, max(pr["los"].max(), g.max()) + 25)
         for s_ in ["top", "right"]:
             ax.spines[s_].set_visible(False)
         for s_ in ["left", "bottom"]:
             ax.spines[s_].set_color(P["axis"])
-        ax.tick_params(colors="#4a564f", labelsize=9 if big else 8)
-        ax.set_xlabel("km", color="#4a564f", fontsize=8); ax.set_ylabel("m ASL", color="#4a564f", fontsize=8)
+        ax.set_facecolor(P["bg"])
+        ax.tick_params(colors=P["tick"], labelsize=9 if big else 8)
+        ax.set_xlabel("km", color=P["tick"], fontsize=8); ax.set_ylabel("m ASL", color=P["tick"], fontsize=8)
         ax.set_title(f"{ta} → {tb}   {pr['D'] / 1000:.1f} km · {'Fresnel zone clear' if pr['clear'] else 'obstructed'}",
                      fontsize=10 if big else 8.5, color=P["text"], loc="left", fontweight="bold")
 
     fig, axs = plt.subplots(len(links), 1, figsize=(11, 2.8 * len(links)), dpi=130, squeeze=False)
     for a_, L in zip(axs[:, 0], links):
         prof(a_, L["pr"], L["a"], L["b"])
-    plt.tight_layout(); fig.savefig(work / "profiles_backbone.png", facecolor="white"); plt.close()
+    fig.patch.set_facecolor(P["bg"]); plt.tight_layout(); fig.savefig(work / "profiles_backbone.png", facecolor=P["bg"]); plt.close()
     ll_items = [(k, L) for k, L in lodge_links.items() if L]
     rows = math.ceil(len(ll_items) / 2)
     fig, axs = plt.subplots(rows, 2, figsize=(11, 2.5 * rows), dpi=130, squeeze=False)
@@ -379,7 +380,7 @@ def run(cfg_path):
         prof(a_, L["pr"], L["a"], k, False)
     for a_ in list(axs.flat)[len(ll_items):]:
         a_.axis("off")
-    plt.tight_layout(); fig.savefig(work / "profiles_lodges.png", facecolor="white"); plt.close()
+    fig.patch.set_facecolor(P["bg"]); plt.tight_layout(); fig.savefig(work / "profiles_lodges.png", facecolor=P["bg"]); plt.close()
 
     # ------------------------------------------------------------ metrics
     ll = lambda p: tuple(round(v, 5) for v in Ti.transform(*p)[::-1])
@@ -452,14 +453,15 @@ def build_html(cfg, brand, ev, m, work):
     relay_word = (f" and {'one short relay' if len(relays) == 1 else f'{len(relays)} short relays'}" if relays else "")
     named = ev["named"][0]
     proof_rows = "".join(f"<div class='proof'><span class='tag'>{e(o['driver'])}</span><p>{e(o['text'])}</p></div>" for o in named["outcomes"])
-    unnamed = "".join(f"<blockquote><p>{e(u['text'])}</p><cite>{e(u['label'])}</cite></blockquote>" for u in ev["unnamed"])
-    drivers = "".join(f"<div class='driver'><h3>{e(d['name'])}</h3><p>{e(d['text'])}</p></div>" for d in ev["model"]["drivers"])
+    unnamed = "".join(f"<div class='callout {e(u.get('kind', 'win'))}'><span class='callout-label'>{e(u.get('title', u['label']))}</span>"
+                      f"<p>{e(u['text'])}</p><cite>{e(u['label'])}</cite></div>" for u in ev["unnamed"])
+    drivers = "".join(f"<div class='driver-card'><div class='driver-label'>{e(d['name'])}</div><p>{e(d['text'])}</p></div>" for d in ev["model"]["drivers"])
     today = "".join(f"<li>{e(t)}</li>" for t in cfg.get("today", []))
     positions = "; ".join(f"{s['name']} {s['latlon'][0]:.5f}, {s['latlon'][1]:.5f}" for s in sites)
     rep = {
         "TITLE": f"{e(cfg['short'])} Reserve Network",
         "FONT_CSS": brand["fonts"]["google_css"],
-        "LIGHT": css_tokens(brand["light"]), "DARK": css_tokens(brand["dark"]),
+        "LIGHT": css_tokens(brand["tokens"]),
         "F_DISPLAY": brand["fonts"]["display"], "F_BODY": brand["fonts"]["body"], "F_MONO": brand["fonts"]["mono"],
         "RESERVE": e(cfg["reserve"]), "SHORT": e(cfg["short"]), "PREPARED_FOR": e(cfg["prepared_for"]),
         "DATE": dt.date.fromisoformat(cfg["date"]).strftime("%-d %B %Y"), "IMG_DATE": m["imagery_date"],
@@ -478,7 +480,7 @@ def build_html(cfg, brand, ev, m, work):
         "UNNAMED": unnamed, "MODEL_HEAD": e(ev["model"]["headline"]), "MODEL_PRINCIPLE": e(ev["model"]["principle"]),
         "DRIVERS": drivers, "POSITIONS": e(positions), "UPLL": f"{m['uplink']['latlon'][0]:.5f}, {m['uplink']['latlon'][1]:.5f}",
         "CO_NAME": e(brand["company"]["name"]), "CO_CONTACT": e(brand["company"]["contact"]),
-        "CO_EMAIL": e(brand["company"]["email"]), "CO_PHONE": e(brand["company"]["phone"]),
+        "CO_EMAIL": e(brand["company"]["email"]), "CO_PHONE": e(brand["company"]["phone"]), "CO_WEB": e(brand["company"].get("web", "")),
     }
     for k, v in rep.items():
         tpl = tpl.replace("{{" + k + "}}", v)
@@ -500,8 +502,9 @@ def to_standalone(page, brand):
     head, body = page.split("<!--BODY-->", 1)
     return ('<!doctype html><html lang="en"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1">' + head +
-            "<style>@page{size:A4;margin:12mm 10mm}@media print{body{padding-inline:0}.wrap{gap:34px}"
-            "section,figure,.findings,.compare,.lenses,.proofs,blockquote{break-inside:avoid}}</style></head><body>" + body + "</body></html>")
+            "<style>@page{size:A4;margin:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}"
+            "@media print{html,body{background:var(--bg)}.driver-card,.callout,.stat-grid,.proof-grid,.lens,figure,.tablewrap,.steps li{break-inside:avoid}"
+            ".section-head{break-after:avoid}}</style></head><body>" + body + "</body></html>")
 
 
 if __name__ == "__main__":

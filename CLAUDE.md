@@ -325,7 +325,7 @@ Skill: `.claude/skills/reserve-terrain-study.md` · Engine: `sales-engine/terrai
 
 - Aerial Sentinel-2 map + candidate carrier uplink + ridge high-sites/relays + Fresnel-checked profiles for every lodge
 - "One backbone for every driver" section (guest experience, staff communication, security) with customer proof from `sales-engine/terrain-study/evidence.json` (Sandymount Safaris is the named reference)
-- Colours/fonts only from `sales-engine/terrain-study/brand.json` (provisional until the Elephant Barefoot palette is confirmed)
+- Colours/fonts only from `sales-engine/terrain-study/brand.json` (Barefoot Addo proposal palette: #0A0A0B / #CCFF00, Inter Tight + Inter + Roboto Mono)
 - Pricing stays internal until after survey
 
 ---

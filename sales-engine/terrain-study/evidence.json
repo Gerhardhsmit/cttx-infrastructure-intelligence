@@ -8,26 +8,55 @@
       "before": "A consumer wireless service at about 3 Mbps down and 8 Mbps up, with the provider on site daily to swap IPs and reinstall equipment.",
       "after": "A Vodacom-backed 100 Mbps symmetrical link into the reserve, a CTTX-built main mast and two secondary masts, solar and lithium power, all monitored remotely.",
       "outcomes": [
-        {"driver": "Guest experience", "text": "HD sport streams live at the lodges. Guest connectivity is no longer something the lodges think about."},
-        {"driver": "Staff communication", "text": "Over 800 Mbps measured across the reserve's own backbone, linking the main lodge, Mountain Retreat and Samar."},
-        {"driver": "Security and operations", "text": "Daily provider callouts went to zero. Every fault used to need a vehicle and a person; now the network is monitored remotely."},
-        {"driver": "Ownership", "text": "The reserve keeps adding systems on top of the backbone. In the client's words, they stopped doing speed tests."}
+        {
+          "driver": "Guest experience",
+          "text": "HD sport streams live at the lodges. Guest connectivity is no longer something the lodges think about."
+        },
+        {
+          "driver": "Staff communication",
+          "text": "Over 800 Mbps measured across the reserve's own backbone, linking the main lodge, Mountain Retreat and Samar."
+        },
+        {
+          "driver": "Security and operations",
+          "text": "Daily provider callouts went to zero. Every fault used to need a vehicle and a person; now the network is monitored remotely."
+        },
+        {
+          "driver": "Ownership",
+          "text": "The reserve keeps adding systems on top of the backbone. In the client's words, they stopped doing speed tests."
+        }
       ]
     }
   ],
   "unnamed": [
     {
       "label": "An Eastern Cape lodge near Addo",
-      "driver": "Security and operations",
+      "kind": "alert",
+      "title": "When the network goes quiet after hours",
       "text": "Elephants broke out after 21:00 and staff had no effective way to coordinate. The requirement that came out of it: dependable communications after hours, across the areas where an incident can happen."
+    },
+    {
+      "label": "The same lodge, modelled business case (26 Sep 2026)",
+      "kind": "win",
+      "title": "Owning the network pays for itself",
+      "text": "Replacing a rented, contended service and rented access points with a lodge-owned network roughly halves the monthly connectivity bill. Payback is modelled at about 14 months, and the network then covers areas the old setup never reached, including the spa.",
+      "source": "Barefoot Addo Network Proposal, 26 Sep 2026. Earlier ROI draft showed 22-23 months; the final proposal figure is used. Modelled, not yet built."
     }
   ],
   "model": {
     "headline": "One backbone for every driver of the business",
     "drivers": [
-      {"name": "Guest experience", "text": "Reliable Wi-Fi, booking and card payments at every lodge."},
-      {"name": "Staff communication", "text": "Lodges, HQ, rangers and maintenance on one network, day and night."},
-      {"name": "Security and operations", "text": "Cameras, gates, fence alarms and sensors on the same backbone, powered through load-shedding."}
+      {
+        "name": "Guest experience",
+        "text": "Reliable Wi-Fi, booking and card payments at every lodge."
+      },
+      {
+        "name": "Staff communication",
+        "text": "Lodges, HQ, rangers and maintenance on one network, day and night."
+      },
+      {
+        "name": "Security and operations",
+        "text": "Cameras, gates, fence alarms and sensors on the same backbone, powered through load-shedding."
+      }
     ],
     "principle": "Carrier connectivity comes in once. Everything on the property runs over infrastructure the reserve owns. New cameras, sensors and lodges plug in without a new provider contract."
   }
