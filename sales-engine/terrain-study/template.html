@@ -120,7 +120,7 @@ tr.tot td{font-weight:700;color:var(--accent);border-top:1px solid var(--border-
     <div class="wordmark"><span class="mark">CTTX<span>.</span></span><span class="tag">Services</span></div>
     <p class="eyebrow">Reserve Network Study</p>
     <h1>One network across the whole reserve.</h1>
-    <p class="sub">We modelled {{SHORT}}'s terrain from satellite elevation data and checked every radio path against it. <em>{{SITES_PHRASE}} put {{N_CLEAR}} of the {{N_TOTAL}} lodges we could locate on clear radio paths</em>, fed from a carrier uplink on {{UPLABEL}}.</p>
+    <p class="sub">We modelled {{SHORT}}'s terrain from satellite elevation data and checked every radio path against it. <em>{{HERO_RESULT}}</em>, fed from a carrier uplink on {{UPLABEL}}.</p>
     <div class="cover-meta">
       <span><strong>Prepared for</strong><br>{{PREPARED_FOR}}</span>
       <span><strong>Prepared by</strong><br>{{CO_CONTACT}}, {{CO_NAME}}</span>
@@ -142,7 +142,7 @@ tr.tot td{font-weight:700;color:var(--accent);border-top:1px solid var(--border-
   </figure>
 
   <div class="stat-grid">
-    <div class="stat hero"><div class="value">{{N_CLEAR}} of {{N_TOTAL}}</div><div class="label">lodges on a clear, Fresnel-checked radio path</div></div>
+    <div class="stat hero"><div class="value">{{STAT1_VALUE}}</div><div class="label">{{STAT1_LABEL}}</div></div>
     <div class="stat"><div class="value">{{N_HIGH}} + {{N_RELAY}}</div><div class="label">ridge high-sites plus short relays</div></div>
     <div class="stat"><div class="value">{{COV}}%</div><div class="label">of the {{AREA}} km² study area in line of sight</div></div>
     <div class="stat"><div class="value">{{UPKM}} km</div><div class="label">clear carrier uplink into the reserve</div></div>
@@ -173,7 +173,8 @@ tr.tot td{font-weight:700;color:var(--accent);border-top:1px solid var(--border-
       <thead><tr><th>Lodge</th><th>Served from</th><th>Path length</th><th>Line of sight</th></tr></thead>
       <tbody>{{ROWS}}</tbody>
     </table></div>
-    <figure class="fig"><img src="{{PROF2}}" alt="Terrain profile for each lodge link"></figure>
+    {{LODGE_FIG}}
+    {{UNLOCATED_NOTE}}
     <p class="caption">5.8 GHz · k = 4/3 · uplink tower 30 m · high-site masts 18 m · lodge masts 8 m. Lodge positions come from published GPS coordinates.</p>
   </section>
 

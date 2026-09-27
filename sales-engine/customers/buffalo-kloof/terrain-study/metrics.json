@@ -1,0 +1,64 @@
+{
+ "reserve": "Buffalo Kloof",
+ "date": "2026-09-28",
+ "imagery_date": "26 March 2026 to 14 July 2026",
+ "epsg": 32735,
+ "coverage_pct": 44.497395544719055,
+ "area_km2": 73.0863,
+ "lodges_total": 0,
+ "lodges_clear": 0,
+ "unlocated": [
+  "Spekboom Bush Camp",
+  "Acacia Lodge",
+  "Khatu Villa"
+ ],
+ "area_mode": true,
+ "uplink": {
+  "label": "Makhanda high ground",
+  "latlon": [
+   -33.3304,
+   26.51695
+  ],
+  "to": "High Site North",
+  "km": 11.196794184051075
+ },
+ "sites": [
+  {
+   "name": "High Site North",
+   "kind": "high",
+   "elev": 359.261474609375,
+   "latlon": [
+    -33.38136,
+    26.62085
+   ],
+   "feed": null
+  },
+  {
+   "name": "High Site South",
+   "kind": "high",
+   "elev": 307.0374450683594,
+   "latlon": [
+    -33.41124,
+    26.66008
+   ],
+   "feed": null
+  }
+ ],
+ "links": [
+  {
+   "a": "Carrier uplink",
+   "b": "High Site North",
+   "kind": "uplink",
+   "km": 11.196794184051075,
+   "fresnel_ratio": 9.782693495151346
+  },
+  {
+   "a": "High Site South",
+   "b": "High Site North",
+   "kind": "backbone",
+   "km": 4.9280422076114565,
+   "fresnel_ratio": 2.120101781287318
+  }
+ ],
+ "lodges": {}
+}

@@ -83,10 +83,11 @@ def s2_tiles(W, S, E, N):
     return sorted(tiles)
 
 
-def best_scene(tile, months=10):
+def scene_candidates(tile, months=12, keep=12):
+    """Scenes for one Sentinel-2 tile over the last `months`, clearest (tile-wide) first."""
     zone, band, sq = tile[:2], tile[2], tile[3:]
     today = dt.date.today()
-    best = None
+    found = []
     for i in range(months):
         y, mo = today.year, today.month - i
         while mo <= 0:
@@ -100,12 +101,19 @@ def best_scene(tile, months=10):
             except Exception:
                 continue
             cc, nd = props.get("eo:cloud_cover", 100), props.get("s2:nodata_pixel_percentage", 100)
-            score = cc + nd * 0.5
-            if best is None or score < best[0]:
-                best = (score, f"{S2}/{p}TCI.tif", name[10:18], cc, nd)
-        if best and best[3] < 1 and best[4] < 1:
-            break
-    return best
+            if cc < 40 and nd < 90:
+                found.append((cc, f"{S2}/{p}TCI.tif", name[10:18], nd))
+    return [f for f in sorted(found)[:keep]]
+
+
+def local_cloud(rgb):
+    """Share of valid pixels in the study window that look like cloud (bright, low-saturation)."""
+    valid = rgb.sum(0) > 0
+    if valid.sum() == 0:
+        return 1.0, 0.0
+    r, g, b_ = [c.astype(int) for c in rgb]
+    bright = (r > 170) & (g > 170) & (b_ > 170) & (np.max(rgb, 0).astype(int) - np.min(rgb, 0) < 45)
+    return float(bright[valid].mean()), float(valid.mean())
 
 
 # ---------------------------------------------------------------- geometry
@@ -148,10 +156,20 @@ def run(cfg_path):
     work.mkdir(parents=True, exist_ok=True)
 
     lodges = cfg["lodges"]
+    located = [l for l in lodges if l.get("lat") is not None and l.get("lon") is not None]
+    unlocated = [l["name"] for l in lodges if l not in located]
+    ar = cfg.get("area")  # {"lat","lon","radius_km","source"}: reserve extent when lodges lack positions
+    if not located and not ar:
+        sys.exit("No lodge positions and no 'area' in the config. Add published coordinates or the reserve area.")
     up = cfg["uplink"]
-    lats = [l["lat"] for l in lodges] + [up["lat"]]
-    lons = [l["lon"] for l in lodges] + [up["lon"]]
-    pad = 0.04
+    lats = [l["lat"] for l in located] + [up["lat"]]
+    lons = [l["lon"] for l in located] + [up["lon"]]
+    if ar:
+        dlat = ar["radius_km"] / 111.0
+        dlon = ar["radius_km"] / (111.0 * math.cos(math.radians(ar["lat"])))
+        lats += [ar["lat"] - dlat, ar["lat"] + dlat]
+        lons += [ar["lon"] - dlon, ar["lon"] + dlon]
+    pad = 0.06
     W, S, E, N = min(lons) - pad, min(lats) - pad, max(lons) + pad, max(lats) + pad
     zone = int((np.mean(lons) + 180) // 6) + 1
     epsg = (32700 if np.mean(lats) < 0 else 32600) + zone
@@ -173,19 +191,36 @@ def run(cfg_path):
 
     # imagery
     print("· imagery")
+    # Build one cloud-free image of the study window from the clearest passes of every tile,
+    # filling gaps pass by pass until the window is covered.
     img, dates = None, set()
-    for tile in s2_tiles(W, S, E, N):
-        sc = best_scene(tile)
-        if not sc:
+    pool = sorted(c for tile in s2_tiles(W, S, E, N) for c in scene_candidates(tile))
+    for cc, url, date, nd in pool:
+        try:
+            m_, _ = merge([rasterio.open("/vsicurl/" + url)], bounds=tuple(b), res=10, nodata=0)
+        except Exception:
             continue
-        m_, _ = merge([rasterio.open("/vsicurl/" + sc[1])], bounds=tuple(b), res=10, nodata=0,
-                      dst_crs=f"EPSG:{epsg}") if False else merge([rasterio.open("/vsicurl/" + sc[1])], bounds=tuple(b), res=10, nodata=0)
+        cloud, cover = local_cloud(m_)
+        if cover < 0.02 or cloud > 0.01:
+            continue
+        before = 0 if img is None else (img.sum(0) > 0).mean()
         img = m_ if img is None else np.where((img.sum(0) == 0)[None], m_, img)
-        dates.add(sc[2])
-    img_date = dt.datetime.strptime(max(dates), "%Y%m%d").strftime("%-d %B %Y")
+        after = (img.sum(0) > 0).mean()
+        if after > before + 0.001:
+            dates.add(date)
+            print(f"  imagery {date}: local cloud {cloud*100:.1f}%, window covered {after*100:.0f}%")
+        if after > 0.995:
+            break
+    if img is None:
+        sys.exit("No cloud-free Sentinel-2 imagery found for this area in the last 12 months.")
+    fmt_d = lambda d: dt.datetime.strptime(d, "%Y%m%d").strftime("%-d %B %Y")
+    img_date = fmt_d(max(dates)) if len(dates) == 1 else f"{fmt_d(min(dates))} to {fmt_d(max(dates))}"
 
     # points
-    LX = {l["name"]: xy(l["lat"], l["lon"]) for l in lodges}
+    LX = {l["name"]: xy(l["lat"], l["lon"]) for l in located}
+    from shapely.geometry import Point
+    from shapely.ops import unary_union
+    area_poly = Point(*xy(ar["lat"], ar["lon"])).buffer(ar["radius_km"] * 1000) if ar else None
     if up.get("mode") == "known_site":
         U = xy(up["lat"], up["lon"])
         up_label = up.get("label", "Carrier site")
@@ -199,7 +234,10 @@ def run(cfg_path):
 
     # high-site candidates: local maxima inside the lodge footprint
     print("· link planning")
-    foot = MultiPoint(list(LX.values())).convex_hull.buffer(3500)
+    parts = ([MultiPoint(list(LX.values())).convex_hull.buffer(3500)] if LX else []) + ([area_poly] if area_poly else [])
+    foot = unary_union(parts)
+    if foot.geom_type != "Polygon":
+        foot = foot.convex_hull
     fp = MPath(np.array(foot.exterior.coords))
     mx = maximum_filter(dem, size=21)
     cands = []
@@ -213,10 +251,19 @@ def run(cfg_path):
                   and tr.profile((c[1], c[2]), p, MAST, CPE)["clear"]} for i, c in enumerate(cands)}
     upclear = {i: tr.profile(U, (c[1], c[2]), UPLINK_H, MAST)["clear"] for i, c in enumerate(cands)}
 
+    # coverage of the reserve area per candidate (area mode): sample points, LOS for a 3 m terminal
+    areacov = {i: set() for i in range(len(cands))}
+    if area_poly is not None:
+        minx, miny, maxx, maxy = area_poly.bounds
+        gxs, gys = np.meshgrid(np.linspace(minx, maxx, 14), np.linspace(miny, maxy, 14))
+        pts = [(x, y) for x, y in zip(gxs.ravel(), gys.ravel()) if area_poly.contains(Point(x, y))]
+        for i, c in enumerate(cands):
+            areacov[i] = {j for j, pnt in enumerate(pts) if tr.profile((c[1], c[2]), pnt, MAST, FIELD_H)["clear"]}
+
     best = None
     for i in served:
-        if upclear[i] and (best is None or (len(served[i]), cands[i][0]) > best[0]):
-            best = ((len(served[i]), cands[i][0]), [i])
+        if upclear[i] and (best is None or (len(served[i]), len(areacov[i]), cands[i][0]) > best[0]):
+            best = ((len(served[i]), len(areacov[i]), cands[i][0]), [i])
         for j in served:
             if j <= i or np.hypot(cands[i][1] - cands[j][1], cands[i][2] - cands[j][2]) < 2500:
                 continue
@@ -224,7 +271,7 @@ def run(cfg_path):
                 continue
             if not tr.profile((cands[i][1], cands[i][2]), (cands[j][1], cands[j][2]), MAST, MAST)["clear"]:
                 continue
-            sc = (len(served[i] | served[j]), cands[i][0] + cands[j][0] - 50)
+            sc = (len(served[i] | served[j]), len(areacov[i] | areacov[j]), cands[i][0] + cands[j][0] - 50)
             if best is None or sc > best[0]:
                 best = (sc, [i, j])
     if best is None:
@@ -236,7 +283,7 @@ def run(cfg_path):
     up_to = min([s for s, i in zip(sites, best[1]) if upclear[i]], key=lambda s: np.hypot(s["p"][0] - U[0], s["p"][1] - U[1]))
 
     # relays for lodges no high site can see
-    covered = set().union(*[served[i] for i in best[1]])
+    covered = set().union(set(), *[served[i] for i in best[1]])
     for lodge in [k for k in LX if k not in covered]:
         opts = []
         for c in cands:
@@ -293,6 +340,8 @@ def run(cfg_path):
             ok &= (za + (zb - za) * t) - (tr.z(x1 + (GX - x1) * t, y1 + (GY - y1) * t) + d1 * d2 / (12.742 * K)) >= FRESNEL_CLEAR * f1
         cov |= ok & (D < MAX_LODGE_KM * 1000)
     hull = MultiPoint(list(LX.values()) + [s["p"] for s in sites]).convex_hull.buffer(2000)
+    if area_poly is not None:
+        hull = unary_union([hull, area_poly]).convex_hull
     hp = MPath(np.array(hull.exterior.coords))
     fm = hp.contains_points(np.c_[GX.ravel(), GY.ravel()]).reshape(GX.shape)
     cov_pct = float(cov[fm].mean() * 100)
@@ -321,7 +370,11 @@ def run(cfg_path):
                 path_effects=[pe.Stroke(linewidth=lw + 2.4, foreground=M["halo"]), pe.Normal()])
 
     def lab(p, t, dx=8, dy=8, fs=10, bold=False, col="white"):
-        ax.annotate(t, p, xytext=(dx, dy), textcoords="offset points", color=col, fontsize=fs,
+        # Labels near the right edge flip to the left of their marker so they never get cut off.
+        ha = "left"
+        if (p[0] - b[0]) / (b[2] - b[0]) > 0.72:
+            dx, ha = -abs(dx), "right"
+        ax.annotate(t, p, xytext=(dx, dy), textcoords="offset points", color=col, fontsize=fs, ha=ha,
                     fontweight="bold" if bold else "normal", zorder=9,
                     path_effects=[pe.withStroke(linewidth=3, foreground=M["halo"])])
 
@@ -374,20 +427,25 @@ def run(cfg_path):
         prof(a_, L["pr"], L["a"], L["b"])
     fig.patch.set_facecolor(P["bg"]); plt.tight_layout(); fig.savefig(work / "profiles_backbone.png", facecolor=P["bg"]); plt.close()
     ll_items = [(k, L) for k, L in lodge_links.items() if L]
-    rows = math.ceil(len(ll_items) / 2)
+    (work / "profiles_lodges.png").unlink(missing_ok=True)
+    rows = max(1, math.ceil(len(ll_items) / 2))
     fig, axs = plt.subplots(rows, 2, figsize=(11, 2.5 * rows), dpi=130, squeeze=False)
     for a_, (k, L) in zip(axs.flat, ll_items):
         prof(a_, L["pr"], L["a"], k, False)
     for a_ in list(axs.flat)[len(ll_items):]:
         a_.axis("off")
-    fig.patch.set_facecolor(P["bg"]); plt.tight_layout(); fig.savefig(work / "profiles_lodges.png", facecolor=P["bg"]); plt.close()
+    fig.patch.set_facecolor(P["bg"]); plt.tight_layout()
+    if ll_items:
+        fig.savefig(work / "profiles_lodges.png", facecolor=P["bg"])
+    plt.close()
 
     # ------------------------------------------------------------ metrics
     ll = lambda p: tuple(round(v, 5) for v in Ti.transform(*p)[::-1])
     n_clear = sum(1 for v in lodge_links.values() if v)
     metrics = dict(
         reserve=cfg["reserve"], date=cfg["date"], imagery_date=img_date, epsg=epsg,
-        coverage_pct=cov_pct, area_km2=area, lodges_total=len(LX), lodges_clear=n_clear,
+        coverage_pct=cov_pct, area_km2=area, lodges_total=len(LX), lodges_clear=n_clear, unlocated=unlocated,
+        area_mode=bool(ar),
         uplink=dict(label=up_label, latlon=ll(U), to=up_to["name"], km=links[0]["pr"]["D"] / 1000),
         sites=[dict(name=s["name"], kind=s["kind"], elev=s["elev"], latlon=ll(s["p"]), feed=s.get("feed")) for s in sites],
         links=[dict(a=L["a"], b=L["b"], kind=L["kind"], km=L["pr"]["D"] / 1000, fresnel_ratio=L["pr"]["ratio"]) for L in links],
@@ -406,7 +464,7 @@ def run(cfg_path):
     if money:
         sys.exit(f"Refusing to build: the customer-facing study contains cost figures {sorted(set(money))[:5]}. "
                  "Costs belong in INTERNAL_* files only.")
-    stem = f"{cfg['short'].replace(' ', '_')}_Reserve_Network_CTTX"
+    stem = re.sub(r"[^A-Za-z0-9]+", "_", cfg["short"]).strip("_") + "_Reserve_Network_CTTX"
     standalone = to_standalone(page, brand)
     (out / f"{stem}.html").write_text(standalone)
     (work / "artifact.html").write_text(page)
@@ -449,7 +507,9 @@ def build_html(cfg, brand, ev, m, work):
         f"<tr><td>{e(k)}</td><td>{e(v['frm']) if v else '—'}</td><td class='num'>{v['km']:.1f} km</td>"
         f"<td><span class='pill'>Clear</span></td></tr>" if v else
         f"<tr><td>{e(k)}</td><td>—</td><td class='num'>—</td><td><span class='pill warn'>Needs survey</span></td></tr>"
-        for k, v in m["lodges"].items())
+        for k, v in m["lodges"].items()) + "".join(
+        f"<tr><td>{e(k)}</td><td>—</td><td class='num'>—</td><td><span class='pill warn'>Position to confirm</span></td></tr>"
+        for k in m.get("unlocated", []))
     backbone_text = (f"{highs[1]['name']} ({highs[1]['elev']:.0f} m) and {highs[0]['name']} ({highs[0]['elev']:.0f} m) "
                      f"sit {bb['km']:.1f} km apart with a clear link between them." if len(highs) == 2 and bb else
                      f"{highs[0]['name']} ({highs[0]['elev']:.0f} m) sees across the lodge area.")
@@ -557,10 +617,20 @@ def build_html(cfg, brand, ev, m, work):
         "RESERVE": e(cfg["reserve"]), "SHORT": e(cfg["short"]), "PREPARED_FOR": e(cfg["prepared_for"]),
         "DATE": dt.date.fromisoformat(cfg["date"]).strftime("%-d %B %Y"), "IMG_DATE": m["imagery_date"],
         "MAP": b64(work / "map.jpg", "image/jpeg"),
-        "PROF1": b64(work / "profiles_backbone.png", "image/png"), "PROF2": b64(work / "profiles_lodges.png", "image/png"),
+        "PROF1": b64(work / "profiles_backbone.png", "image/png"), 
         "N_CLEAR": str(m["lodges_clear"]), "N_TOTAL": str(m["lodges_total"]),
         "N_HIGH": str(len(highs)), "N_RELAY": str(len(relays)),
         "SITES_PHRASE": site_word + relay_word,
+        "HERO_RESULT": (f"{site_word + relay_word} put {m['lodges_clear']} of the {m['lodges_total']} lodges we could locate on clear radio paths"
+                        + (f" and give line of sight across {m['coverage_pct']:.0f}% of the reserve" if m.get("area_mode") else "")
+                        if m["lodges_total"] else
+                        f"{site_word + relay_word} give line of sight across {m['coverage_pct']:.0f}% of the reserve"),
+        "STAT1_VALUE": (f"{m['lodges_clear']} of {m['lodges_total']}" if m["lodges_total"] else f"{m['coverage_pct']:.0f}%"),
+        "STAT1_LABEL": ("lodges on a clear, Fresnel-checked radio path" if m["lodges_total"] else "of the reserve area in line of sight"),
+        "LODGE_FIG": (f'<figure class="fig"><img src="{b64(work / "profiles_lodges.png", "image/png")}" alt="Terrain profile for each lodge link"></figure>'
+                      if (work / "profiles_lodges.png").exists() else ""),
+        "UNLOCATED_NOTE": (f"<p class='caption'>Lodges marked “position to confirm” have no published location. We add them to the model once you share a marked map or KMZ.</p>"
+                           if m.get("unlocated") else ""),
         "COV": f"{m['coverage_pct']:.0f}", "AREA": f"{m['area_km2']:.0f}",
         "UPKM": f"{m['uplink']['km']:.1f}", "UPLABEL": e(m["uplink"]["label"]), "UPTO": e(m["uplink"]["to"]),
         "BACKBONE_TEXT": e(backbone_text), "CONTEXT": e(cfg.get("context", "")),

@@ -1,0 +1,48 @@
+{
+ "slug": "fort-governors-estate",
+ "reserve": "Fort Governor's Estate",
+ "short": "Fort Governor's",
+ "prepared_for": "Sean van Zyl, Fort Governor's Safaris",
+ "date": "2026-09-28",
+ "lodges": [
+  {
+   "name": "Stoneyvale Cottages",
+   "lat": -33.279357,
+   "lon": 26.757691,
+   "units": 5,
+   "wifi_today": "public",
+   "coord_source": "lekkeslaap.co.za listing pin"
+  },
+  {
+   "name": "Mountain Retreat",
+   "lat": -33.270239,
+   "lon": 26.776349,
+   "units": 3,
+   "wifi_today": "unknown",
+   "coord_source": "lekkeslaap.co.za listing pin"
+  },
+  {
+   "name": "Uniondale Lodge",
+   "lat": -33.257822,
+   "lon": 26.668382,
+   "units": 4,
+   "wifi_today": "unknown",
+   "coord_source": "lekkeslaap.co.za / OTA listing pin (origin not certain)"
+  }
+ ],
+ "uplink": {
+  "mode": "town_high_ground",
+  "town": "Makhanda",
+  "lat": -33.31,
+  "lon": 26.52667,
+  "radius_m": 2500
+ },
+ "today": [
+  "Three lodges on more than 10,000 ha, all off-grid",
+  "Wi-Fi is listed at Stoneyvale; none is published for Mountain Retreat or Uniondale",
+  "Hunting parties spread across the estate, away from the lodges"
+ ],
+ "context": "Fort Governor's runs three off-grid lodges and walk-and-stalk hunting across more than 10,000 ha. Communications have to reach the field as well as the lodges. We propose one small owned backbone for the estate.",
+ "security_note": "Hunting parties in the field, staff at three lodges and a need to reach someone quickly if something goes wrong. One network that covers the lodges and the main hunting areas makes that dependable.",
+ "units_source": "lekkeslaap.co.za / travelground.com, Sep 2026"
+}

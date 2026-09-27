@@ -1,0 +1,71 @@
+{
+ "reserve": "Gondwana Game Reserve",
+ "date": "2026-09-28",
+ "imagery_date": "3 May 2026",
+ "epsg": 32734,
+ "coverage_pct": 39.15881611156443,
+ "area_km2": 109.1961,
+ "lodges_total": 1,
+ "lodges_clear": 1,
+ "unlocated": [
+  "Lehele Villas",
+  "Fynbos and Kwena Villas",
+  "Ulubisi House",
+  "Tented Eco Camp"
+ ],
+ "area_mode": true,
+ "uplink": {
+  "label": "Herbertsdale high ground",
+  "latlon": [
+   -34.02727,
+   21.78189
+  ],
+  "to": "High Site South",
+  "km": 14.707253312566557
+ },
+ "sites": [
+  {
+   "name": "High Site North",
+   "kind": "high",
+   "elev": 351.43389892578125,
+   "latlon": [
+    -34.05336,
+    21.9206
+   ],
+   "feed": null
+  },
+  {
+   "name": "High Site South",
+   "kind": "high",
+   "elev": 327.9953308105469,
+   "latlon": [
+    -34.10456,
+    21.91139
+   ],
+   "feed": null
+  }
+ ],
+ "links": [
+  {
+   "a": "Carrier uplink",
+   "b": "High Site South",
+   "kind": "uplink",
+   "km": 14.707253312566557,
+   "fresnel_ratio": 0.9751793324840158
+  },
+  {
+   "a": "High Site South",
+   "b": "High Site North",
+   "kind": "backbone",
+   "km": 5.740984236174142,
+   "fresnel_ratio": 4.627892140296072
+  }
+ ],
+ "lodges": {
+  "Kwena Lodge": {
+   "frm": "High Site South",
+   "km": 1.6724963096739385,
+   "fresnel_ratio": 0.804043591821728
+  }
+ }
+}

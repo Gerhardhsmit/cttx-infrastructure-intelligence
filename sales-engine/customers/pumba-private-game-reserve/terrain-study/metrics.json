@@ -1,0 +1,71 @@
+{
+ "reserve": "Pumba Private Game Reserve",
+ "date": "2026-09-28",
+ "imagery_date": "26 March 2026 to 14 July 2026",
+ "epsg": 32735,
+ "coverage_pct": 86.88279978296256,
+ "area_km2": 59.7132,
+ "lodges_total": 2,
+ "lodges_clear": 2,
+ "unlocated": [],
+ "area_mode": false,
+ "uplink": {
+  "label": "Makhanda high ground",
+  "latlon": [
+   -33.33052,
+   26.51728
+  ],
+  "to": "High Site South",
+  "km": 14.215315684148559
+ },
+ "sites": [
+  {
+   "name": "High Site North",
+   "kind": "high",
+   "elev": 691.7213745117188,
+   "latlon": [
+    -33.35227,
+    26.41559
+   ],
+   "feed": null
+  },
+  {
+   "name": "High Site South",
+   "kind": "high",
+   "elev": 509.2945556640625,
+   "latlon": [
+    -33.40357,
+    26.3917
+   ],
+   "feed": null
+  }
+ ],
+ "links": [
+  {
+   "a": "Carrier uplink",
+   "b": "High Site South",
+   "kind": "uplink",
+   "km": 14.215315684148559,
+   "fresnel_ratio": 2.086277143486498
+  },
+  {
+   "a": "High Site South",
+   "b": "High Site North",
+   "kind": "backbone",
+   "km": 6.106234518915892,
+   "fresnel_ratio": 11.408817819062552
+  }
+ ],
+ "lodges": {
+  "Pumba Water Lodge": {
+   "frm": "High Site South",
+   "km": 3.009899786771282,
+   "fresnel_ratio": 6.086939166619687
+  },
+  "Msenge Bush Lodge": {
+   "frm": "High Site South",
+   "km": 4.427052417921362,
+   "fresnel_ratio": 3.969092140797043
+  }
+ }
+}

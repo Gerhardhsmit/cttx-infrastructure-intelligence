@@ -1,0 +1,76 @@
+{
+ "reserve": "Fort Governor's Estate",
+ "date": "2026-09-28",
+ "imagery_date": "14 July 2026",
+ "epsg": 32735,
+ "coverage_pct": 60.32431294092871,
+ "area_km2": 76.9257,
+ "lodges_total": 3,
+ "lodges_clear": 3,
+ "unlocated": [],
+ "area_mode": false,
+ "uplink": {
+  "label": "Makhanda high ground",
+  "latlon": [
+   -33.33053,
+   26.51728
+  ],
+  "to": "High Site South",
+  "km": 16.42852701857352
+ },
+ "sites": [
+  {
+   "name": "High Site South",
+   "kind": "high",
+   "elev": 846.201904296875,
+   "latlon": [
+    -33.2764,
+    26.68155
+   ],
+   "feed": null
+  },
+  {
+   "name": "High Site North",
+   "kind": "high",
+   "elev": 536.7538452148438,
+   "latlon": [
+    -33.26336,
+    26.78403
+   ],
+   "feed": null
+  }
+ ],
+ "links": [
+  {
+   "a": "Carrier uplink",
+   "b": "High Site South",
+   "kind": "uplink",
+   "km": 16.42852701857352,
+   "fresnel_ratio": 11.861456679107357
+  },
+  {
+   "a": "High Site North",
+   "b": "High Site South",
+   "kind": "backbone",
+   "km": 9.652590325917702,
+   "fresnel_ratio": 7.130628624537498
+  }
+ ],
+ "lodges": {
+  "Stoneyvale Cottages": {
+   "frm": "High Site South",
+   "km": 7.098066410013154,
+   "fresnel_ratio": 2.372885881971352
+  },
+  "Mountain Retreat": {
+   "frm": "High Site North",
+   "km": 1.0451444101884546,
+   "fresnel_ratio": 8.51086712345191
+  },
+  "Uniondale Lodge": {
+   "frm": "High Site South",
+   "km": 2.39729953318256,
+   "fresnel_ratio": 0.985866567352251
+  }
+ }
+}
