@@ -96,6 +96,47 @@ class OutboundWorker:
         else:
             self.status['status'] = 'READY'
 
+    def create_draft_in_outlook(self, recipient: str, subject: str, body: str, body_type: str = 'html') -> Dict[str, Any]:
+        """
+        Create a draft email in local Outlook COM (Windows only)
+
+        Returns:
+            {'success': bool, 'message_id': str, 'error': str, 'draft_info': str}
+        """
+        try:
+            import win32com.client
+            outlook = win32com.client.Dispatch("Outlook.Application")
+
+            # Create mail item
+            mail = outlook.CreateItem(0)  # 0 = mailItem
+            mail.To = recipient
+            mail.Subject = subject
+
+            if body_type == 'html':
+                mail.HTMLBody = body
+            else:
+                mail.Body = body
+
+            # Save as draft (do NOT send)
+            mail.Save()
+
+            logger.info(f"Successfully created draft for {recipient}")
+
+            return {
+                'success': True,
+                'message_id': str(uuid.uuid4()),
+                'error': None,
+                'draft_info': f"Draft saved: {subject} to {recipient}"
+            }
+        except Exception as e:
+            logger.error(f"Outlook COM draft creation failed: {e}")
+            return {
+                'success': False,
+                'message_id': None,
+                'error': str(e),
+                'draft_info': None
+            }
+
     def send_via_outlook_com(self, recipient: str, subject: str, body: str, body_type: str = 'html') -> Dict[str, Any]:
         """
         Send via local Outlook COM (Windows only)

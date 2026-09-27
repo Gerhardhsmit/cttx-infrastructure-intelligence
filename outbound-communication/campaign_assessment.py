@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-CTTX Assessment Outreach Campaign
-Sends personalized assessment emails to 25 prospects from prospects_batch1.json
+CTTX Assessment Outreach Campaign — Draft Creation
+Generates personalized assessment emails and creates Outlook Drafts for review and approval.
+Does NOT send directly — drafts await user review/approval in Outlook before sending.
 """
 
 import json
@@ -10,16 +11,47 @@ from pathlib import Path
 from datetime import datetime
 from worker import OutboundWorker
 
-# Load prospects
+# Load paths
 REPO_ROOT = Path(__file__).parent.parent
 PROSPECTS_FILE = REPO_ROOT / "sales-engine" / "prospects_batch1.json"
+DECISION_MAKERS_FILE = REPO_ROOT / "sales-engine" / "CTTX_Decision_Makers_Contact_List.json"
 
 def load_prospects():
     """Load prospects from JSON file"""
     with open(PROSPECTS_FILE) as f:
         return json.load(f)
 
-def generate_assessment_email(prospect):
+def load_decision_makers():
+    """Load decision maker contact information"""
+    with open(DECISION_MAKERS_FILE) as f:
+        data = json.load(f)
+
+    # Create lookup by prospect name
+    lookup = {}
+    for prospect in data['prospects']:
+        lookup[prospect['name']] = prospect
+
+    return lookup
+
+def get_recipient_email(prospect_name: str, decision_maker_info: dict) -> tuple:
+    """
+    Get best available email for prospect
+    Returns: (email, decision_maker_name, email_type)
+    """
+    dm = decision_maker_info.get(prospect_name, {})
+
+    # Prefer direct decision maker email
+    if dm.get('email') and dm['email'] != 'not_found':
+        return (dm['email'], dm.get('decision_maker', 'there'), 'direct')
+
+    # Fall back to general contact email
+    if dm.get('general_contact') and 'contact form' not in dm['general_contact'].lower():
+        return (dm['general_contact'], dm.get('title', 'Manager'), 'general')
+
+    # No email found
+    return (None, dm.get('decision_maker', 'there'), 'not_found')
+
+def generate_assessment_email(prospect, decision_maker_name):
     """Generate personalized assessment email for a prospect"""
 
     company = prospect['name']
@@ -31,7 +63,7 @@ def generate_assessment_email(prospect):
 
     body = f"""<html><body style="font-family: Arial, sans-serif; line-height: 1.6;">
 
-<p>Hi {prospect.get('decision_maker', 'there')},</p>
+<p>Hi {decision_maker_name},</p>
 
 <p>We work with {segment.lower()} operations in {location} that rely on connectivity to keep their business running.</p>
 
@@ -76,16 +108,19 @@ This is a professional outreach from CTTX Services. We respect your privacy and 
     return subject, body
 
 def main():
-    """Run assessment outreach campaign"""
+    """Generate assessment outreach campaign as Outlook Drafts"""
 
     print("=" * 70)
-    print("CTTX ASSESSMENT OUTREACH CAMPAIGN")
+    print("CTTX ASSESSMENT OUTREACH CAMPAIGN — DRAFT GENERATION")
     print("=" * 70)
     print()
 
-    # Load prospects
+    # Load data
     prospects = load_prospects()
+    decision_makers = load_decision_makers()
+
     print(f"📋 Loaded {len(prospects)} prospects from {PROSPECTS_FILE.name}")
+    print(f"📇 Loaded decision maker data for {len(decision_makers)} records")
     print()
 
     # Initialize worker
@@ -97,47 +132,61 @@ def main():
 
     # Campaign summary
     results = {
+        'timestamp': datetime.utcnow().isoformat(),
         'total': len(prospects),
-        'sent': 0,
+        'drafts_created': 0,
         'failed': 0,
-        'emails': []
+        'not_found_emails': 0,
+        'drafts': []
     }
 
-    print("SENDING ASSESSMENT EMAILS")
+    print("GENERATING ASSESSMENT DRAFTS")
     print("-" * 70)
 
     for i, prospect in enumerate(prospects, 1):
         company = prospect['name']
-        recipient = prospect.get('email') or f"info@{company.lower().replace(' ', '')}.co.za"
+
+        # Get recipient email
+        recipient, dm_name, email_type = get_recipient_email(company, decision_makers)
 
         # Generate email
-        subject, body = generate_assessment_email(prospect)
+        subject, body = generate_assessment_email(prospect, dm_name)
 
-        # Create message
-        message = {
-            'recipient': recipient,
-            'subject': subject,
-            'body': body,
-            'bodyType': 'html'
-        }
+        if not recipient:
+            print(f"{i:2d}. ⚠ {company:40s} — NO EMAIL FOUND (phone: {prospect.get('phone', 'N/A')})")
+            results['not_found_emails'] += 1
+            results['drafts'].append({
+                'prospect': company,
+                'recipient': 'not_found',
+                'subject': subject,
+                'success': False,
+                'error': 'No email address found for prospect',
+                'phone': prospect.get('phone')
+            })
+            continue
 
-        # Send
-        receipt = worker.send_message(message)
+        # Create draft
+        draft_result = worker.create_draft_in_outlook(recipient, subject, body, 'html')
 
-        status = "✓" if receipt['success'] else "✗"
-        print(f"{i:2d}. {status} {company:40s} → {recipient}")
-
-        if receipt['success']:
-            results['sent'] += 1
+        if draft_result['success']:
+            status = "✓"
+            results['drafts_created'] += 1
         else:
+            status = "✗"
             results['failed'] += 1
 
-        results['emails'].append({
+        email_source = f"({email_type})" if email_type != 'direct' else ""
+        print(f"{i:2d}. {status} {company:40s} → {recipient} {email_source}")
+
+        results['drafts'].append({
             'prospect': company,
             'recipient': recipient,
+            'decision_maker': dm_name,
             'subject': subject,
-            'success': receipt['success'],
-            'error': receipt.get('error')
+            'email_type': email_type,
+            'success': draft_result['success'],
+            'error': draft_result.get('error'),
+            'draft_info': draft_result.get('draft_info')
         })
 
     print("-" * 70)
@@ -145,24 +194,46 @@ def main():
 
     # Summary
     print("CAMPAIGN SUMMARY")
-    print(f"Total prospects:    {results['total']}")
-    print(f"Successfully sent:  {results['sent']}")
-    print(f"Failed:             {results['failed']}")
+    print(f"Total prospects:       {results['total']}")
+    print(f"Drafts created:        {results['drafts_created']}")
+    print(f"Not found (no email):  {results['not_found_emails']}")
+    print(f"Failed:                {results['failed']}")
     print()
 
     # Save results
-    results_file = Path("/tmp/cttx-campaign-results.json")
+    results_file = Path("/tmp/cttx-campaign-drafts.json")
     results_file.write_text(json.dumps(results, indent=2))
-    print(f"📊 Full results saved to: {results_file}")
+    print(f"📊 Results saved to: {results_file}")
     print()
 
-    print("✓ CAMPAIGN COMPLETE")
+    print("NEXT STEPS FOR GERHARD:")
+    print("-" * 70)
     print()
-    print("Next steps:")
-    print("1. Check Outlook Sent Items to verify emails were delivered")
-    print("2. Monitor responses over next 3 days")
-    print("3. Follow up with prospects on day 3 who don't respond")
-    print("4. Schedule assessments for interested prospects")
+    print("1. CHECK YOUR OUTLOOK DRAFTS FOLDER")
+    print(f"   → You should see {results['drafts_created']} new draft emails")
+    print()
+    print("2. REVIEW EACH DRAFT")
+    print("   → Read the personalized content for quality/accuracy")
+    print("   → Edit if needed (e.g., correct company details, adjust messaging)")
+    print()
+    print("3. APPROVE AND SEND")
+    print("   → For each draft you approve, simply click SEND in Outlook")
+    print("   → Drafts for 'not found' contacts need manual email lookup")
+    print()
+    print("4. FOLLOW UP")
+    print("   → Monitor responses over next 3 days")
+    print("   → Schedule assessments for interested prospects")
+    print()
+
+    if results['not_found_emails'] > 0:
+        print("CONTACTS NEEDING EMAIL LOOKUP:")
+        print("-" * 70)
+        for draft in results['drafts']:
+            if draft['recipient'] == 'not_found':
+                print(f"  • {draft['prospect']:40s} (Phone: {draft.get('phone', 'N/A')})")
+        print()
+
+    print("✓ DRAFT GENERATION COMPLETE")
     print()
 
 if __name__ == '__main__':
