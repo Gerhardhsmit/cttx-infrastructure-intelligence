@@ -476,6 +476,46 @@ def build_html(cfg, brand, ev, m, work):
                 label = "under 1 yr" if yrs < 1 else f"{yrs:.1f} yrs"
                 cells += f"<td class='yr{good}'>{label}</td>"
         pay_rows += f"<tr><td>{n} lodges</td>{cells}</tr>"
+    # ---- what this reserve likely spends today (uplink vs rented Wi-Fi), from published unit counts
+    EM = json.loads((HERE / "estimate_model.json").read_text())
+    RE = pm.get("reserve_estimate", {})
+    fc = EM["full_coverage"]
+    wifi_lbl = {"public": "Public areas", "all_rooms": "All rooms", "unknown": "Not published"}
+    est_rows, lo_tot, hi_tot, wifi_tot, ap_tot, n_est = "", 0, 0, 0, 0, 0
+    R = lambda v: "R" + f"{int(round(v)):,}".replace(",", "\u202f")
+    for l in list(cfg["lodges"]) + list(cfg.get("other_establishments", [])):
+        u = l.get("units")
+        if not u:
+            continue
+        full = u * fc["per_unit"] + (fc["small_camp_extra"] if u <= fc["small_camp_max_units"]
+                                     else fc["main_areas"] + fc["back_of_house"] + fc["outdoor"])
+        rule = EM["aps_today"].get(l.get("wifi_today", "unknown"), 3)
+        today = full if rule == "full" else min(rule, full)
+        tier = next(t for t in EM["uplink_tiers_incl_vat"] if u <= t["max_units"])
+        wf = today * EM["per_ap_monthly_incl_vat"]
+        lo_tot += tier["low"] + wf; hi_tot += tier["high"] + wf; wifi_tot += wf; ap_tot += today; n_est += 1
+        est_rows += (f"<tr><td>{e(l['name'])}</td><td class='num'>{u}</td><td>{wifi_lbl.get(l.get('wifi_today', 'unknown'))}</td>"
+                     f"<td class='num'>{today} <span class='dim'>/ {full}</span></td>"
+                     f"<td class='num'>{R(tier['low'])}–{R(tier['high'])[1:]}</td><td class='num'>{R(wf)}</td></tr>")
+    est_rows += (f"<tr class='tot'><td>Reserve total</td><td></td><td></td><td class='num'>{ap_tot}</td>"
+                 f"<td class='num' colspan='2'>{R(lo_tot)}–{R(hi_tot)[1:]} a month</td></tr>")
+    if n_est and RE:
+        capex_r = (pm["capex_base_incl_vat"] + pm["capex_per_lodge_incl_vat"] * n_est
+                   + ap_tot * EM["owned_ap_capex_incl_vat"])
+        owned_r = RE["carrier_monthly_incl_vat"] + RE["managed_service_monthly_incl_vat"] + pm.get("owned_running_monthly_incl_vat", 0)
+        spend = lo_tot if RE.get("use_spend") == "low" else (lo_tot + hi_tot) / 2
+        yrs = capex_r / (spend - owned_r) / 12 if spend > owned_r else None
+        payback_txt = (f"about {max(round(yrs * 2) / 2, 1):g} years" if yrs and yrs <= 5 else "more than five years")
+    else:
+        payback_txt = "to be calculated from your invoices"
+    est_block = "" if not n_est else f"""
+    <h3 class="sub">What {e(cfg['short'])} likely spends today</h3>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Lodge</th><th>Units</th><th>Wi-Fi today</th><th>APs today / needed</th><th>Uplink / month</th><th>Rented Wi-Fi / month</th></tr></thead>
+      <tbody>{est_rows}</tbody></table></div>
+    <p class="caption">Our estimate from published room counts and a real lodge invoice: rented access points cost about {R(EM['per_ap_monthly_incl_vat'])} each per month, and a lodge uplink {R(EM['uplink_tiers_incl_vat'][0]['low'])}–{R(EM['uplink_tiers_incl_vat'][-1]['high'])[1:]} depending on size. "Needed" is the count for full coverage of rooms, common areas and back of house. Incl. VAT.</p>
+    <div class="callout alert"><span class="callout-label">Paid every month, never owned</span><p>{n_est} establishments, {n_est} separate uplinks. Roughly {R(wifi_tot)} a month of that goes on rented Wi-Fi equipment charged per device, which never becomes the reserve's. Over three years that is about {R(wifi_tot * 36)} for equipment the reserve will not own, and it only covers part of each lodge.</p></div>
+    <div class="callout win"><span class="callout-label">One backbone instead</span><p>On our conservative estimate, using the low end of today's spend and including CTTX's managed monitoring, one owned backbone for {e(cfg['short'])} recovers its investment in {payback_txt}. After that, the savings, full coverage and security benefits continue.</p></div>"""
     positions = "; ".join(f"{s['name']} {s['latlon'][0]:.5f}, {s['latlon'][1]:.5f}" for s in sites)
     rep = {
         "TITLE": f"{e(cfg['short'])} Reserve Network",
@@ -497,12 +537,12 @@ def build_html(cfg, brand, ev, m, work):
         "PROOF_NAME": e(named["name"]), "PROOF_SCALE": e(named["scale"]),
         "PROOF_BEFORE": e(named["before"]), "PROOF_AFTER": e(named["after"]), "PROOF_ROWS": proof_rows,
         "UNNAMED": unnamed, "MODEL_HEAD": e(ev["model"]["headline"]), "MODEL_PRINCIPLE": e(ev["model"]["principle"]),
-        "DRIVERS": drivers, "PAY_HEAD": pay_head, "PAY_ROWS": pay_rows, "POSITIONS": e(positions), "UPLL": f"{m['uplink']['latlon'][0]:.5f}, {m['uplink']['latlon'][1]:.5f}",
+        "DRIVERS": drivers, "PAY_HEAD": pay_head, "PAY_ROWS": pay_rows, "EST_BLOCK": est_block, "POSITIONS": e(positions), "UPLL": f"{m['uplink']['latlon'][0]:.5f}, {m['uplink']['latlon'][1]:.5f}",
         "CO_NAME": e(brand["company"]["name"]), "CO_CONTACT": e(brand["company"]["contact"]),
         "CO_EMAIL": e(brand["company"]["email"]), "CO_PHONE": e(brand["company"]["phone"]), "CO_WEB": e(brand["company"].get("web", "")),
     }
     for k, v in rep.items():
-        tpl = tpl.replace("{{" + k + "}}", v)
+        tpl = tpl.replace("{{" + k + "}}", str(v))
     left = re.findall(r"\{\{[A-Z0-9_]+\}\}", tpl)
     assert not left, left
     return tpl

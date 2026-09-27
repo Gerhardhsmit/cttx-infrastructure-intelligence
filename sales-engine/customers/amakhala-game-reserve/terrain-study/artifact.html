@@ -110,6 +110,9 @@ footer .contact span{color:var(--muted);margin-right:6px}
 table.payback td.yr{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
 table.payback td.yr.good{color:var(--accent);font-weight:700}
 table.payback th small{display:block;text-transform:none;letter-spacing:0;font-family:var(--body);color:var(--muted);font-size:11px;margin-top:3px}
+h3.sub{font-size:18px;font-weight:700;margin-top:8px}
+.dim{color:var(--muted)}
+tr.tot td{font-weight:700;color:var(--accent);border-top:1px solid var(--border-strong)}
 </style>
 <!--BODY-->
 <div class="cover">
@@ -148,7 +151,7 @@ table.payback th small{display:block;text-transform:none;letter-spacing:0;font-f
   <section>
     <div class="section-head"><span class="section-num">01</span><h2>Where things stand today</h2></div>
     <p class="lede">Most lodges on Amakhala list Wi-Fi in the public areas by the main lodge, with each lodge sorting out its own connection. We propose a single backbone that belongs to the reserve.</p>
-    <div class="callout alert"><span class="callout-label">What the public record shows</span><ul><li>Each lodge buys and manages its own service</li><li>Wi-Fi is listed for the public areas by the main lodge</li><li>Security, ecology and maintenance teams are not on a shared network</li><li>Nothing links the gates, water points or fences</li></ul></div>
+    <div class="callout alert"><span class="callout-label">What the public record shows</span><ul>3</ul></div>
   </section>
 
   <section>
@@ -194,6 +197,15 @@ table.payback th small{display:block;text-transform:none;letter-spacing:0;font-f
   <section>
     <div class="section-head"><span class="section-num">06</span><h2>What it pays back</h2></div>
     <p class="lede">On connectivity spend alone, a reserve that replaces rented services at each lodge with one owned backbone typically recovers its investment in under three years. Everything else in this document comes on top of that.</p>
+
+    <h3 class="sub">What Amakhala likely spends today</h3>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Lodge</th><th>Units</th><th>Wi-Fi today</th><th>APs today / needed</th><th>Uplink / month</th><th>Rented Wi-Fi / month</th></tr></thead>
+      <tbody><tr><td>Safari Lodge</td><td class='num'>11</td><td>All rooms</td><td class='num'>17 <span class='dim'>/ 17</span></td><td class='num'>R7 000–11 706</td><td class='num'>R4 352</td></tr><tr><td>Bush Lodge</td><td class='num'>8</td><td>Public areas</td><td class='num'>3 <span class='dim'>/ 14</span></td><td class='num'>R3 500–7 000</td><td class='num'>R768</td></tr><tr><td>Leeuwenbosch</td><td class='num'>4</td><td>Not published</td><td class='num'>3 <span class='dim'>/ 7</span></td><td class='num'>R1 500–3 500</td><td class='num'>R768</td></tr><tr><td>Bukela Game Lodge</td><td class='num'>14</td><td>Not published</td><td class='num'>3 <span class='dim'>/ 20</span></td><td class='num'>R7 000–11 706</td><td class='num'>R768</td></tr><tr><td>Hlosi Game Lodge</td><td class='num'>14</td><td>Public areas</td><td class='num'>3 <span class='dim'>/ 20</span></td><td class='num'>R7 000–11 706</td><td class='num'>R768</td></tr><tr><td>Quatermain&#x27;s Camp</td><td class='num'>3</td><td>Not published</td><td class='num'>3 <span class='dim'>/ 6</span></td><td class='num'>R1 500–3 500</td><td class='num'>R768</td></tr><tr><td>HillsNek Safari Camp</td><td class='num'>4</td><td>Not published</td><td class='num'>3 <span class='dim'>/ 7</span></td><td class='num'>R1 500–3 500</td><td class='num'>R768</td></tr><tr><td>Woodbury Lodge</td><td class='num'>7</td><td>Public areas</td><td class='num'>3 <span class='dim'>/ 13</span></td><td class='num'>R3 500–7 000</td><td class='num'>R768</td></tr><tr><td>Woodbury Tented Camp</td><td class='num'>10</td><td>Public areas</td><td class='num'>3 <span class='dim'>/ 16</span></td><td class='num'>R3 500–7 000</td><td class='num'>R768</td></tr><tr class='tot'><td>Reserve total</td><td></td><td></td><td class='num'>41</td><td class='num' colspan='2'>R46 496–77 114 a month</td></tr></tbody></table></div>
+    <p class="caption">Our estimate from published room counts and a real lodge invoice: rented access points cost about R256 each per month, and a lodge uplink R1 500–11 706 depending on size. "Needed" is the count for full coverage of rooms, common areas and back of house. Incl. VAT.</p>
+    <div class="callout alert"><span class="callout-label">Paid every month, never owned</span><p>9 establishments, 9 separate uplinks. Roughly R10 496 a month of that goes on rented Wi-Fi equipment charged per device, which never becomes the reserve's. Over three years that is about R377 856 for equipment the reserve will not own, and it only covers part of each lodge.</p></div>
+    <div class="callout win"><span class="callout-label">One backbone instead</span><p>On our conservative estimate, using the low end of today's spend and including CTTX's managed monitoring, one owned backbone for Amakhala recovers its investment in about 2.5 years. After that, the savings, full coverage and security benefits continue.</p></div>
+    <h3 class="sub">How this compares across reserves</h3>
     <div class="tablewrap"><table class="payback">
       <thead><tr><th>Lodges on the reserve</th><th>R2 500 / lodge / month<small>Entry wireless or LTE</small></th><th>R4 000 / lodge / month<small>Business wireless</small></th><th>R6 000 / lodge / month<small>Business link and rented Wi-Fi</small></th></tr></thead>
       <tbody><tr><td>4 lodges</td><td class='yr'>5+ yrs</td><td class='yr'>5+ yrs</td><td class='yr good'>2.4 yrs</td></tr><tr><td>6 lodges</td><td class='yr'>5+ yrs</td><td class='yr'>3.4 yrs</td><td class='yr good'>1.6 yrs</td></tr><tr><td>8 lodges</td><td class='yr'>5+ yrs</td><td class='yr good'>2.2 yrs</td><td class='yr good'>1.2 yrs</td></tr><tr><td>11 lodges</td><td class='yr'>3.3 yrs</td><td class='yr good'>1.5 yrs</td><td class='yr good'>under 1 yr</td></tr></tbody>
@@ -206,7 +218,7 @@ table.payback th small{display:block;text-transform:none;letter-spacing:0;font-f
   <section>
     <div class="section-head"><span class="section-num">07</span><h2>What changes when the reserve owns it</h2></div>
     <div class="compare">
-      <div class="callout alert"><span class="callout-label">Today</span><ul><li>Each lodge buys and manages its own service</li><li>Wi-Fi is listed for the public areas by the main lodge</li><li>Security, ecology and maintenance teams are not on a shared network</li><li>Nothing links the gates, water points or fences</li></ul></div>
+      <div class="callout alert"><span class="callout-label">Today</span><ul>3</ul></div>
       <div class="callout win"><span class="callout-label">With a reserve backbone</span><ul><li>One uncontended carrier feed shared across the reserve</li><li>Lodges, HQ, the anti-poaching base and gates on one private network</li><li>Coverage out into the field, day and night</li><li>An owned asset that takes cameras and sensors without new towers</li></ul></div>
     </div>
     <div class="lenses">

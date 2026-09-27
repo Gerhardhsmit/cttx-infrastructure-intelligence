@@ -1,0 +1,12 @@
+{
+  "_note": "Rules for estimating what each lodge spends today, split into uplink and rented on-site Wi-Fi, from published room counts. Calibrated on the Barefoot Addo Herotel invoice #8313058 (31 Aug 2026): 23 APs billed as device instalments (9 on 24-month, 14 on 12-month) + managed Wi-Fi = R5,899/month incl VAT, i.e. ~R256 per AP per month, never owned; 100 Mbps uplink R9,999 + static IP R180 ex VAT = R11,706 incl VAT. Full-coverage AP rule reproduces Barefoot's 23-28 AP count. Estimates only: the prospect's invoices always replace them.",
+  "per_ap_monthly_incl_vat": 256,
+  "full_coverage": {"per_unit": 1, "main_areas": 3, "back_of_house": 2, "outdoor": 1, "small_camp_max_units": 4, "small_camp_extra": 3},
+  "aps_today": {"public": 3, "all_rooms": "full", "unknown": 3},
+  "uplink_tiers_incl_vat": [
+    {"max_units": 5, "low": 1500, "high": 3500, "label": "LTE or entry business wireless"},
+    {"max_units": 10, "low": 3500, "high": 7000, "label": "Business wireless 20-50 Mbps"},
+    {"max_units": 999, "low": 7000, "high": 11706, "label": "Business wireless up to 100 Mbps"}
+  ],
+  "owned_ap_capex_incl_vat": 3500
+}

@@ -110,6 +110,9 @@ footer .contact span{color:var(--muted);margin-right:6px}
 table.payback td.yr{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
 table.payback td.yr.good{color:var(--accent);font-weight:700}
 table.payback th small{display:block;text-transform:none;letter-spacing:0;font-family:var(--body);color:var(--muted);font-size:11px;margin-top:3px}
+h3.sub{font-size:18px;font-weight:700;margin-top:8px}
+.dim{color:var(--muted)}
+tr.tot td{font-weight:700;color:var(--accent);border-top:1px solid var(--border-strong)}
 </style>
 <!--BODY-->
 <div class="cover">
@@ -194,6 +197,8 @@ table.payback th small{display:block;text-transform:none;letter-spacing:0;font-f
   <section>
     <div class="section-head"><span class="section-num">06</span><h2>What it pays back</h2></div>
     <p class="lede">On connectivity spend alone, a reserve that replaces rented services at each lodge with one owned backbone typically recovers its investment in under three years. Everything else in this document comes on top of that.</p>
+{{EST_BLOCK}}
+    <h3 class="sub">How this compares across reserves</h3>
     <div class="tablewrap"><table class="payback">
       <thead><tr><th>Lodges on the reserve</th>{{PAY_HEAD}}</tr></thead>
       <tbody>{{PAY_ROWS}}</tbody>

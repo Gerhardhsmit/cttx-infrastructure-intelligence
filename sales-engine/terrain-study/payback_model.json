@@ -25,5 +25,12 @@
   ],
   "threshold_months": 36,
   "cap_months": 60,
-  "owned_running_monthly_incl_vat": 1500
+  "owned_running_monthly_incl_vat": 1500,
+  "reserve_estimate": {
+    "carrier_monthly_incl_vat": 17498,
+    "carrier_note": "Business Connect 500 Mbps R16,899 + LTE failover R599 incl VAT (Notion rate card 15 Jun 2026)",
+    "managed_service_monthly_incl_vat": 5175,
+    "managed_note": "R4,500 ex VAT mid-tier retainer, as recommended in the Barefoot quote",
+    "use_spend": "low"
+  }
 }
