@@ -18,7 +18,7 @@ All send paths (Outlook `.Send()`, Microsoft Graph `sendMail`, Resend API,
 
 1. 07:30 weekdays — the "CTTX daily prospect drafts" routine (Claude desktop
    app on Gerhard's PC) writes `.eml` files to
-   `Desktop\Paratus\! DRAFTS - For Your Attention\`.
+   `Desktop\CTTX Prospect Drafts\`.
 2. 08:30 weekdays — Windows Task Scheduler runs `load_drafts.py`, which puts
    each `.eml` into Outlook **Drafts** and moves it to `_loaded\`. Drafts to
    info@/reservations@-style addresses go to `_rejected\` with a reason.

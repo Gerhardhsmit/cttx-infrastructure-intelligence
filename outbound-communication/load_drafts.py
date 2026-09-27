@@ -3,7 +3,7 @@
 Load the daily routine's .eml drafts into Outlook Drafts. DRAFTS ONLY.
 
 The "CTTX daily prospect drafts" routine writes .eml files to
-Desktop\\Paratus\\! DRAFTS - For Your Attention\\. This script picks them up,
+Desktop\\CTTX Prospect Drafts\\. This script picks them up,
 saves each one into the Outlook Drafts folder, and moves the .eml into a
 "_loaded" subfolder so it is never loaded twice.
 
@@ -26,7 +26,9 @@ from pathlib import Path
 
 from worker import OutboundWorker
 
-DEFAULT_FOLDER = Path.home() / "Desktop" / "Paratus" / "! DRAFTS - For Your Attention"
+# Dedicated folder: only prospect assessment drafts live here. Never point this
+# at "Paratus\\! DRAFTS - For Your Attention", which holds client/creditor drafts.
+DEFAULT_FOLDER = Path.home() / "Desktop" / "CTTX Prospect Drafts"
 
 GENERIC_LOCAL_PARTS = {
     "info", "reservations", "reservation", "res", "bookings", "booking", "book",
@@ -66,7 +68,8 @@ def main():
 
     loaded_dir = folder / "_loaded"
     rejected_dir = folder / "_rejected"
-    files = sorted(folder.glob("*.eml"))
+    # Only the routine's prospect drafts, never other client correspondence.
+    files = sorted(folder.glob("*_Assessment_*.eml"))
     if not files:
         print(f"No new .eml drafts in {folder}")
         return

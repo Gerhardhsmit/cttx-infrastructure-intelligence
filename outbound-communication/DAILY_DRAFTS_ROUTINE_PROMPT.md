@@ -16,7 +16,7 @@ GERHARD'S DRAFT RULES (27 Sep 2026) — these override everything else:
 3. PRIORITY: Eastern Cape reserves and lodges first, then mines, then wind/solar farms.
 4. QUALITY OVER VOLUME: up to 4 drafts. If only 2 qualify, write 2.
 
-STEP 1 — EXCLUDE ANYONE ALREADY TOUCHED: (a) Notion "CTTX Pipeline" (collection://e2cdd4da-b824-4188-9f31-24365a3c8e0c) — skip any Stage other than "Not Contacted"; (b) Desktop/Paratus/! DRAFTS - For Your Attention and its "_Superseded - do not send" subfolder; (c) Gmail connector as a read-only mirror of inbound mail — search the company name; (d) anyone who received the 27 Sep 2026 "CTTX Infrastructure Assessment — <company>" email (sent in error). Gerhard's Outlook outbound is not visible to you: no trace does not mean no contact.
+STEP 1 — EXCLUDE ANYONE ALREADY TOUCHED: (a) Notion "CTTX Pipeline" (collection://e2cdd4da-b824-4188-9f31-24365a3c8e0c) — skip any Stage other than "Not Contacted"; (b) Desktop/CTTX Prospect Drafts (including _loaded and _rejected) and Desktop/Paratus/! DRAFTS - For Your Attention (including "_Superseded - do not send") — skip anyone with a draft in any of them; (c) Gmail connector as a read-only mirror of inbound mail — search the company name; (d) anyone who received the 27 Sep 2026 "CTTX Infrastructure Assessment — <company>" email (sent in error). Gerhard's Outlook outbound is not visible to you: no trace does not mean no contact.
 
 STEP 2 — PICK CANDIDATES in priority order from Pipeline rows with Stage = "Not Contacted" (research new Eastern Cape reserves, mines, wind/solar farms if it runs dry). Never a competitor, supplier or existing CTTX contact.
 
@@ -31,9 +31,9 @@ STEP 4a — WRITE THE DRAFTS (qualifying prospects only), in Gerhard's voice:
 - Specific ask: a call this week or a site visit.
 - Signature: Gerhard Smit / Director / CTTX Services (Pty) Ltd / gerhard@cttx.co.za | 041 371 1089 | 084 550 3281 / www.cttx.co.za
 Plain-text .eml with From/To/Cc/Subject/Date/X-Unsent: 1/MIME-Version/Content-Type: text/plain; charset=utf-8, plus X-CTTX-Note (attach the one-page PDF; source URL for the recipient's name and address).
-Save to Desktop/Paratus/! DRAFTS - For Your Attention/ as "<Company> - DRAFT_<Recipient Name>_Assessment_<YYYYMMDD>.eml".
+Save to Desktop/CTTX Prospect Drafts/ (create it if missing) as "<Company> - DRAFT_<Recipient Name>_Assessment_<YYYYMMDD>.eml".
 
-STEP 4b — CALL LIST (no verified named decision maker): append to Desktop/Paratus/! DRAFTS - For Your Attention/CALL_LIST_<YYYYMMDD>.md — company, segment, switchboard number, role to ask for, any partial name, one line of verified context for the opener.
+STEP 4b — CALL LIST (no verified named decision maker): append to Desktop/CTTX Prospect Drafts/CALL_LIST_<YYYYMMDD>.md — company, segment, switchboard number, role to ask for, any partial name, one line of verified context for the opener.
 
 STEP 5 — LOG IN NOTION: per draft update Email, Next Action (what, to whom, phone follow-up), Next Action Date (today), Priority. Call-list prospects: Next Action = "Call — ask for <role>". Leave Stage "Not Contacted". POPI basis: B2B direct marketing to juristic persons using published business contacts, opt-out offered. Consent Source valid values only: CRUISER, Phone Call, Web Form, LinkedIn, Email Reply, In Person.
 
