@@ -318,6 +318,18 @@ mark it MISSING if a Notion search genuinely turns up nothing.
 
 ---
 
+## DESIGN STANDARD: RESERVE TERRAIN STUDY (first contact, no pricing)
+
+**Every reserve / lodge-group prospect gets the CTTX Reserve Terrain Study before any pricing.**
+Skill: `.claude/skills/reserve-terrain-study.md` · Engine: `sales-engine/terrain-study/` (README there)
+
+- Aerial Sentinel-2 map + candidate carrier uplink + ridge high-sites/relays + Fresnel-checked profiles for every lodge
+- "One backbone for every driver" section (guest experience, staff communication, security) with customer proof from `sales-engine/terrain-study/evidence.json` (Sandymount Safaris is the named reference)
+- Colours/fonts only from `sales-engine/terrain-study/brand.json` (provisional until the Elephant Barefoot palette is confirmed)
+- Pricing stays internal until after survey
+
+---
+
 ## MISSING — REQUIRES DIRECTOR DECISION
 
 The following genuinely does not exist in Notion or this repo (checked) and must be provided by director:

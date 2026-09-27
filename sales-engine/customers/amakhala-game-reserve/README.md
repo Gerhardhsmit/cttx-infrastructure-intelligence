@@ -7,7 +7,7 @@
 |---|---|
 | `DESKTOP_STUDY.md` | Reserve intelligence, terrain/RF reading, stakeholders, missing items |
 | `Amakhala_Reserve_Network_CTTX.pdf` / `.html` | **Customer-facing** one-page terrain study: satellite map, candidate uplink, high sites, Fresnel-checked path profiles. No pricing |
-| `terrain-study/` | Reproducible analysis: Copernicus DEM + Sentinel-2 scripts, metrics, images |
+| `terrain-study/` | Engine outputs: map, profiles, metrics, config, artifact page. Rebuild with `python3 sales-engine/terrain-study/engine.py sales-engine/terrain-study/reserves/amakhala.json` |
 | `INTERNAL_INDICATIVE_QUOTE.md` | Internal only: indicative Phase 1 pricing, held back until after survey |
 | `CTTX_CostSheet_Amakhala_2026-09-27.xlsx` | Internal working cost sheet (formulas) |
 | `OUTREACH.md` | Email (the "in one page" draft), LinkedIn, WhatsApp, cadence |

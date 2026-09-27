@@ -1,0 +1,11 @@
+{
+  "_note": "CTTX proposal design tokens. Single source of truth for colours and fonts in every terrain study (HTML, PDF, map and profile images). STATUS: PROVISIONAL. Replace with the palette from the Elephant Barefoot proposal (OneDrive /Clients/Barefoot Elephant Lodge (IR-1127371)/) once Gerhard confirms it.",
+  "status": "provisional",
+  "light": {"ground": "#F3F4EF", "panel": "#FFFFFF", "ink": "#16211B", "muted": "#56635B", "rule": "#D3D9D0", "primary": "#2E5641", "accent": "#B97A0E", "accent_fill": "#E2A42B", "chip": "#E6ECE4"},
+  "dark":  {"ground": "#0F1613", "panel": "#16201B", "ink": "#E7ECE5", "muted": "#9AA79F", "rule": "#2A3831", "primary": "#8CC09F", "accent": "#F2B233", "accent_fill": "#F2B233", "chip": "#1E2B24"},
+  "map": {"link": "#F2B233", "lodge_link": "#FFFFFF", "coverage": "#5FD3C4", "coverage_alpha": 0.34, "halo": "#0B1410", "outline": "#F4F1E8"},
+  "profile": {"terrain": "#6F8A5E", "path": "#D48F10", "fresnel": "#F2B233", "text": "#1B2620", "axis": "#8A968F"},
+  "fonts": {"display": "Barlow Condensed", "display_weights": "500;600;700", "body": "IBM Plex Sans", "mono": "IBM Plex Mono",
+            "google_css": "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"},
+  "company": {"name": "CTTX Services", "contact": "Gerhard Smit", "email": "gerhard@cttx.co.za", "phone": "084 550 3281"}
+}

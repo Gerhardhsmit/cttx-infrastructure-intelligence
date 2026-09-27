@@ -26,6 +26,10 @@ Assessment for [Customer]. [Context]. KMZ + Link Planner supplied.
 
 ## INTAKE WORKFLOW
 
+### Step 0: Reserve / lodge prospects
+
+If the opportunity is a reserve, conservancy or lodge group, run `.claude/skills/reserve-terrain-study.md` first. The terrain study is the first-contact document (no pricing). Pricing and quotation follow only after the survey.
+
 ### Step 1: Parse & Recognize
 
 Extract from user input:

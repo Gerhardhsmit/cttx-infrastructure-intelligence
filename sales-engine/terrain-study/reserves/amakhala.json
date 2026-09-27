@@ -1,0 +1,26 @@
+{
+  "slug": "amakhala-game-reserve",
+  "reserve": "Amakhala Game Reserve",
+  "short": "Amakhala",
+  "prepared_for": "Richard, Amakhala Game Reserve",
+  "date": "2026-09-27",
+  "lodges": [
+    {"name": "Safari Lodge", "lat": -33.50352, "lon": 26.02922},
+    {"name": "Bush Lodge", "lat": -33.539637, "lon": 26.034739},
+    {"name": "Leeuwenbosch", "lat": -33.536636, "lon": 26.068419},
+    {"name": "Bukela Game Lodge", "lat": -33.53470, "lon": 26.08611},
+    {"name": "Hlosi Game Lodge", "lat": -33.550574, "lon": 26.105461},
+    {"name": "Quatermain's Camp", "lat": -33.50169, "lon": 26.11689},
+    {"name": "HillsNek Safari Camp", "lat": -33.51274, "lon": 26.14171},
+    {"name": "Woodbury Lodge", "lat": -33.50815, "lon": 26.15307}
+  ],
+  "uplink": {"mode": "town_high_ground", "town": "Paterson", "lat": -33.4333, "lon": 25.9667, "radius_m": 2500},
+  "today": [
+    "Each lodge buys and manages its own service",
+    "Wi-Fi is listed for the public areas by the main lodge",
+    "Security, ecology and maintenance teams are not on a shared network",
+    "Nothing links the gates, water points or fences"
+  ],
+  "context": "Most lodges on Amakhala list Wi-Fi in the public areas by the main lodge, with each lodge sorting out its own connection. We propose a single backbone that belongs to the reserve.",
+  "security_note": "Gate cameras, fence and trigger alarms, and after-hours communication for the Equine APU and K9 unit. When something happens at night, the right people know in minutes."
+}
