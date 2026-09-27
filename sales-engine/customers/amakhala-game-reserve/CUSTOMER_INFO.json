@@ -1,0 +1,23 @@
+{
+  "customer": "Amakhala Game Reserve",
+  "segment": "Private Game Reserve",
+  "province": "Eastern Cape",
+  "location": "Near Paterson, ~60-70 km from Gqeberha (R342)",
+  "size_ha": "7,000-9,000 (published sources differ)",
+  "establishments": 11,
+  "contact": {"name": "Richard (likely Richard Pearse, Reserve GM/CEO - unverified)", "email": "richard@amakhala.co.za", "reserve_office": "041 450 5658"},
+  "other_stakeholders": ["Dwain Strydom (Reserve Manager, per Amakhala blog)", "Founder families: Weeber / Fowlds / Howard-Bisset"],
+  "opportunity_type": "Hybrid Infrastructure",
+  "carrier": "Vodacom Business Connect 200 Mbps 1:1 + LTE failover (assumed, 24 months)",
+  "phase1_capex_ex_vat": 427966,
+  "phase1_capex_incl_vat": 492161,
+  "mrc_ex_vat": 9945,
+  "contract_value_24m_ex_vat": 238680,
+  "nrc_ex_vat": 3444,
+  "managed_service_optional": "R3,500-5,500/month",
+  "status": "Desktop study + indicative proposal complete; outreach draft in Gmail; not yet contacted",
+  "notion": "https://app.notion.com/p/3ddab0d207a781af8d2cf2d7e22e01f0",
+  "popi": "B2B published domain; legitimate interest; opt-out included",
+  "blockers": ["Throughput + term confirmation", "Incident history", "Current connectivity spend", "KMZ / coordinates", "Vodacom feasibility (Duane Forlee)"],
+  "last_updated": "2026-09-27"
+}
