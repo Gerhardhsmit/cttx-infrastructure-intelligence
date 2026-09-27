@@ -132,7 +132,13 @@ Customer → Requirement → Assessment → Architecture → Carrier (if applica
    - Components: wireless backbone, fiber, towers, power, backhaul, carrier link, installation, engineering, service
    - Customer requirement defines solution, not supplier product list
 
-5. **Minimum-Question Principle**
+5. **Email: Drafts Only — Never Send**
+   - Never send email from any account (Outlook COM `.Send()`, Microsoft Graph, Resend, Gmail, M365 connector send tools)
+   - Only create drafts; Gerhard reviews and sends every email himself
+   - Never guess recipient addresses (e.g. `info@<company>.co.za`); use only addresses verified on the prospect's own site
+   - `outbound-communication/` is drafts-only; `test_no_send.py` enforces it (27 Sep 2026 incident)
+
+6. **Minimum-Question Principle**
    - Ask only when: can't find in existing knowledge, can't derive from supplied files, materially affects price/solution
    - Format: MISSING → WHY IT MATTERS → QUESTION
 
