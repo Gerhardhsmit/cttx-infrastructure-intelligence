@@ -76,6 +76,21 @@ def test_all():
     run(desk, "--reload", "2026-09-28-test")
     assert len(FakeWorker.calls) == 2                                      # explicit reload works
 
+    # MIME-embedded attachment (make_eml.py): the PDF inside the .eml is extracted and attached,
+    # and takes precedence over a same-named X-CTTX-Attach path.
+    import make_eml
+    msg = make_eml.build("Named Person <named2@example.co.za>", "Mime: the network, in one page",
+                         "Named,\n\nBody text.\n\nGerhard Smit\nDirector | CTTX Services (Pty) Ltd\n",
+                         [out / "study.pdf"], note="test")
+    (out / "D - DRAFT_Named_Person_Assessment_20260928.eml").write_bytes(msg.as_bytes())
+    (out / "study.pdf").unlink()                                          # only the embedded copy exists now
+    run(desk, "--from-repo")
+    assert len(FakeWorker.calls) == 3, FakeWorker.calls
+    to, subject, body, att = FakeWorker.calls[-1]
+    assert att == ["study.pdf"], att                                       # embedded attachment carried
+    assert (out / "_attachments" / "D - DRAFT_Named_Person_Assessment_20260928" / "study.pdf").read_bytes() == b"%PDF-1.4"
+    assert "Body text." in body and "Gerhard Smit\nDirector" in body
+
 
 if __name__ == "__main__":
     test_all()

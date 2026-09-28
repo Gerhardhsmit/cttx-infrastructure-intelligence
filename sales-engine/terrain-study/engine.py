@@ -182,6 +182,7 @@ class Terrain:
 # ---------------------------------------------------------------- study
 def run(cfg_path):
     cfg = json.loads(Path(cfg_path).read_text())
+    cfg["_config_path"] = str(cfg_path)
     brand = json.loads((HERE / "brand.json").read_text())
     evidence = json.loads((HERE / "evidence.json").read_text())
     out = REPO / "sales-engine" / "customers" / cfg["slug"]
@@ -218,6 +219,20 @@ def run(cfg_path):
     located = [l for l in lodges if l.get("lat") is not None and l.get("lon") is not None]
     unlocated = [l["name"] for l in lodges if l not in located]
     ar = cfg.get("area")  # {"lat","lon","radius_km","source"}: reserve extent when lodges lack positions (or turbine extent)
+    # Optional confirmed boundary: area.polygon_geojson = GeoJSON Feature/geometry (lon,lat) next to the config.
+    # The polygon replaces the equivalent circle; lat/lon/radius_km are derived from it if absent.
+    boundary_ll = None
+    if ar and ar.get("polygon_geojson"):
+        gj = json.loads((Path(cfg["_config_path"]).parent / ar["polygon_geojson"]).read_text())
+        geom = gj.get("geometry", gj)
+        ring = geom["coordinates"][0] if geom["type"] == "Polygon" else max(geom["coordinates"], key=lambda r: len(r[0]))[0]
+        boundary_ll = [(float(lo), float(la)) for lo, la in ring]
+        from shapely.geometry import Polygon as _Poly
+        _pg = _Poly(boundary_ll)
+        ar.setdefault("lat", _pg.centroid.y); ar.setdefault("lon", _pg.centroid.x)
+        # equivalent radius in km from the polygon's planar area (deg -> km at this latitude)
+        ar.setdefault("radius_km", math.sqrt(_pg.area * 111.0 * 111.0 * math.cos(math.radians(_pg.centroid.y)) / math.pi))
+        print(f"  boundary: mapped polygon, {len(boundary_ll)} vertices, centre {ar['lat']:.5f}, {ar['lon']:.5f}, equivalent radius {ar['radius_km']:.1f} km")
     if not located and not ar:
         sys.exit("No lodge positions and no 'area' in the config. Add published coordinates or the reserve area.")
     up = cfg["uplink"]
@@ -289,7 +304,11 @@ def run(cfg_path):
     LX = {l["name"]: xy(l["lat"], l["lon"]) for l in located}
     from shapely.geometry import Point
     from shapely.ops import unary_union
-    area_poly = Point(*xy(ar["lat"], ar["lon"])).buffer(ar["radius_km"] * 1000) if ar else None
+    if ar and boundary_ll:
+        from shapely.geometry import Polygon as _Poly
+        area_poly = _Poly([xy(la, lo) for lo, la in boundary_ll]).buffer(0)
+    else:
+        area_poly = Point(*xy(ar["lat"], ar["lon"])).buffer(ar["radius_km"] * 1000) if ar else None
     upopts = []  # (label, (x, y)) in order of preference
     for r in towers:
         op = r["tags"].get("operator")
@@ -433,6 +452,8 @@ def run(cfg_path):
     hull = MultiPoint(list(LX.values()) + [s["p"] for s in sites]).convex_hull.buffer(2000)
     if area_poly is not None:
         hull = unary_union([hull, area_poly]).convex_hull
+    if boundary_ll:
+        hull = area_poly  # confirmed mapped boundary: coverage and the outline follow the real polygon
     hp = MPath(np.array(hull.exterior.coords))
     fm = hp.contains_points(np.c_[GX.ravel(), GY.ravel()]).reshape(GX.shape)
     cov_pct = float(cov[fm].mean() * 100)
@@ -541,6 +562,7 @@ def run(cfg_path):
         reserve=cfg["reserve"], date=cfg["date"], imagery_date=img_date, epsg=epsg,
         coverage_pct=cov_pct, area_km2=area, lodges_total=len(LX), lodges_clear=n_clear, unlocated=unlocated,
         area_mode=bool(ar),
+        boundary_mapped=bool(boundary_ll),
         uplink=dict(label=up_label, latlon=ll(U), to=up_to["name"], km=links[0]["pr"]["D"] / 1000),
         sites=[dict(name=s["name"], kind=s["kind"], elev=s["elev"], latlon=ll(s["p"]), feed=s.get("feed")) for s in sites],
         links=[dict(a=L["a"], b=L["b"], kind=L["kind"], km=L["pr"]["D"] / 1000, fresnel_ratio=L["pr"]["ratio"]) for L in links],
@@ -761,6 +783,8 @@ def build_html(cfg, brand, ev, m, work):
         "CO_NAME": e(brand["company"]["name"]), "CO_CONTACT": e(brand["company"]["contact"]),
         "CO_EMAIL": e(brand["company"]["email"]), "CO_PHONE": e(brand["company"]["phone"]), "CO_WEB": e(brand["company"].get("web", "")),
     }
+    if m.get("boundary_mapped"):
+        rep["T_STUDY_AREA"] = e("the mapped boundary of the reserve")
     for k, v in rep.items():
         tpl = tpl.replace("{{" + k + "}}", str(v))
     left = re.findall(r"\{\{[A-Z0-9_]+\}\}", tpl)

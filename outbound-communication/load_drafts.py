@@ -85,7 +85,23 @@ def parse_eml(path: Path):
     if body_type == "text":
         body = reflow(body)
     attach = [a.strip() for a in str(msg.get("X-CTTX-Attach", "")).split(",") if a.strip()]
-    return to, cc, subject, body, body_type, [path.parent / a for a in attach]
+    files = [path.parent / a for a in attach]
+    # Embedded MIME attachments (make_eml.py): extract next to the .eml under _attachments/<stem>/.
+    # They take precedence over a same-named X-CTTX-Attach path, so the study inside the .eml is what loads.
+    embedded = [(part.get_filename(), part.get_payload(decode=True)) for part in msg.iter_attachments()]
+    if embedded:
+        outdir = path.parent / "_attachments" / path.stem
+        outdir.mkdir(parents=True, exist_ok=True)
+        emb_paths = []
+        for name, data in embedded:
+            if not name or data is None:
+                continue
+            fp = outdir / Path(name).name
+            fp.write_bytes(data)
+            emb_paths.append(fp)
+        names = {f.name for f in emb_paths}
+        files = emb_paths + [f for f in files if f.name not in names]
+    return to, cc, subject, body, body_type, files
 
 
 def ledger_path(folder: Path) -> Path:
@@ -350,7 +366,9 @@ def main():
         result = worker.create_draft_in_outlook("; ".join(to), subject, body, body_type, "; ".join(cc),
                                                 attachments=attachments)
         if result["success"]:
-            extra = f" + {len(attachments)} attachment(s)" if attachments else ""
+            n_saved = result.get("attachments_saved")
+            extra = (f" + {len(attachments)} attachment(s), Outlook confirms {n_saved}" if attachments and n_saved is not None
+                     else f" + {len(attachments)} attachment(s)" if attachments else "")
             repl = f" (replaced {result['replaced']} older version)" if result.get("replaced") else ""
             print(f"DRAFT  {path.name} -> {', '.join(to)}{extra}  [{result.get('location', 'Drafts')}]{repl}")
             loaded += 1

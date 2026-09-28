@@ -33,6 +33,10 @@ He does not use Gmail for outreach. Never suggest Gmail as a fallback.
 
    <body>
    ```
+   **Where a study exists, the PDF is EMBEDDED in the `.eml` as a MIME attachment** (build with
+   `outbound-communication/make_eml.py`; verify with `--verify`). `X-CTTX-Attach` alone is no longer
+   sufficient: the loader extracts embedded attachments, attaches them, and then checks that Outlook
+   actually saved them (a draft whose attachment count is short is reported as FAILED, not loaded).
    Filename must contain `_Assessment_`:
    `<Company> - DRAFT_<First_Last>_Assessment_<YYYYMMDD>.eml`
 2. Save them, and any attachment named in `X-CTTX-Attach`, under

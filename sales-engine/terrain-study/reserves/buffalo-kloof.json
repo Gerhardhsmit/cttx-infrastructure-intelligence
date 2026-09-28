@@ -27,17 +27,17 @@
   }
  ],
  "area": {
-  "lat": -33.3946,
-  "lon": 26.6184,
-  "radius_km": 4.6,
-  "source": "Buffalo Kloof Protected Environment centroid (Wikipedia); 6,781 ha proclaimed area as an equivalent circle"
+  "polygon_geojson": "buffalo-kloof.boundary.geojson",
+  "source": "Buffalo Kloof Protected Environment: mapped boundary polygon, OpenStreetMap relation 17035922 via Overture Maps release 2026-09-23.1 (7,474 ha mapped; 6,781 ha proclaimed per Wikipedia)"
  },
  "uplink": {
-  "mode": "town_high_ground",
+  "mode": "auto",
   "town": "Makhanda",
   "lat": -33.31,
   "lon": 26.52667,
-  "radius_m": 2500
+  "radius_m": 2500,
+  "tower_radius_km": 25,
+  "note": "No mast within 25 km carries a Vodacom operator tag in public data. Candidate uplink = nearest mapped communication mast; the Vodacom site is to be confirmed with Duane Forlee before design."
  },
  "today": [
   "Spekboom Bush Camp lists Wi-Fi in the central living area only",

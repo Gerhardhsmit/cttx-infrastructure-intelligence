@@ -1,3 +1,6 @@
+## Building a draft with the study embedded
+`python outbound-communication/make_eml.py --to "Name <a@b.co.za>" --subject "..." --body body.txt --attach Study.pdf --note "..." --out "Company - DRAFT_First_Last_Assessment_YYYYMMDD.eml"` embeds the PDF as a MIME part. `--verify file.eml` lists what is embedded (exit 1 if nothing). The loader attaches embedded parts and checks Outlook's saved attachment count.
+
 ## Loading drafts (the one-click way)
 Double-click **Load CTTX Drafts** on the Desktop. The first time, run `python outbound-communication\load_drafts.py --install-shortcut` to create the shortcut, or double-click `Load CTTX Drafts.bat` in the repo root.
 It pulls the latest drafts, loads only new ones into the gerhard@cttx.co.za Drafts folder, attaches their PDFs, and never sends. The ledger is `Desktop\CTTX Prospect Drafts\_ledger.txt`: delete a line to load that draft again.

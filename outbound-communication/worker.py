@@ -160,6 +160,16 @@ class OutboundWorker:
             # Save as draft. There is deliberately no send call anywhere in this file.
             mail.Save()
 
+            # Verify what Outlook actually kept: a draft that promises a study must carry it.
+            expected = len(attachments or [])
+            saved_att = int(mail.Attachments.Count)
+            if saved_att < expected:
+                self.status['failed'] += 1
+                logger.error(f"Attachment check failed for '{subject}': expected {expected}, Outlook saved {saved_att}. Draft left in place for inspection; NOT counted as loaded.")
+                return {'success': False, 'message_id': None,
+                        'error': f"attachment check failed: expected {expected}, saved {saved_att}",
+                        'draft_info': None, 'attachments_saved': saved_att}
+
             # Only now, with the new draft safely saved, remove older versions to the same
             # recipient with the same subject. They go to Deleted Items/Trash and can be restored.
             replaced = 0
@@ -188,6 +198,7 @@ class OutboundWorker:
                 'draft_info': f"Draft saved: {subject} to {recipient}",
                 'location': location,
                 'replaced': replaced,
+                'attachments_saved': saved_att,
             }
         except Exception as e:
             self.status['failed'] += 1
