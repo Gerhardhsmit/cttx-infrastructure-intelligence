@@ -163,16 +163,18 @@ graph TD
 
 ## 5. Monthly Recurring — Carrier Connectivity
 
-**Vodacom Business Connect 100 Mbps** — Uncontended (1:1), Uncapped, Unshaped, No FUP, Symmetrical, Business SLA, Huawei router included, 1 static IP standard. 36-month contract (per Gerhard's instruction, 26 Sept 2026 — see note below). Subject to feasibility confirmation.
+**Vodacom Business Connect 100 Mbps** — Uncontended (1:1), Uncapped, Unshaped, No FUP, Symmetrical, Business SLA, LTE backup, Huawei router included, 1 static IP standard. 36-month contract. Subject to feasibility confirmation.
 
-> ⚠️ **Unconfirmed:** the Notion Vodacom Reseller Pricing Master lists Business Connect on a standard 24-month term; the MRC/NRC figures below are the confirmed 24-month rates. Whether Vodacom's 36-month rate for this product differs (better or worse) has not been checked with Vodacom directly. Confirm before this goes to contract — the monthly figure in this quote may need adjusting once a 36-month rate is confirmed.
+> ✅ **36-month rate confirmed (28 Sept 2026)** against the CTTX Vodacom Reseller price book (Duane Forlee, Vodacom, 29 May 2026, VAT-inclusive): 36-month is slightly cheaper than 24-month (R7,224 vs R7,298 client price at 20%). NRC held at R3,599 incl VAT — the most recent deal-confirmed figure (Barko, Sept 2026); the May price book lists installation at R3,300, so NRC may come in lower.
+>
+> ⚠️ **Internal — reconcile before the next quote:** the two Notion pricing pages disagree on the 24-month 100 Mbps cost basis (the "Products & Pricing" page: R5,682 ex VAT; the reseller price book: R6,082 incl VAT = R5,289 ex VAT). This quote uses the reseller price book, which is the primary source (Vodacom channel manager direct) and matches the July Lynco deal. The other page should be corrected so there is one source of truth.
 
 | Item | Price (Excl. VAT) | Price (Incl. VAT) |
 |------|---------------------|---------------------|
-| Monthly Recurring Charge | R7,103.00 | R8,168.00 |
+| Monthly Recurring Charge (36-month term) | R6,281.74 | R7,224.00 |
 | Once-off Connection Fee (NRC) | R3,130.00 | R3,599.00 |
 
-**24-Month Contract Value:** R170,472.00 (excl. VAT) / R196,032.00 (incl. VAT)
+**36-Month Contract Value:** R226,142.64 (excl. VAT) / R260,064.00 (incl. VAT)
 
 ---
 
