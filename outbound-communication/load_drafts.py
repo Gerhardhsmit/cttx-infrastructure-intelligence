@@ -106,6 +106,46 @@ def repo_key(path: Path) -> str:
     return path.relative_to(REPO_ROOT).as_posix()
 
 
+def current_repo_keys():
+    """(subject, {to addresses}) for every live draft under sales-engine/outreach/."""
+    keys = set()
+    for p in OUTREACH_DIR.rglob("*_Assessment_*.eml"):
+        to, _cc, subject, _b, _t, _a = parse_eml(p)
+        keys.add(((subject or "").strip().lower(), frozenset(a.lower() for a in to)))
+    return keys
+
+
+def prune_superseded(dry_run: bool = False):
+    """Move to Deleted Items every prospect draft in gerhard@cttx.co.za Drafts whose
+    (subject, recipients) no longer matches a live .eml under sales-engine/outreach/.
+    Only prospect subjects are touched; other client mail is never read or moved.
+    Restorable with --restore. Never sends."""
+    import win32com.client
+    outlook = win32com.client.Dispatch("Outlook.Application")
+    account, drafts = find_cttx_account(outlook)
+    live = current_repo_keys()
+    print(f"Live drafts in repo: {len(live)}. Checking {account.SmtpAddress} \\ Drafts ...")
+    moved = kept = 0
+    for item in list(drafts.Items):
+        try:
+            subject = (item.Subject or "").strip()
+            if not is_prospect_subject(subject):
+                continue
+            to = frozenset(r.Address.lower() for r in item.Recipients if r.Type == 1)
+        except Exception:
+            continue
+        if (subject.lower(), to) in live:
+            kept += 1
+            continue
+        print(f"  {'WOULD REMOVE' if dry_run else 'REMOVED'}  {item.LastModificationTime} | {item.To} | {subject}")
+        if not dry_run:
+            item.Delete()
+        moved += 1
+    print(f"\n{'Would move' if dry_run else 'Moved'} {moved} superseded draft(s) to Deleted Items, kept {kept}. Nothing was sent.")
+    if moved and not dry_run:
+        print("To bring one back: python outbound-communication\\load_drafts.py --restore")
+
+
 def find_drafts(text: str):
     """Read-only: list drafts in every mailbox whose subject contains text."""
     import win32com.client
@@ -202,6 +242,8 @@ def main():
     parser.add_argument("--install-shortcut", action="store_true")
     parser.add_argument("--status", action="store_true", help="read-only: list Drafts and prospect drafts in Trash")
     parser.add_argument("--restore", action="store_true", help="move prospect drafts back from Trash to Drafts")
+    parser.add_argument("--prune", action="store_true",
+                        help="move to Deleted Items every prospect draft that no longer matches a live .eml under sales-engine/outreach/ (restorable)")
     parser.add_argument("--reload", metavar="TEXT",
                         help="load again the repo drafts whose path contains TEXT (delete the old copy in Outlook first)")
     args = parser.parse_args()
@@ -213,6 +255,9 @@ def main():
         return
     if args.find:
         find_drafts(args.find)
+        return
+    if args.prune:
+        prune_superseded(dry_run=args.dry_run)
         return
     if args.install_shortcut:
         install_shortcut()
