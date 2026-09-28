@@ -1,0 +1,33 @@
+{
+ "slug": "sibuya-game-reserve",
+ "reserve": "Sibuya Game Reserve",
+ "short": "Sibuya",
+ "prepared_for": "Kyle Dickie, Sibuya Game Reserve",
+ "date": "2026-09-28",
+ "lodges": [
+  {"name": "Forest Camp", "lat": null, "lon": null, "units": 8, "wifi_today": "unknown"},
+  {"name": "River Camp", "lat": null, "lon": null, "units": 4, "wifi_today": "unknown"},
+  {"name": "Bush Lodge", "lat": null, "lon": null, "units": 4, "wifi_today": "unknown"}
+ ],
+ "area": {
+  "lat": -33.6082,
+  "lon": 26.64766,
+  "radius_km": 3.1,
+  "source": "Mapped protected area 'Sibuya Game Reserve' (wilderness_area) in Overture/OpenStreetMap, release 2026-09-23, centre of the mapped polygon; 3,000 ha stated on sibuya.co.za as an equivalent circle"
+ },
+ "uplink": {
+  "mode": "town_high_ground",
+  "town": "Kenton-on-Sea",
+  "lat": -33.6825,
+  "lon": 26.6717,
+  "radius_m": 2500
+ },
+ "today": [
+  "Three camps: Forest Camp (8 tents), River Camp (4 tents) and Bush Lodge (4 suites), reached by boat up the Kariega River",
+  "The two tented camps are solar-powered and reached by an 11 km boat trip from the Kenton-on-Sea jetty",
+  "No reserve-wide network is described for rangers, gates or cameras"
+ ],
+ "context": "Sibuya runs three camps on 3,000 ha along the Kariega River, reached by boat rather than road. A property that no road-based provider will build to needs its own backbone: one owned network that crosses the river and reaches the camps and the field.",
+ "security_note": "Sibuya is a Big Five reserve with rhino and a documented poaching history. A backbone that reaches the camps, the river crossings and the rangers is what lets the reserve see and respond to an incident, day and night.",
+ "units_source": "sibuya.co.za accommodation pages and siyabona.com, Sep 2026"
+}

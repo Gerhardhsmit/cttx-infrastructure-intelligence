@@ -1,0 +1,107 @@
+{
+  "_note": "Customer proof points used in every terrain study's 'What other reserves got back' section. Only add a named reference once the customer has given permission (record it in 'permission'). Unnamed items must not identify the customer. No pricing in this file: studies are first-contact documents.",
+  "named": [
+    {
+      "name": "Sandymount Safaris",
+      "scale": "30,000+ ha, three lodges",
+      "permission": "Rykie Fourie (Reserve Executive) confirmed named use, 15 May 2026 (Notion: Sandymount Safaris - Case Study Source)",
+      "before": "A consumer wireless service at about 3 Mbps down and 8 Mbps up, with the provider on site daily to swap IPs and reinstall equipment.",
+      "after": "A Vodacom-backed 100 Mbps symmetrical link into the reserve, a CTTX-built main mast and two secondary masts, solar and lithium power, all monitored remotely.",
+      "outcomes": [
+        {
+          "driver": "Guest experience",
+          "text": "HD sport streams live at the lodges. Guest connectivity is no longer something the lodges think about."
+        },
+        {
+          "driver": "Staff communication",
+          "text": "Over 800 Mbps measured across the reserve's own backbone, linking the main lodge, Mountain Retreat and Samar."
+        },
+        {
+          "driver": "Security and operations",
+          "text": "Daily provider callouts went to zero. Every fault used to need a vehicle and a person; now the network is monitored remotely."
+        },
+        {
+          "driver": "Ownership",
+          "text": "The reserve keeps adding systems on top of the backbone. In the client's words, they stopped doing speed tests."
+        }
+      ]
+    }
+  ],
+  "unnamed": [
+    {
+      "label": "An Eastern Cape lodge near Addo",
+      "kind": "alert",
+      "title": "When the network goes quiet after hours",
+      "text": "Elephants broke out after 21:00 and staff had no effective way to coordinate. The requirement that came out of it: dependable communications after hours, across the areas where an incident can happen."
+    },
+    {
+      "label": "The same lodge, business case from its own invoices (Sep 2026)",
+      "kind": "win",
+      "title": "Owning the network pays for itself",
+      "text": "Replacing a rented, contended service and rented Wi-Fi with a lodge-owned network breaks even in under three years on connectivity savings alone. It also connects areas the old setup never reached, including the spa.",
+      "source": "CTTX_Quote_BarefootAddoElephantLodge_2026-09-25.md: break-even 34 months without managed retainer (71 with). Do not quote the 14-month figure from the later web proposal."
+    }
+  ],
+  "model": {
+    "headline": "One backbone for every driver of the business",
+    "drivers": [
+      {
+        "name": "Guest experience",
+        "text": "Reliable Wi-Fi, booking and card payments at every lodge."
+      },
+      {
+        "name": "Staff communication",
+        "text": "Lodges, HQ, rangers and maintenance on one network, day and night."
+      },
+      {
+        "name": "Security and operations",
+        "text": "Cameras, gates, fence alarms and sensors on the same backbone, powered through load-shedding."
+      }
+    ],
+    "principle": "Carrier connectivity comes in once. Everything on the property runs over infrastructure the reserve owns. New cameras, sensors and lodges plug in without a new provider contract."
+  },
+  "by_type": {
+    "wind": {
+      "model": {
+        "headline": "One standby path for every critical load",
+        "drivers": [
+          {
+            "name": "SCADA continuity",
+            "text": "An automatic second path keeps turbines and the substation visible to the control room when the fibre is cut or stolen."
+          },
+          {
+            "name": "Crew communication",
+            "text": "O&M crews reachable across the site, at the turbines and in the substation, on one monitored network."
+          },
+          {
+            "name": "Security",
+            "text": "Perimeter and substation cameras keep reporting during exactly the incidents that cut the fibre."
+          }
+        ],
+        "principle": "The fibre stays the primary path. The owned wireless path is independent of the fibre route and monitored remotely."
+      },
+      "experience": "CTTX has delivered this kind of work at Oya Wind Farm and Eskom Medupi.",
+      "experience_source": "Gerhard's own outreach drafts, 28 Sep 2026"
+    },
+    "farm": {
+      "model": {
+        "headline": "One backbone for every driver of the farm",
+        "drivers": [
+          {
+            "name": "Water and power",
+            "text": "Pump stations, dams and boreholes report their status, so problems are found before a block goes dry."
+          },
+          {
+            "name": "Staff communication",
+            "text": "Office, packhouse, workshops and field teams on one network, day and night."
+          },
+          {
+            "name": "Security",
+            "text": "Cameras and alarms on the same backbone, covering the theft of copper, diesel and equipment."
+          }
+        ],
+        "principle": "Carrier connectivity comes in once. Everything on the farm runs over infrastructure the farm owns."
+      }
+    }
+  }
+}

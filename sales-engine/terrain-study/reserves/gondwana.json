@@ -1,0 +1,65 @@
+{
+ "slug": "gondwana-game-reserve",
+ "reserve": "Gondwana Game Reserve",
+ "short": "Gondwana",
+ "prepared_for": "Mark Rutherfoord, Gondwana Game Reserve",
+ "date": "2026-09-28",
+ "lodges": [
+  {
+   "name": "Kwena Lodge",
+   "lat": -34.0894878,
+   "lon": 21.9118881,
+   "units": 14,
+   "wifi_today": "all_rooms",
+   "coord_source": "search snippets tied to gondwanagr.co.za directions page; one source calls it the reserve point"
+  },
+  {
+   "name": "Lehele Villas",
+   "lat": null,
+   "lon": null,
+   "units": 7,
+   "wifi_today": "all_rooms"
+  },
+  {
+   "name": "Fynbos and Kwena Villas",
+   "lat": null,
+   "lon": null,
+   "wifi_today": "all_rooms"
+  },
+  {
+   "name": "Ulubisi House",
+   "lat": null,
+   "lon": null,
+   "units": 3,
+   "wifi_today": "all_rooms"
+  },
+  {
+   "name": "Tented Eco Camp",
+   "lat": null,
+   "lon": null,
+   "units": 7,
+   "wifi_today": "unknown"
+  }
+ ],
+ "area": {
+  "lat": -34.0753,
+  "lon": 21.9068,
+  "radius_km": 5.9,
+  "source": "Reserve point latitude.to / sa-venues; 11,000 ha as an equivalent circle"
+ },
+ "uplink": {
+  "mode": "town_high_ground",
+  "town": "Herbertsdale",
+  "lat": -34.0167,
+  "lon": 21.7667,
+  "radius_m": 2500
+ },
+ "today": [
+  "Kwena Lodge, villas and a Tented Eco Camp spread across 11,000 ha",
+  "The Tented Eco Camp is described as off-grid with no cell reception",
+  "An anti-poaching unit and a counter-poaching training camp run on the reserve"
+ ],
+ "context": "Gondwana runs a lodge, several villa groups and an off-grid eco camp across 11,000 ha, with its own anti-poaching unit. We propose one backbone that belongs to the reserve and reaches the villas, the camp and the field.",
+ "security_note": "The Rainbow Rhino Initiative and the anti-poaching unit already use drones and tracking. A reserve-wide backbone carries that data, the gate cameras and after-hours communication on one monitored network.",
+ "units_source": "safari.com, gondwanagr.co.za, insideguide, Sep 2026 (villa counts unconfirmed)"
+}

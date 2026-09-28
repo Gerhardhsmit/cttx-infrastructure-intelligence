@@ -1,0 +1,43 @@
+{
+ "site_type": "wind",
+ "date": "2026-09-28",
+ "lodges": [],
+ "uplink": {
+  "mode": "auto",
+  "town": "Humansdorp",
+  "lat": -34.0333,
+  "lon": 24.7667,
+  "radius_m": 2500,
+  "tower_radius_km": 25
+ },
+ "slug": "jeffreys-bay-wind-farm",
+ "reserve": "Jeffreys Bay Wind Farm",
+ "short": "Jeffreys Bay",
+ "prepared_for": "Otto Fourie, Jeffreys Bay Wind Farm",
+ "osm_turbines": {
+  "farms": [
+   {
+    "name": "Jeffreys Bay",
+    "lat": -34.0,
+    "lon": 24.84,
+    "turbines": 60
+   }
+  ],
+  "exclude_operators": [
+   "Red Cap"
+  ],
+  "radius_km": 8
+ },
+ "today": [
+  "60 Siemens 2.3 MW turbines on about 3,700 ha across eight farms, commissioned in 2014",
+  "SCADA, crew communications and cameras depend on the site's fibre",
+  "The public record describes no standby path for SCADA if the fibre is cut or stolen"
+ ],
+ "context": "Jeffreys Bay Wind Farm runs 60 turbines across eight farms between Jeffreys Bay and Humansdorp. Everything that tells the control room what the site is doing rides on the fibre. We propose an owned standby wireless path alongside it.",
+ "security_note": "Cable and fibre theft can take out SCADA and the cameras in the same incident. A standby path keeps both reporting while the fibre is repaired.",
+ "sources": [
+  "en.wikipedia.org/wiki/Jeffreys_Bay_Wind_Farm (34.00 S 24.84 E, 60 x Siemens SWT 2.3 MW)",
+  "globeleq.com (3,700 ha, eight farms, 2014)",
+  "OpenStreetMap turbines and substations via Overture 2026-09-23.1"
+ ]
+}

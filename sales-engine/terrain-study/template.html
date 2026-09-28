@@ -1,0 +1,232 @@
+<title>{{TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="{{FONT_CSS}}">
+<style>
+:root{ {{LIGHT}}; color-scheme:dark;
+  --display:"{{F_DISPLAY}}","Inter",-apple-system,sans-serif;
+  --body:"{{F_BODY}}",-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:"{{F_MONO}}",ui-monospace,Menlo,monospace; }
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:16px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+p{margin:0;max-width:68ch}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.wrap{max-width:880px;margin:0 auto;padding-inline:24px}
+
+.cover{padding:64px 24px 48px;border-bottom:1px solid var(--border);background:radial-gradient(circle at 85% -10%,rgba(204,255,0,.08),transparent 45%),var(--bg)}
+.cover-inner{max-width:880px;margin:0 auto}
+.wordmark{display:flex;align-items:baseline;gap:10px;margin-bottom:48px}
+.wordmark .mark{font:800 22px/1 var(--display);letter-spacing:.02em}
+.wordmark .mark span{color:var(--accent)}
+.wordmark .tag{font:400 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--border-strong);padding-left:10px}
+.eyebrow{font:400 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 16px}
+.cover h1{font-size:clamp(32px,5.5vw,52px);font-weight:800;line-height:1.08;margin:0 0 20px}
+.cover .sub{font-size:18px;color:var(--muted);max-width:600px;margin:0 0 36px}
+.cover .sub em{font-style:normal;color:var(--text)}
+.cover-meta{display:flex;flex-wrap:wrap;gap:28px;font-size:13px;color:var(--muted);border-top:1px solid var(--border);padding-top:20px}
+.cover-meta strong{color:var(--text);font-weight:500}
+
+.mapfig{margin:40px 0 0;display:flex;flex-direction:column;gap:12px}
+.mapfig img,.fig img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--border)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 22px;font:400 12px/1.4 var(--mono);color:var(--muted)}
+.legend i{display:inline-block;width:22px;border-top:3px solid var(--accent);vertical-align:middle;margin-right:8px}
+.legend i.dash{border-top-style:dashed}
+.legend i.thin{border-top:1.5px solid var(--text)}
+.legend i.cov{height:11px;width:16px;border:0;background:var(--accent);opacity:.35}
+.caption{font-size:13px;color:var(--muted);max-width:none}
+
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:32px 0 8px}
+.stat{background:var(--surface);padding:22px 20px;display:flex;flex-direction:column;gap:8px}
+.stat .value{font:700 28px/1 var(--display);font-variant-numeric:tabular-nums}
+.stat .label{font-size:13px;color:var(--muted)}
+.stat.hero .value{color:var(--accent)}
+
+section{padding:56px 0;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:20px}
+section:last-of-type{border-bottom:0}
+.section-head{display:flex;align-items:baseline;gap:14px}
+.section-num{font:400 13px/1 var(--mono);color:var(--accent);border:1px solid var(--border-strong);border-radius:999px;padding:5px 10px;flex-shrink:0}
+.section-head h2{font-size:26px;font-weight:700}
+.lede{font-size:17px;color:var(--muted);max-width:640px}
+
+.callout{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 22px;display:flex;flex-direction:column;gap:8px}
+.callout.alert{border-color:rgba(255,59,48,.35)}
+.callout.alert .callout-label{color:var(--alert)}
+.callout.win{border-color:rgba(204,255,0,.3)}
+.callout.win .callout-label{color:var(--accent)}
+.callout-label{font:400 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.callout p,.callout li{font-size:15px}
+.callout ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.callout cite{font:400 12px/1.4 var(--mono);color:var(--muted);font-style:normal}
+
+.driver-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.driver-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:10px}
+.driver-label{font:400 11.5px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.driver-card h3{font-size:18px;font-weight:700}
+.driver-card p{font-size:14.5px;max-width:none}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:540px;font-size:14px}
+th,td{text-align:left;padding:11px 16px;border-bottom:1px solid var(--border)}
+th{font:400 11px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+.pill{font:500 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:999px;border:1px solid rgba(204,255,0,.35);color:var(--accent)}
+.pill.warn{border-color:rgba(255,59,48,.35);color:var(--alert)}
+
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.ba{grid-template-columns:1fr}}
+.proof-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.proof{background:var(--surface-2);padding:18px 20px;display:flex;flex-direction:column;gap:8px}
+.proof .tag{font:400 11px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.proof p{font-size:14px}
+.ref{font:700 20px/1.2 var(--display)}
+.ref span{font:400 13px var(--mono);color:var(--muted);margin-left:10px}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.compare{grid-template-columns:1fr}}
+.lenses{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px 32px}
+.lens{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--border-strong);padding-top:14px}
+.lens h3{font-size:16px;font-weight:700;color:var(--accent)}
+.lens p{font-size:14.5px;color:var(--text)}
+
+.steps{counter-reset:step;margin:0;padding:0;list-style:none}
+.steps li{counter-increment:step;position:relative;padding:18px 0 18px 46px;border-bottom:1px solid var(--border)}
+.steps li:last-child{border-bottom:0}
+.steps li::before{content:counter(step);position:absolute;left:0;top:16px;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--bg);font:700 13px/28px var(--mono);text-align:center}
+.step-title{font-weight:600;margin-bottom:4px}
+.step-desc{color:var(--muted);font-size:14.5px}
+
+.method{font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:8px;padding:32px 0 0}
+.method p{max-width:none}
+footer{padding:48px 24px 64px;text-align:center;border-top:1px solid var(--border);margin-top:32px}
+footer .name{font:700 20px/1.2 var(--display);margin-bottom:4px}
+footer .role{color:var(--muted);font-size:14px;margin-bottom:18px}
+footer .contact{display:flex;justify-content:center;gap:10px 24px;flex-wrap:wrap;font-size:14px}
+footer .contact span{color:var(--muted);margin-right:6px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:640px){.proof-grid{grid-template-columns:1fr}.cover{padding:44px 16px 36px}.wrap{padding-inline:16px}section{padding:40px 0}}
+table.payback td.yr{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+table.payback td.yr.good{color:var(--accent);font-weight:700}
+table.payback th small{display:block;text-transform:none;letter-spacing:0;font-family:var(--body);color:var(--muted);font-size:11px;margin-top:3px}
+h3.sub{font-size:18px;font-weight:700;margin-top:8px}
+.dim{color:var(--muted)}
+tr.tot td{font-weight:700;color:var(--accent);border-top:1px solid var(--border-strong)}
+</style>
+<!--BODY-->
+<div class="cover">
+  <div class="cover-inner">
+    <div class="wordmark"><span class="mark">CTTX<span>.</span></span><span class="tag">Services</span></div>
+    <p class="eyebrow">{{T_EYEBROW}}</p>
+    <h1>{{T_H1}}</h1>
+    <p class="sub">We modelled {{SHORT}}'s terrain from satellite elevation data and checked every radio path against it. <em>{{HERO_RESULT}}</em>, fed from a carrier uplink on {{UPLABEL}}.</p>
+    <div class="cover-meta">
+      <span><strong>Prepared for</strong><br>{{PREPARED_FOR}}</span>
+      <span><strong>Prepared by</strong><br>{{CO_CONTACT}}, {{CO_NAME}}</span>
+      <span><strong>Date</strong><br>{{DATE}}</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <figure class="mapfig">
+    <img src="{{MAP}}" alt="Satellite image of {{RESERVE}} with the candidate carrier uplink, proposed high sites and links, over a radio-coverage overlay">
+    <div class="legend">
+      <span><i class="dash"></i>Carrier uplink</span>
+      <span><i></i>Private backbone</span>
+      <span><i class="thin"></i>{{T_LEGEND_LINK}}</span>{{TURBINE_LEGEND}}
+      <span><i class="cov"></i>Clear line of sight for a 3&nbsp;m field terminal</span>
+    </div>
+    <p class="caption">Sentinel-2 imagery, {{IMG_DATE}}. The dotted outline is {{T_STUDY_AREA}}. Site positions are desktop candidates, to be confirmed on a site visit.</p>
+  </figure>
+
+  <div class="stat-grid">
+    <div class="stat hero"><div class="value">{{STAT1_VALUE}}</div><div class="label">{{STAT1_LABEL}}</div></div>
+    <div class="stat"><div class="value">{{N_HIGH}} + {{N_RELAY}}</div><div class="label">ridge high-sites plus short relays</div></div>
+    <div class="stat"><div class="value">{{COV}}%</div><div class="label">of the {{AREA}} km² study area in line of sight</div></div>
+    <div class="stat"><div class="value">{{UPKM}} km</div><div class="label">{{T_STAT4_LABEL}}</div></div>
+  </div>
+
+  <section>
+    <div class="section-head"><span class="section-num">01</span><h2>Where things stand today</h2></div>
+    <p class="lede">{{CONTEXT}}</p>
+    <div class="callout alert"><span class="callout-label">What the public record shows</span><ul>{{TODAY}}</ul></div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">02</span><h2>Carrier in, private network out</h2></div>
+    <p class="lede">{{T_S02_LEDE}}</p>
+    <div class="driver-grid">
+      <div class="driver-card"><div class="driver-label">Layer 1 · Carrier</div><h3>Uplink from {{UPLABEL}}</h3><p>An uncontended business-grade Vodacom service, delivered by CTTX over a {{UPKM}} km link to {{UPTO}}. {{T_LAYER1_TAIL}}</p></div>
+      <div class="driver-card"><div class="driver-label">Layer 2 · Backbone</div><h3>Ridge high-sites</h3><p>{{BACKBONE_TEXT}} Each site runs on solar and lithium storage with remote monitoring, so the network stays up through load-shedding.</p></div>
+      <div class="driver-card"><div class="driver-label">Layer 3 · Distribution</div><h3>{{T_LAYER3_H}}</h3><p>{{T_LAYER3_P}}</p></div>
+    </div>
+    <div class="callout win"><span class="callout-label">Built for what comes next</span><p>{{T_NEXT_P}}</p></div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">03</span><h2>Every path checked against the terrain</h2></div>
+    <p class="lede">Each profile shows the ground between two sites, the radio path (lime line) and its Fresnel zone (lime band). We allow for earth curvature and require at least 60% of the zone to be clear at every point. A path that fails is not drawn.</p>
+    <figure class="fig"><img src="{{PROF1}}" alt="Terrain profiles for the carrier uplink and backbone links"></figure>
+    <div class="tablewrap"><table>
+      <thead><tr><th>{{T_SITE_WORD_CAP}}</th><th>Served from</th><th>Path length</th><th>Line of sight</th></tr></thead>
+      <tbody>{{ROWS}}</tbody>
+    </table></div>
+    {{LODGE_FIG}}
+    {{UNLOCATED_NOTE}}
+    <p class="caption">{{T_PROF_CAPTION}}</p>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">04</span><h2>{{MODEL_HEAD}}</h2></div>
+    <p class="lede">{{T_S04_LEDE}}</p>
+    <div class="driver-grid">{{DRIVERS}}</div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">05</span><h2>{{T_S05_TITLE}}</h2></div>
+    {{PROOF_BLOCK}}
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">06</span><h2>{{T_S06_TITLE}}</h2></div>
+    <p class="lede">{{T_S06_LEDE}}</p>
+    <div class="callout win"><span class="callout-label">{{T_S06_HOOK_LABEL}}</span><p>{{T_S06_HOOK}}</p></div>
+    <div class="callout"><span class="callout-label">Built to be forwarded</span><p>{{T_S06_FORWARD}}</p></div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">07</span><h2>{{T_S07_TITLE}}</h2></div>
+    <div class="compare">
+      <div class="callout alert"><span class="callout-label">Today</span><ul>{{TODAY}}</ul></div>
+      <div class="callout win"><span class="callout-label">{{T_WITH_LABEL}}</span><ul>{{T_WITH_LIST}}</ul></div>
+    </div>
+    <div class="lenses">
+      <div class="lens"><h3>Avoided loss</h3><p>{{SECURITY_NOTE}}</p></div>
+      <div class="lens"><h3>Operational efficiency</h3><p>{{T_LENS_EFF}}</p></div>
+      <div class="lens"><h3>Infrastructure ownership</h3><p>{{T_LENS_OWN}}</p></div>
+      <div class="lens"><h3>Executive risk reduction</h3><p>{{T_LENS_EXEC}}</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">08</span><h2>Next steps</h2></div>
+    <ul class="steps">
+      <li><div class="step-title">30-minute call</div><div class="step-desc">{{T_STEP1}}</div></li>
+      <li><div class="step-title">Confirm the sites</div><div class="step-desc">{{T_STEP2}}</div></li>
+      <li><div class="step-title">{{T_STEP3_TITLE}}</div><div class="step-desc">{{T_STEP3}}</div></li>
+      <li><div class="step-title">Design and proposal</div><div class="step-desc">A final design in Cambium LINKPlanner, with equipment, power, a phased plan and the investment case.</div></li>
+    </ul>
+    <div class="method">
+      <p><b>Method.</b> Terrain: Copernicus DEM GLO-30 (30 m). Imagery: ESA Sentinel-2 L2A true colour, {{IMG_DATE}}. Radio model: 5.8 GHz, effective earth radius factor 4/3, 60% first-Fresnel-zone clearance at every point. The terrain model does not include trees or buildings. Every path is confirmed on survey before anything is built.</p>
+      <p><b>Candidate positions.</b> {{POSITIONS}}; carrier uplink {{UPLL}} ({{UPLABEL}}). The exact carrier site is subject to Vodacom feasibility.</p>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="name">{{CO_CONTACT}}</div>
+  <div class="role">{{CO_NAME}}</div>
+  <div class="contact"><div><span>Tel</span>{{CO_PHONE}}</div><div><span>Email</span>{{CO_EMAIL}}</div><div><span>Web</span>{{CO_WEB}}</div></div>
+</footer>

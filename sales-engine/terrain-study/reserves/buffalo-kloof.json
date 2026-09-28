@@ -1,0 +1,53 @@
+{
+ "slug": "buffalo-kloof",
+ "reserve": "Buffalo Kloof",
+ "short": "Buffalo Kloof",
+ "prepared_for": "Warne Rippon, Buffalo Kloof",
+ "date": "2026-09-28",
+ "lodges": [
+  {
+   "name": "Spekboom Bush Camp",
+   "lat": null,
+   "lon": null,
+   "units": 7,
+   "wifi_today": "public"
+  },
+  {
+   "name": "Acacia Lodge",
+   "lat": null,
+   "lon": null,
+   "units": 4,
+   "wifi_today": "unknown"
+  },
+  {
+   "name": "Khatu Villa",
+   "lat": null,
+   "lon": null,
+   "wifi_today": "unknown"
+  }
+ ],
+ "area": {
+  "polygon_geojson": "buffalo-kloof.boundary.geojson",
+  "source": "Buffalo Kloof Protected Environment: mapped boundary polygon, OpenStreetMap relation 17035922 via Overture Maps release 2026-09-23.1 (7,474 ha mapped; 6,781 ha proclaimed per Wikipedia)",
+  "label": "the Protected Environment",
+  "scope_note": "7,474 ha of the roughly 20,000 ha Buffalo Kloof conservancy. The rest of the conservancy has no public boundary yet and is not modelled",
+  "scope_source": "buffalokloof.co.za: \"a thriving 20,000-hectare conservancy\" (web search, 28 Sep 2026)"
+ },
+ "uplink": {
+  "mode": "auto",
+  "town": "Makhanda",
+  "lat": -33.31,
+  "lon": 26.52667,
+  "radius_m": 2500,
+  "tower_radius_km": 25,
+  "note": "No mast within 25 km carries a Vodacom operator tag in public data. Candidate uplink = nearest mapped communication mast; the Vodacom site is to be confirmed with Duane Forlee before design."
+ },
+ "today": [
+  "Spekboom Bush Camp lists Wi-Fi in the central living area only",
+  "Black and white rhino, with an anti-poaching team using cameras and helicopter patrols",
+  "No reserve-wide network is described for the field operation"
+ ],
+ "context": "Buffalo Kloof carries black and white rhino, cheetah reintroduction and a dedicated anti-poaching team across the Kowie River valley. The connectivity that is described stops at the camp's living area. We propose one backbone that belongs to the reserve and reaches the field.",
+ "security_note": "Surveillance cameras, helicopter patrols and tracking already run on Buffalo Kloof. An owned backbone carries that data and ranger communications on one monitored network, day and night.",
+ "units_source": "buffalokloof.co.za accommodation pages, Sep 2026"
+}

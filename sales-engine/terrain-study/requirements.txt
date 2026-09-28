@@ -1,0 +1,8 @@
+rasterio
+numpy
+scipy
+matplotlib
+pyproj
+shapely
+pillow
+mgrs

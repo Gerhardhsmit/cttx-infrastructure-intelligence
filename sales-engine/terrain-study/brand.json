@@ -1,0 +1,12 @@
+{
+  "_note": "CTTX proposal design tokens. Single source of truth for colours and fonts in every terrain study (HTML, PDF, map and profile images). Source: Barefoot Addo Network Proposal (session_01F75G8iv8ooxhkGc1PV5mNB, artifact LxJyiouEK9JQLZiB9zzZyk, 26 Sep 2026). Dark-first, single theme.",
+  "status": "confirmed from Barefoot Addo proposal",
+  "tokens": {"bg": "#0A0A0B", "surface": "#1A1A1C", "surface-2": "#151517", "text": "#FFFFFF", "muted": "#A1A1A1",
+             "accent": "#CCFF00", "accent-dim": "#8FB300", "alert": "#FF3B30",
+             "border": "rgba(255,255,255,0.09)", "border-strong": "rgba(255,255,255,0.16)"},
+  "map": {"link": "#CCFF00", "lodge_link": "#FFFFFF", "coverage": "#CCFF00", "coverage_alpha": 0.14, "halo": "#0A0A0B", "outline": "#FFFFFF"},
+  "profile": {"bg": "#1A1A1C", "terrain": "#3F4A36", "path": "#CCFF00", "fresnel": "#CCFF00", "text": "#FFFFFF", "axis": "#5A5A5E", "tick": "#A1A1A1"},
+  "fonts": {"display": "Inter Tight", "body": "Inter", "mono": "Roboto Mono",
+            "google_css": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap"},
+  "company": {"name": "CTTX Services (Pty) Ltd", "contact": "Gerhard Smit", "email": "gerhard@cttx.co.za", "phone": "084 550 3281", "web": "cttx.co.za"}
+}
