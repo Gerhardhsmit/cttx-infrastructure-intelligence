@@ -48,6 +48,33 @@ OL_FOLDER_DRAFTS = 16
 CTTX_ACCOUNT = os.environ.get("CTTX_OUTLOOK_ACCOUNT", "gerhard@cttx.co.za").lower()
 
 
+PROSPECT_MARKERS = ("in one page",)  # subjects of CTTX prospect drafts
+
+
+def is_prospect_subject(subject: str) -> bool:
+    return any(m in (subject or "").lower() for m in PROSPECT_MARKERS)
+
+
+def trash_folders(store):
+    """Deleted Items / Trash folders anywhere in the store (IMAP keeps Trash under Inbox)."""
+    found = []
+    try:
+        found.append(store.GetDefaultFolder(3))  # olFolderDeletedItems
+    except Exception:
+        pass
+
+    def walk(folder, depth=0):
+        if depth > 3:
+            return
+        for i in range(1, folder.Folders.Count + 1):
+            f = folder.Folders.Item(i)
+            if f.Name.lower() in ("trash", "deleted items") and all(f.EntryID != x.EntryID for x in found):
+                found.append(f)
+            walk(f, depth + 1)
+    walk(store.GetRootFolder())
+    return found
+
+
 def find_cttx_account(outlook):
     """Return (account, drafts_folder) for gerhard@cttx.co.za, or raise with the accounts found."""
     ns = outlook.GetNamespace("MAPI")
@@ -113,20 +140,6 @@ class OutboundWorker:
             outlook = win32com.client.Dispatch("Outlook.Application")
             account, drafts = find_cttx_account(outlook)
 
-            # A newer version replaces an older draft to the same recipient with the
-            # same subject. The old one goes to Deleted Items and can be recovered.
-            replaced = 0
-            want_to = {r.strip().lower() for r in recipient.split(";") if r.strip()}
-            for item in list(drafts.Items):
-                try:
-                    same_subject = (item.Subject or "").strip().lower() == subject.strip().lower()
-                    item_to = {r.Address.lower() for r in item.Recipients if r.Type == 1}
-                except Exception:
-                    continue
-                if same_subject and item_to == want_to:
-                    item.Delete()
-                    replaced += 1
-
             # Create the item directly inside gerhard@cttx.co.za's Drafts folder.
             mail = drafts.Items.Add(0)  # 0 = mailItem
             mail.SendUsingAccount = account  # sets the From account only; nothing is sent
@@ -146,6 +159,23 @@ class OutboundWorker:
 
             # Save as draft. There is deliberately no send call anywhere in this file.
             mail.Save()
+
+            # Only now, with the new draft safely saved, remove older versions to the same
+            # recipient with the same subject. They go to Deleted Items/Trash and can be restored.
+            replaced = 0
+            new_id = mail.EntryID
+            want_to = {r.strip().lower() for r in recipient.split(";") if r.strip()}
+            for item in list(drafts.Items):
+                try:
+                    if item.EntryID == new_id:
+                        continue
+                    same_subject = (item.Subject or "").strip().lower() == subject.strip().lower()
+                    item_to = {r.Address.lower() for r in item.Recipients if r.Type == 1}
+                except Exception:
+                    continue
+                if same_subject and item_to == want_to:
+                    item.Delete()
+                    replaced += 1
             location = f"{account.SmtpAddress} \\ {drafts.FolderPath.split(chr(92))[-1] if drafts.FolderPath else drafts.Name}"
 
             self.status['drafts_created'] += 1

@@ -18,6 +18,8 @@ Usage (Windows). Easiest: double-click "Load CTTX Drafts.bat" in the repo root.
     python load_drafts.py --find Amakhala        # read-only: where are drafts with this subject?
     python load_drafts.py --install-shortcut     # put a "Load CTTX Drafts" shortcut on the Desktop
     python load_drafts.py --reload amakhala-study  # load a specific repo draft again
+    python load_drafts.py --status               # read-only: what is in Drafts, and in Trash
+    python load_drafts.py --restore              # move prospect drafts back from Trash to Drafts
 
 Attachments: an .eml may carry "X-CTTX-Attach: file1.pdf, file2.pdf". Paths are
 relative to the .eml's folder. A missing attachment fails that draft loudly.
@@ -32,7 +34,8 @@ from email.parser import BytesParser
 from email.utils import getaddresses
 from pathlib import Path
 
-from worker import OutboundWorker, find_cttx_account
+import datetime
+from worker import OutboundWorker, find_cttx_account, is_prospect_subject, trash_folders
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 OUTREACH_DIR = REPO_ROOT / "sales-engine" / "outreach"
@@ -127,6 +130,54 @@ def find_drafts(text: str):
         print(f"No drafts with '{text}' in the subject in any mailbox.")
 
 
+def mailbox_status(restore=False):
+    """Read-only by default: what is in gerhard@cttx.co.za Drafts and in Trash/Deleted Items.
+    With restore=True, move prospect drafts back from Trash when no copy is in Drafts."""
+    import win32com.client
+    outlook = win32com.client.Dispatch("Outlook.Application")
+    account, drafts = find_cttx_account(outlook)
+    items = list(drafts.Items)
+    in_drafts = {((i.Subject or "").strip().lower(), (i.To or "").lower()) for i in items}
+    print(f"Drafts in {account.SmtpAddress} ({drafts.FolderPath}): {len(items)}")
+    for i in items:
+        print(f"  DRAFT  {i.LastModificationTime} | {i.To} | {i.Subject} | {i.Attachments.Count} attachment(s)")
+    restored = in_trash = 0
+    for trash in trash_folders(account.DeliveryStore):
+        hits = [i for i in list(trash.Items) if is_prospect_subject(getattr(i, "Subject", ""))]
+        print(f"Prospect drafts in {trash.FolderPath}: {len(hits)}")
+        newest = {}
+        for i in hits:
+            key = ((i.Subject or "").strip().lower(), (i.To or "").lower())
+            if key not in newest or i.LastModificationTime > newest[key].LastModificationTime:
+                newest[key] = i
+        in_trash += len(newest)
+        for key, i in newest.items():
+            print(f"  TRASH  {i.LastModificationTime} | {i.To} | {i.Subject} | {i.Attachments.Count} attachment(s)")
+            if restore and key not in in_drafts:
+                i.Move(drafts)
+                in_drafts.add(key)
+                restored += 1
+    if restore:
+        print(f"\nRestored {restored} draft(s) to Drafts. Nothing was sent.")
+    elif in_trash:
+        print("\nTo move these back into Drafts: python outbound-communication\\load_drafts.py --restore")
+
+
+class Tee:
+    def __init__(self, path):
+        self.f = open(path, "a", encoding="utf-8")
+        self.out = sys.stdout
+        self.f.write(f"\n===== {datetime.datetime.now():%Y-%m-%d %H:%M:%S} {' '.join(sys.argv[1:])}\n")
+
+    def write(self, s):
+        self.out.write(s)
+        self.f.write(s)
+        self.f.flush()
+
+    def flush(self):
+        self.out.flush()
+
+
 def install_shortcut():
     import win32com.client
     target = REPO_ROOT / "Load CTTX Drafts.bat"
@@ -149,10 +200,17 @@ def main():
     parser.add_argument("--yes", action="store_true", help="skip the first-run confirmation")
     parser.add_argument("--find", metavar="TEXT", help="read-only: show drafts whose subject contains TEXT")
     parser.add_argument("--install-shortcut", action="store_true")
+    parser.add_argument("--status", action="store_true", help="read-only: list Drafts and prospect drafts in Trash")
+    parser.add_argument("--restore", action="store_true", help="move prospect drafts back from Trash to Drafts")
     parser.add_argument("--reload", metavar="TEXT",
                         help="load again the repo drafts whose path contains TEXT (delete the old copy in Outlook first)")
     args = parser.parse_args()
 
+    args.folder.mkdir(parents=True, exist_ok=True)
+    sys.stdout = Tee(args.folder / "_load_log.txt")
+    if args.status or args.restore:
+        mailbox_status(restore=args.restore)
+        return
     if args.find:
         find_drafts(args.find)
         return
