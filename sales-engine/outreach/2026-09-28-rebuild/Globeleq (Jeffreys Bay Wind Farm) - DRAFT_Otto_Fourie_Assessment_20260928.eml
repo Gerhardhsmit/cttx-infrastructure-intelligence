@@ -1,0 +1,38 @@
+From: Gerhard Smit <gerhard@cttx.co.za>
+To: Otto Fourie <otto.fourie@globeleq.co.za>
+Cc: gerhard@cttx.co.za, Nico Lombard <nico.lombard@globeleq.co.za>
+Subject: Jeffreys Bay Wind Farm: the network on the site, in one page
+Date: Mon, 28 Sep 2026 16:30:00 +0200
+X-Unsent: 1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+X-CTTX-Attach: Jeffreys_Bay_Wind_Farm_Network_CTTX.pdf
+X-CTTX-Note: Rebuilt 28 Sep 2026 on Gerhard's instruction, replacing the earlier draft with the same subject. Otto Fourie, Site Manager, Jeffreys Bay WF (LinkedIn headline; Apollo verified 27 Sep 2026). Nico Lombard, Asset Manager, Globeleq (Apollo re-checked 28 Sep 2026) on cc. Notion Pipeline lists Willie van Niekerk (GM, Globeleq SAMS) as the primary escalation contact, no address on file: escalate to him if no reply in 14 days. Terrain figures from sales-engine/customers/jeffreys-bay-wind-farm/terrain-study/metrics.json; turbine and substation positions from OpenStreetMap via Overture. Oya and Medupi references are Gerhard's own project history. POPI: B2B direct marketing to a juristic person via a business address; one-line opt-out included. No prior contact in the Gmail mirror (checked 28 Sep 2026).
+
+Otto,
+
+Gerhard Smit here, CTTX in Gqeberha. We engineer owned networks on wind farms, reserves and remote sites; we don't sell packages.
+
+On a wind farm the network question is resilience: when the fibre is cut or stolen, does SCADA stay up, can the O&M crews still work across the site, and are the perimeter cameras still reporting? A standby wireless path that takes over automatically costs far less than a day of lost visibility. We have done this kind of work at Oya Wind Farm and at Eskom Medupi.
+
+I've copied Nico as asset manager, since this sits between site operations and the asset.
+
+We've done a desktop terrain study of Jeffreys Bay Wind Farm from 30 m satellite elevation data and the mapped positions of all 60 turbines and the substation. It's attached, one page, no pricing. What it found:
+
+- Two high sites, one at about 380 m on the western ridge and one at about 170 m in the east, 7.9 km apart with a clear path between them.
+- From those two sites, 59 of the 60 turbines are in direct line of sight, and the substation is 3.6 km from the eastern site on a clear path.
+- A mapped communications mast 2.0 km from the western site gives a short candidate uplink; its operator isn't tagged in the public data, so that's the first thing to confirm.
+- About 76% of the 85 km2 study area is in line of sight of the two sites.
+
+Those positions are desktop candidates until we walk them. What the study says is that a standby backbone for the whole site needs two masts, not a network of them.
+
+The next step is a half-day assessment on site: what you have, what fails, what it costs you when the fibre goes, and what an owned standby path would look like. R3,500 ex VAT, credited against the build, and the report is yours either way. If you can tell me how often the fibre has been cut in the last two years and how long SCADA was blind each time, I'll size the standby path to match.
+
+Can I call you for 10 minutes this week?
+
+Gerhard Smit
+Director | CTTX Services (Pty) Ltd
+gerhard@cttx.co.za | 041 371 1089 | 084 550 3281
+www.cttx.co.za
+
+If this isn't relevant to you, reply "no thanks" and I won't follow up.

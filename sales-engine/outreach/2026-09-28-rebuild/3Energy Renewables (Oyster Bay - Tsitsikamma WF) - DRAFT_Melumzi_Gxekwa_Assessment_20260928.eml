@@ -1,0 +1,36 @@
+From: Gerhard Smit <gerhard@cttx.co.za>
+To: Melumzi Gxekwa <melumzi@3energy.co.za>
+Cc: gerhard@cttx.co.za
+Subject: Oyster Bay and Tsitsikamma: the network on site, in one page
+Date: Mon, 28 Sep 2026 16:30:00 +0200
+X-Unsent: 1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+X-CTTX-Attach: Oyster_Bay_and_Tsitsikamma_Wind_Farm_Network_CTTX.pdf
+X-CTTX-Note: Rebuilt 28 Sep 2026 on Gerhard's instruction, replacing the earlier draft with the same subject. Melumzi Gxekwa, Site Operations Manager, 3Energy Renewables (LinkedIn: eBOP responsible person Oyster Bay WF, site manager Tsitsikamma Community WF; Apollo verified 27 Sep 2026). Terrain figures from sales-engine/customers/oyster-bay-tsitsikamma-wind-farms/terrain-study/metrics.json; turbine and substation positions from OpenStreetMap via Overture. Notion row 'Oyster Bay / Impofu Wind Complex' frames this as a shared-corridor opportunity (Enel Green Power owner side); this draft goes to the site-level operator. POPI: B2B direct marketing to a juristic person via a business address; one-line opt-out included. No prior contact in the Gmail mirror (checked 28 Sep 2026).
+
+Melumzi,
+
+Gerhard Smit here, CTTX in Gqeberha. We engineer owned networks on wind farms, reserves and remote sites; we don't sell packages.
+
+You look after the eBOP at Oyster Bay and site management at Tsitsikamma Community Wind Farm, so you'll know the real question on a wind farm is resilience: when the fibre is cut or stolen, does SCADA stay up, can the O&M crews still work across the site, and are the perimeter cameras still reporting? A standby wireless path that takes over automatically costs far less than a day of lost visibility. We have done this kind of work at Oya Wind Farm and at Eskom Medupi.
+
+We've done a desktop terrain study of both sites together, from 30 m satellite elevation data and the mapped positions of all 72 turbines and both substations. It's attached, one page, no pricing. What it found:
+
+- One standby backbone covers both farms: two coastal-ridge high sites at about 180 m, 13.5 km apart with a clear path between them.
+- From those two sites, 68 of the 72 turbines are in direct line of sight. The Oyster Bay substation is 1.4 km from the eastern site and the Tsitsikamma substation 8.4 km from the western one, both on clear paths.
+- A mapped communications mast gives a 14.1 km candidate uplink into the eastern site; its operator isn't tagged in the public data, so that's the first thing to confirm.
+- About 50% of the 320 km2 study area is in line of sight of the two sites.
+
+Those positions are desktop candidates until we walk them. What the study says is that the two farms can share one owned standby path rather than each building its own.
+
+The next step is a half-day assessment on site: what you have, what fails, what it costs you when the fibre goes, and what an owned standby path would look like. R3,500 ex VAT, credited against the build, and the report is yours either way. If you can tell me how often the fibre has been cut in the last two years and how long SCADA was blind each time, I'll size the standby path to match.
+
+Can I call you for 10 minutes this week?
+
+Gerhard Smit
+Director | CTTX Services (Pty) Ltd
+gerhard@cttx.co.za | 041 371 1089 | 084 550 3281
+www.cttx.co.za
+
+If this isn't relevant to you, reply "no thanks" and I won't follow up.

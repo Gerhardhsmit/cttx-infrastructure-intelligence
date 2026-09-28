@@ -1,0 +1,67 @@
+{
+ "site_type": "reserve",
+ "turbines_total": 0,
+ "turbines_clear": 0,
+ "reserve": "Sibuya Game Reserve",
+ "date": "2026-09-28",
+ "imagery_date": "5 August 2026",
+ "epsg": 32735,
+ "coverage_pct": 77.03405865657521,
+ "area_km2": 34.2468,
+ "lodges_total": 0,
+ "lodges_clear": 0,
+ "unlocated": [
+  "Forest Camp",
+  "River Camp",
+  "Bush Lodge"
+ ],
+ "area_mode": true,
+ "uplink": {
+  "label": "Kenton-on-Sea high ground",
+  "latlon": [
+   -33.67689,
+   26.66255
+  ],
+  "to": "High Site East",
+  "km": 6.220426030425891
+ },
+ "sites": [
+  {
+   "name": "High Site East",
+   "kind": "high",
+   "elev": 151.11911010742188,
+   "latlon": [
+    -33.62089,
+    26.66665
+   ],
+   "feed": null
+  },
+  {
+   "name": "High Site West",
+   "kind": "high",
+   "elev": 97.64655303955078,
+   "latlon": [
+    -33.60917,
+    26.63694
+   ],
+   "feed": null
+  }
+ ],
+ "links": [
+  {
+   "a": "Carrier uplink",
+   "b": "High Site East",
+   "kind": "uplink",
+   "km": 6.220426030425891,
+   "fresnel_ratio": 4.956551433494547
+  },
+  {
+   "a": "High Site West",
+   "b": "High Site East",
+   "kind": "backbone",
+   "km": 3.0465882557378836,
+   "fresnel_ratio": 9.25524624380674
+  }
+ ],
+ "lodges": {}
+}
