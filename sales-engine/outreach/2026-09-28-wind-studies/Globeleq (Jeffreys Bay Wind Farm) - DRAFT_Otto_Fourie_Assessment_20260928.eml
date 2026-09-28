@@ -1,0 +1,31 @@
+From: Gerhard Smit <gerhard@cttx.co.za>
+To: Otto Fourie <otto.fourie@globeleq.co.za>
+Cc: gerhard@cttx.co.za, Nico Lombard <nico.lombard@globeleq.co.za>
+Subject: Jeffreys Bay Wind Farm: the network on the site, in one page
+Date: Mon, 28 Sep 2026 07:30:00 +0200
+X-Unsent: 1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+X-CTTX-Attach: Jeffreys_Bay_Wind_Farm_Network_CTTX.pdf
+X-CTTX-Note: Replaces the earlier draft with the same subject (the loader moves the old one to Trash only after this one is saved). Otto Fourie, site manager JBay WF (LinkedIn headline); Nico Lombard, Asset Manager Globeleq (cc). Apollo verified 27 Sep 2026. Facts: 60 Siemens 2.3 MW turbines, ~3,700 ha, eight farms, 2014 (Wikipedia, globeleq.com). Turbine and substation positions from OpenStreetMap; terrain statements from CTTX's desktop model. Oya/Medupi experience line from Gerhard's own batch drafts. No prior contact found in the Gmail mirror. POPI: B2B direct marketing to a juristic person via a business address, opt-out included.
+
+Otto,
+
+Gerhard Smit here, CTTX in Gqeberha. We engineer owned networks on wind farms, reserves and remote sites; we don't sell packages.
+
+On a wind farm the network question is resilience: when the fibre is cut or stolen, does SCADA stay up, can the O&M crews still work across the site, and are the perimeter cameras still reporting? A standby wireless path that takes over automatically costs far less than one day of lost visibility. We have done this kind of work at Oya Wind Farm and at Eskom Medupi.
+
+I've copied Nico as asset manager, since this sits between site operations and the asset.
+
+I've done a desktop terrain study of Jeffreys Bay Wind Farm from satellite elevation data and the mapped turbine positions; it's attached. It shows a standby backbone where two high sites have line of sight to 59 of the 60 turbines and the substation, with the uplink from a mapped mast nearby. The site positions are desktop candidates until we walk them.
+
+The next step is a half-day assessment on site: what you have, what fails, what it costs you when the fibre goes, and what an owned standby path would look like. R3,500 ex VAT, credited against the build, and the report is yours either way. If you can tell me how often the fibre has been cut in the last two years and how long SCADA was blind each time, I'll size the standby path to match.
+
+Can I call you for 10 minutes this week?
+
+Gerhard Smit
+Director | CTTX Services (Pty) Ltd
+gerhard@cttx.co.za | 041 371 1089 | 084 550 3281
+www.cttx.co.za
+
+If this isn't relevant to you, reply "no thanks" and I won't follow up.
