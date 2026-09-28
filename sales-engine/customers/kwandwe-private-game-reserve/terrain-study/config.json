@@ -1,0 +1,164 @@
+{
+ "slug": "kwandwe-private-game-reserve",
+ "reserve": "Kwandwe Private Game Reserve",
+ "short": "Kwandwe",
+ "prepared_for": "Angus Sholto-Douglas, Kwandwe Private Game Reserve",
+ "date": "2026-09-28",
+ "lodges": [
+  {
+   "name": "Great Fish River Lodge",
+   "lat": -33.0911,
+   "lon": 26.57404,
+   "wifi_today": "unknown",
+   "coord_source": "Mapped building named 'Great Fish River Lodge' (OpenStreetMap via Overture Maps release 2026-09-23.1), 657 m\u00b2 footprint",
+   "units": 9
+  },
+  {
+   "name": "Ecca Lodge",
+   "lat": -33.11025,
+   "lon": 26.52672,
+   "wifi_today": "unknown",
+   "coord_source": "Places point 'Kwandwe Ecca Lodge' and three mapped buildings within 60 m (Overture Maps release 2026-09-23.1)",
+   "units": 6
+  },
+  {
+   "name": "Uplands Homestead",
+   "lat": -33.12837,
+   "lon": 26.47247,
+   "wifi_today": "unknown",
+   "coord_source": "Places point only (Overture Maps release 2026-09-23.1); no mapped building at this point. Nearest building group is 2.2 km east. Confirm on site",
+   "units": 3
+  },
+  {
+   "name": "Melton Manor",
+   "lat": null,
+   "lon": null,
+   "units": 4,
+   "wifi_today": "unknown",
+   "coord_source": "No published or mapped position: confirm on site"
+  },
+  {
+   "name": "Heatherton Towers",
+   "lat": -33.14654,
+   "lon": 26.52542,
+   "wifi_today": "unknown",
+   "coord_source": "Mapped building named 'Heatherton Towers' (OpenStreetMap via Overture Maps release 2026-09-23.1), 865 m\u00b2"
+  },
+  {
+   "name": "Airstrip",
+   "lat": -33.1338,
+   "lon": 26.57912,
+   "wifi_today": "unknown",
+   "coord_source": "Mapped aerodrome 'Kwandwe Airport', ICAO FAKG, 2,060 m runway (OpenStreetMap via Overture Maps release 2026-09-23.1)"
+  },
+  {
+   "name": "East complex",
+   "lat": -33.10005,
+   "lon": 26.60772,
+   "wifi_today": "unknown",
+   "coord_source": "10 mapped buildings, ~1,160 m\u00b2 total, unnamed (Google/Microsoft footprints via Overture Maps release 2026-09-23.1). Use to confirm"
+  },
+  {
+   "name": "West of GFR Lodge",
+   "lat": -33.09499,
+   "lon": 26.5688,
+   "wifi_today": "unknown",
+   "coord_source": "One mapped building, 406 m\u00b2, unnamed (OpenStreetMap via Overture Maps release 2026-09-23.1)"
+  },
+  {
+   "name": "East of Ecca Lodge",
+   "lat": -33.10491,
+   "lon": 26.5394,
+   "wifi_today": "unknown",
+   "coord_source": "Three mapped buildings, unnamed (OpenStreetMap via Overture Maps release 2026-09-23.1)"
+  },
+  {
+   "name": "North-west of GFR Lodge",
+   "lat": -33.08667,
+   "lon": 26.55751,
+   "wifi_today": "unknown",
+   "coord_source": "Two building footprints, unnamed (Overture Maps release 2026-09-23.1)"
+  },
+  {
+   "name": "Dam buildings",
+   "lat": -33.12336,
+   "lon": 26.50785,
+   "wifi_today": "unknown",
+   "coord_source": "Two building footprints near a mapped dam, unnamed (Overture Maps release 2026-09-23.1)"
+  },
+  {
+   "name": "East of Uplands",
+   "lat": -33.12802,
+   "lon": 26.49573,
+   "wifi_today": "unknown",
+   "coord_source": "Two building footprints, unnamed (Overture Maps release 2026-09-23.1)"
+  },
+  {
+   "name": "South-west outpost",
+   "lat": -33.1553,
+   "lon": 26.49129,
+   "wifi_today": "unknown",
+   "coord_source": "Four small structures, unnamed (Overture Maps release 2026-09-23.1)"
+  },
+  {
+   "name": "North boundary",
+   "lat": -33.05932,
+   "lon": 26.53818,
+   "wifi_today": "unknown",
+   "coord_source": "Two building footprints on the mapped boundary, unnamed (Overture Maps release 2026-09-23.1)"
+  },
+  {
+   "name": "North ridge farmstead",
+   "lat": -33.05559,
+   "lon": 26.51873,
+   "wifi_today": "unknown",
+   "coord_source": "Eight mapped buildings 30 m outside the mapped boundary; may be Kwandwe land (Overture Maps release 2026-09-23.1)"
+  },
+  {
+   "name": "R67 edge buildings",
+   "lat": -33.12827,
+   "lon": 26.61345,
+   "wifi_today": "unknown",
+   "coord_source": "Three building footprints on the eastern boundary by the R67; possible gate (Overture Maps release 2026-09-23.1)"
+  }
+ ],
+ "area": {
+  "polygon_geojson": "kwandwe.boundary.geojson",
+  "source": "Kwandwe Private Game Reserve: mapped boundary polygon, OpenStreetMap way 1239610155 via Overture Maps release 2026-09-23.1 (18,482 ha mapped)",
+  "label": "Kwandwe",
+  "scope_note": "18,482 ha is mapped in OpenStreetMap. Published figures for the reserve run from 22,000 to 30,000 ha, so part of the property may lie outside this outline and is not modelled",
+  "scope_source": "Wikipedia and lodge listings (22,000 / 25,000 / 30,000 ha), web search 28 Sep 2026",
+  "high_sites_inside": true,
+  "high_site_buffer_m": 0,
+  "lat": -33.12297855819748,
+  "lon": 26.524260138520322,
+  "radius_km": 7.65839521611666
+ },
+ "uplink": {
+  "mode": "auto",
+  "town": "Makhanda",
+  "lat": -33.31,
+  "lon": 26.52667,
+  "radius_m": 2500,
+  "tower_radius_km": 25,
+  "note": "No mast within 25 km carries a Vodacom operator tag in public data. Candidate uplink = nearest mapped communication mast; the Vodacom site is to be confirmed with Duane Forlee before design."
+ },
+ "today": [
+  "Four lodges (Great Fish River Lodge, Ecca Lodge, Melton Manor, Uplands Homestead), Heatherton Towers, an airstrip and at least ten other building groups on one reserve",
+  "The Great Fish River runs about 30 km through the property and almost divides it in half",
+  "Security (TFT Security) and the environmental team are already part of this conversation",
+  "No reserve-wide network is described for rangers, gates or cameras"
+ ],
+ "context": "Kwandwe runs four lodges, a security operation and an environmental team across a property split by the Great Fish River valley. Lodges on the valley side rarely see each other directly. One owned backbone on the ridges can reach all of them, the gates and the field, on a network the reserve controls.",
+ "security_note": "Kwandwe is a Big Five reserve with rhino, and its security contractor is part of this discussion. A backbone that reaches the lodges, gates and ranger areas carries cameras, radio and alarms on one monitored network, day and night.",
+ "units_source": "Published lodge listings (siyabona.com, expertafrica.com, travelbutlers.com): Great Fish River Lodge 9 suites, Ecca Lodge 6 suites, Melton Manor 4 suites, Uplands Homestead 3 bedrooms. Sep 2026",
+ "wording": {
+  "site_word": "site",
+  "site_word_cap": "Site",
+  "sites_word": "sites",
+  "legend_link": "Site link",
+  "study_area": "the study area around the reserve's sites",
+  "prof_caption": "5.8 GHz \u00b7 k = 4/3 \u00b7 uplink tower 30 m \u00b7 high-site masts 18 m \u00b7 site masts 8 m. Site positions come from mapped buildings and published places (OpenStreetMap, Google/Microsoft building footprints via Overture Maps)."
+ },
+ "_config_path": "sales-engine/terrain-study/reserves/kwandwe.json"
+}

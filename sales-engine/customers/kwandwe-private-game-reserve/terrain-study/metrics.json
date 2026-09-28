@@ -1,0 +1,159 @@
+{
+ "site_type": "reserve",
+ "turbines_total": 0,
+ "turbines_clear": 0,
+ "reserve": "Kwandwe Private Game Reserve",
+ "date": "2026-09-28",
+ "imagery_date": "14 July 2026",
+ "epsg": 32735,
+ "coverage_pct": 53.19877139096095,
+ "area_km2": 184.599,
+ "lodges_total": 15,
+ "lodges_clear": 15,
+ "unlocated": [
+  "Melton Manor"
+ ],
+ "area_mode": true,
+ "boundary_mapped": true,
+ "uplink": {
+  "label": "mapped mast, operator not tagged",
+  "latlon": [
+   -33.28428,
+   26.70253
+  ],
+  "to": "High Site South",
+  "km": 21.954317269567834
+ },
+ "sites": [
+  {
+   "name": "High Site North",
+   "kind": "high",
+   "elev": 612.5968017578125,
+   "latlon": [
+    -33.05981,
+    26.54515
+   ],
+   "feed": null
+  },
+  {
+   "name": "High Site South",
+   "kind": "high",
+   "elev": 355.599365234375,
+   "latlon": [
+    -33.1001,
+    26.61599
+   ],
+   "feed": null
+  },
+  {
+   "name": "Great Fish River Lodge relay",
+   "kind": "relay",
+   "elev": 348.85137939453125,
+   "latlon": [
+    -33.08835,
+    26.58036
+   ],
+   "feed": "High Site North"
+  }
+ ],
+ "links": [
+  {
+   "a": "Carrier uplink",
+   "b": "High Site South",
+   "kind": "uplink",
+   "km": 21.954317269567834,
+   "fresnel_ratio": 9.166104984891312
+  },
+  {
+   "a": "High Site South",
+   "b": "High Site North",
+   "kind": "backbone",
+   "km": 7.97937967513766,
+   "fresnel_ratio": 3.1719044601162634
+  },
+  {
+   "a": "Great Fish River Lodge relay",
+   "b": "High Site North",
+   "kind": "backbone",
+   "km": 4.562071897723665,
+   "fresnel_ratio": 0.6035133721732601
+  }
+ ],
+ "lodges": {
+  "Great Fish River Lodge": {
+   "frm": "Great Fish River Lodge relay",
+   "km": 0.6642346278544544,
+   "fresnel_ratio": 9.648736936945248
+  },
+  "Ecca Lodge": {
+   "frm": "High Site North",
+   "km": 5.850209872585049,
+   "fresnel_ratio": 4.820279128067196
+  },
+  "Uplands Homestead": {
+   "frm": "High Site North",
+   "km": 10.186709587762095,
+   "fresnel_ratio": 3.830322469256647
+  },
+  "Heatherton Towers": {
+   "frm": "High Site North",
+   "km": 9.78959311620526,
+   "fresnel_ratio": 4.938496111045502
+  },
+  "Airstrip": {
+   "frm": "High Site South",
+   "km": 5.078663550527624,
+   "fresnel_ratio": 3.378781637751067
+  },
+  "East complex": {
+   "frm": "High Site South",
+   "km": 0.7721606754576812,
+   "fresnel_ratio": 4.319930894776754
+  },
+  "West of GFR Lodge": {
+   "frm": "Great Fish River Lodge relay",
+   "km": 1.3062925586194694,
+   "fresnel_ratio": 5.4878700776357165
+  },
+  "East of Ecca Lodge": {
+   "frm": "High Site North",
+   "km": 5.028343116950135,
+   "fresnel_ratio": 5.599908821733395
+  },
+  "North-west of GFR Lodge": {
+   "frm": "Great Fish River Lodge relay",
+   "km": 2.140939904803998,
+   "fresnel_ratio": 4.210479533563428
+  },
+  "Dam buildings": {
+   "frm": "High Site North",
+   "km": 7.858097417335853,
+   "fresnel_ratio": 5.359865136184478
+  },
+  "East of Uplands": {
+   "frm": "High Site North",
+   "km": 8.857109365194834,
+   "fresnel_ratio": 4.297403818396936
+  },
+  "South-west outpost": {
+   "frm": "High Site North",
+   "km": 11.718382847230151,
+   "fresnel_ratio": 1.5207434706116492
+  },
+  "North boundary": {
+   "frm": "High Site North",
+   "km": 0.6529498491152368,
+   "fresnel_ratio": 4.064985366461252
+  },
+  "North ridge farmstead": {
+   "frm": "High Site North",
+   "km": 2.5105116025156624,
+   "fresnel_ratio": 0.6847307827385902
+  },
+  "R67 edge buildings": {
+   "frm": "High Site South",
+   "km": 3.131946106202309,
+   "fresnel_ratio": 1.0119682472559715
+  }
+ }
+}
