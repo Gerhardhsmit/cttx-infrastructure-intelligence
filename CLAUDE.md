@@ -4,7 +4,7 @@
 
 **Authority:** Consolidates existing CTTX strategic guidance and architecture.
 
-**Last Updated:** 25 September 2026
+**Last Updated:** 28 September 2026
 
 ---
 
@@ -135,6 +135,7 @@ Customer → Requirement → Assessment → Architecture → Carrier (if applica
 5. **Email: Drafts Only — Never Send**
    - Never send email from any account (Outlook COM `.Send()`, Microsoft Graph, Resend, Gmail, M365 connector send tools)
    - Only create drafts; Gerhard reviews and sends every email himself
+   - **Email architecture (permanent, confirmed by Gerhard 28 Sep 2026):** `gerhard@cttx.co.za` is the CTTX business identity and the actual mailbox (hosted at xneelo). Outlook Desktop is Gerhard's primary human email interface. AI-created outreach goes **`.eml` → Load CTTX Drafts → gerhard@cttx.co.za Drafts** (skill: `.claude/skills/outlook-outreach-drafts/SKILL.md`; loader: `outbound-communication/load_drafts.py`). The Gmail connector (gerhardcttx@gmail.com, a forwarded mirror) is **read-only** for prior-contact and context checks: never draft, send or route CTTX outreach through it because it is easier. The Microsoft 365 connector signs in as `gerhardSmit@cttx.onmicrosoft.com` (obsolete tenant): never use it for CTTX mail and never create Microsoft mail infrastructure to work around it.
    - Never guess recipient addresses (e.g. `info@<company>.co.za`); use only addresses verified on the prospect's own site
    - `outbound-communication/` is drafts-only; `test_no_send.py` enforces it (27 Sep 2026 incident)
 
@@ -148,7 +149,11 @@ Customer → Requirement → Assessment → Architecture → Carrier (if applica
    **Existing clients — never cold-draft:** Safresco (invoiced via Sage), Kwandwe (Angus replied 25 Sep — in conversation).
    **Drafts produced:** `sales-engine/outreach/2026-09-28*/` (+ `TRACKER_batch2.csv`, `CALL_LIST_20260928.md`).
 
-6. **Minimum-Question Principle**
+6. **Assessment Pricing (permanent, confirmed by Gerhard 28 Sep 2026)**
+   - **R3,500 ex VAT, credited against the build** is the current live prospect/outreach assessment offer (half-day on-site assessment). Use it in every outreach draft, terrain-study covering email and first-contact proposal.
+   - The Notion page "🎯 CTTX Remote Infrastructure Assessment Offer" (May 2026) lists a **R75,000–R150,000** Private Infrastructure Network Assessment. That is a separate product/pricing conflict awaiting director reconciliation. **Never use it in prospect outreach, never overwrite either figure, never silently merge the two.** Flag it when relevant; see `sales-engine/COMMERCIAL_RULES.md` Part 2.
+
+7. **Minimum-Question Principle**
    - Ask only when: can't find in existing knowledge, can't derive from supplied files, materially affects price/solution
    - Format: MISSING → WHY IT MATTERS → QUESTION
 
@@ -344,6 +349,8 @@ Skill: `.claude/skills/reserve-terrain-study.md` · Engine: `sales-engine/terrai
 - Colours/fonts only from `sales-engine/terrain-study/brand.json` (Barefoot Addo proposal palette: #0A0A0B / #CCFF00, Inter Tight + Inter + Roboto Mono)
 - Pricing stays internal until after survey
 
+**Primary execution path (permanent, confirmed by Gerhard 28 Sep 2026):** the terrain-study/property-intelligence engine (Copernicus DEM, Sentinel-2, Overture infrastructure, Fresnel-checked profiles) and other reachable infrastructure data are the primary path for desktop surveys. The React Link Planner's external APIs (Nominatim, Overpass, Open-Meteo) and the deployed planner URL are blocked in cloud sessions. **That restriction must not halt the commercial workflow** when the required analysis can be completed with the engine and available data. Escalate the network restriction only when a specific required analysis genuinely cannot be completed by any other available method, naming the analysis and the host.
+
 ---
 
 ## MISSING — REQUIRES DIRECTOR DECISION
@@ -354,7 +361,7 @@ The following genuinely does not exist in Notion or this repo (checked) and must
 - [ ] Varrucom markup/margin (Varrucom is the ALTERNATIVE carrier — Vodacom pricing is found, Varrucom is not yet located)
 - [ ] Equipment reseller margins (Cambium, Victron, Hubble)
 - [ ] Installation/labor day-rate (CTTX's own field engineering rate — not a supplier rate)
-- [ ] Assessment fee pricing (beyond the R3,500 site survey figure already used in templates)
+- [ ] Assessment pricing reconciliation: R3,500 ex VAT (live outreach offer, credited against build) vs R75,000–R150,000 (Notion "Remote Infrastructure Assessment Offer", May 2026). Director to define whether these are two products or one; until then see Critical Business Rule 6.
 - [ ] Discount/volume rules
 - [ ] Formal payment terms document
 

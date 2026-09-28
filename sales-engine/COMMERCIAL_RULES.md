@@ -171,7 +171,21 @@ Decision Required By: Director
 **Assessment & Consulting**
 
 ```
-STATUS: DIRECTOR AUTHORIZATION REQUIRED
+STATUS: LIVE OUTREACH FIGURE CONFIRMED (Gerhard, 28 Sep 2026); FULL PRODUCT PRICING UNRESOLVED
+
+LIVE PROSPECT / OUTREACH OFFER:
+  Half-day on-site assessment: R3,500 ex VAT, credited against the build.
+  Used by: CTTX_Proposal_Template.md, reserve-terrain-study skill,
+  outlook-outreach-drafts skill, Amakhala / Schotia / Elephant Barefoot records.
+
+CONFLICT (do not resolve silently, do not overwrite either figure):
+  Notion "🎯 CTTX Remote Infrastructure Assessment Offer" (16 May 2026,
+  https://app.notion.com/p/362ab0d207a78183a9eee65aa96f31f7) prices a
+  3-4 week Private Infrastructure Network Assessment at R75,000-R150,000.
+  Treat as a separate product pending director reconciliation. Never quote
+  it in prospect outreach.
+
+STILL DIRECTOR AUTHORIZATION REQUIRED (for the full assessment product):
 
 Questions to Answer:
   ☐ Standard assessment fee (R value or % of expected project)?
