@@ -16,6 +16,12 @@ cp sales-engine/terrain-study/reserves/amakhala.json sales-engine/terrain-study/
 python3 sales-engine/terrain-study/engine.py sales-engine/terrain-study/reserves/<slug>.json
 ```
 
+## Site types
+Set `site_type` in the config: `reserve` (default), `wind` or `farm`. The wording comes from `site_types.json`, the drivers and evidence from `evidence.json` (`by_type`), and the terrain/imagery/link-planning core is shared.
+- **wind:** add `osm_turbines`: `{"farms": [{"name","lat","lon","turbines"}], "exclude_operators": [...], "radius_km": 8}`. Turbines and the nearest substation come from OpenStreetMap (via Overture), assigned to each farm by its published location and turbine count. High sites are chosen for line of sight to the turbines.
+- **farm:** needs published site positions (office, packhouse, pumps) or an `area`. If none are published, the farm goes on the call list with a request for a KMZ.
+- **Uplink `auto`:** mapped communication masts within 25 km first, falling back to town high ground.
+
 ## How the engine handles gaps (built in)
 - **Lodges without published positions:** give the reserve `area` (`lat`, `lon`, `radius_km`, `source`) from a published reserve point and its size. The engine picks high sites for the best coverage of the area, still links every lodge that has a position, and lists the others as "Position to confirm". If there is no area and no lodge positions, there is no study; the prospect goes on the call list and gets asked for a KMZ.
 - **Clouds:** imagery is built from the clearest passes in the last 12 months, judged over the study area itself. A pass is used only if its local cloud is 1% or less, and gaps are filled pass by pass until the whole window is covered.

@@ -1,6 +1,8 @@
 # Skill: Reserve Terrain Study (design standard)
 
-**Trigger:** any reserve, game reserve, conservancy, lodge group or large property identified as a potential client, including "do a desktop study", "proposal for <reserve>", "work this reserve", or a reserve name from the prospect database.
+**Also covers wind farms and farms** (`site_type` in the config: `reserve` / `wind` / `farm`; see the engine README).
+
+**Trigger:** any reserve, wind farm, farm,, game reserve, conservancy, lodge group or large property identified as a potential client, including "do a desktop study", "proposal for <reserve>", "work this reserve", or a reserve name from the prospect database.
 
 **Standard:** every such prospect gets the terrain study as the first-contact document **before any pricing**. Engine and rules: `sales-engine/terrain-study/README.md`.
 
