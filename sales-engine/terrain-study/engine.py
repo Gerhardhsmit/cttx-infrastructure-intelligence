@@ -743,6 +743,10 @@ def build_html(cfg, brand, ev, m, work):
             f"Unit counts: {cfg.get('units_source', 'see config')}",
         ]) + "\n", encoding="utf-8")
     positions = "; ".join(f"{s['name']} {s['latlon'][0]:.5f}, {s['latlon'][1]:.5f}" for s in sites)
+    # area.label / area.scope_note: when the mapped boundary is only part of the property
+    # (e.g. a Protected Environment inside a larger conservancy), never call it "the reserve".
+    area_label = (cfg.get("area") or {}).get("label", "the reserve")
+    scope_note = (cfg.get("area") or {}).get("scope_note", "")
     rep = {
         "TITLE": f"{e(cfg['short'])} {'Reserve' if st == 'reserve' else ('Wind Farm' if st == 'wind' else 'Farm')} Network",
         "FONT_CSS": brand["fonts"]["google_css"],
@@ -757,11 +761,11 @@ def build_html(cfg, brand, ev, m, work):
         "SITES_PHRASE": site_word + relay_word,
         "HERO_RESULT": (f"{site_word + relay_word} reach {m['lodges_clear']} of the {m['lodges_total']} mapped substations and give line of sight to {m['turbines_clear']} of {m['turbines_total']} turbines"
                         if m.get("turbines_total") else None) or (f"{site_word + relay_word} put {m['lodges_clear']} of the {m['lodges_total']} lodges we could locate on clear radio paths"
-                        + (f" and give line of sight across {m['coverage_pct']:.0f}% of the reserve" if m.get("area_mode") else "")
+                        + (f" and give line of sight across {m['coverage_pct']:.0f}% of {area_label}" if m.get("area_mode") else "")
                         if m["lodges_total"] else
-                        f"{site_word + relay_word} give line of sight across {m['coverage_pct']:.0f}% of the reserve"),
+                        f"{site_word + relay_word} give line of sight across {m['coverage_pct']:.0f}% of {area_label}"),
         "STAT1_VALUE": (f"{m['turbines_clear']} of {m['turbines_total']}" if m.get("turbines_total") else None) or (f"{m['lodges_clear']} of {m['lodges_total']}" if m["lodges_total"] else f"{m['coverage_pct']:.0f}%"),
-        "STAT1_LABEL": ("turbines in line of sight of the standby backbone" if m.get("turbines_total") else None) or ("lodges on a clear, Fresnel-checked radio path" if m["lodges_total"] else "of the reserve area in line of sight"),
+        "STAT1_LABEL": ("turbines in line of sight of the standby backbone" if m.get("turbines_total") else None) or ("lodges on a clear, Fresnel-checked radio path" if m["lodges_total"] else f"of {area_label} in line of sight"),
         "LODGE_FIG": (f'<figure class="fig"><img src="{b64(work / "profiles_lodges.png", "image/png")}" alt="Terrain profile for each site link"></figure>'
                       if (work / "profiles_lodges.png").exists() else ""),
         "UNLOCATED_NOTE": (f"<p class='caption'>Entries marked “position to confirm” have no published location. We add them to the model once you share a marked map or KMZ.</p>"
@@ -784,7 +788,7 @@ def build_html(cfg, brand, ev, m, work):
         "CO_EMAIL": e(brand["company"]["email"]), "CO_PHONE": e(brand["company"]["phone"]), "CO_WEB": e(brand["company"].get("web", "")),
     }
     if m.get("boundary_mapped"):
-        rep["T_STUDY_AREA"] = e("the mapped boundary of the reserve")
+        rep["T_STUDY_AREA"] = e(f"the mapped boundary of {area_label}" + (f", {scope_note}" if scope_note else ""))
     for k, v in rep.items():
         tpl = tpl.replace("{{" + k + "}}", str(v))
     left = re.findall(r"\{\{[A-Z0-9_]+\}\}", tpl)

@@ -29,9 +29,9 @@
  "area": {
   "polygon_geojson": "buffalo-kloof.boundary.geojson",
   "source": "Buffalo Kloof Protected Environment: mapped boundary polygon, OpenStreetMap relation 17035922 via Overture Maps release 2026-09-23.1 (7,474 ha mapped; 6,781 ha proclaimed per Wikipedia)",
-  "lat": -33.41006838596652,
-  "lon": 26.630483992513998,
-  "radius_km": 4.871900553322435
+  "label": "the Protected Environment",
+  "scope_note": "7,474 ha of the roughly 20,000 ha Buffalo Kloof conservancy. The rest of the conservancy has no public boundary yet and is not modelled",
+  "scope_source": "buffalokloof.co.za: \"a thriving 20,000-hectare conservancy\" (web search, 28 Sep 2026)"
  },
  "uplink": {
   "mode": "auto",
@@ -49,6 +49,5 @@
  ],
  "context": "Buffalo Kloof carries black and white rhino, cheetah reintroduction and a dedicated anti-poaching team across the Kowie River valley. The connectivity that is described stops at the camp's living area. We propose one backbone that belongs to the reserve and reaches the field.",
  "security_note": "Surveillance cameras, helicopter patrols and tracking already run on Buffalo Kloof. An owned backbone carries that data and ranger communications on one monitored network, day and night.",
- "units_source": "buffalokloof.co.za accommodation pages, Sep 2026",
- "_config_path": "sales-engine/terrain-study/reserves/buffalo-kloof.json"
+ "units_source": "buffalokloof.co.za accommodation pages, Sep 2026"
 }
