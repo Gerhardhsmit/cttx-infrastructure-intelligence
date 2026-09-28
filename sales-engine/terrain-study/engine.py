@@ -329,6 +329,8 @@ def run(cfg_path):
     print("· link planning")
     parts = ([MultiPoint(list(LX.values())).convex_hull.buffer(3500)] if LX else []) + ([area_poly] if area_poly else [])
     foot = unary_union(parts)
+    if ar and ar.get("high_sites_inside") and area_poly is not None:
+        foot = area_poly.buffer(ar.get("high_site_buffer_m", 0))  # keep masts on the property (tenure)
     if foot.geom_type != "Polygon":
         foot = foot.convex_hull
     fp = MPath(np.array(foot.exterior.coords))
@@ -405,7 +407,7 @@ def run(cfg_path):
                 opts.append((pr["D"], c, feeds[0]))
         if opts:
             _, c, feed = min(opts, key=lambda o: o[0])
-            sites.append(dict(name=f"{lodge.split()[0]} relay", elev=c[0], p=(c[1], c[2]), kind="relay", feed=feed["name"]))
+            sites.append(dict(name=f"{lodge} relay", elev=c[0], p=(c[1], c[2]), kind="relay", feed=feed["name"]))
 
     def site(n):
         return next(s for s in sites if s["name"] == n)
@@ -637,6 +639,7 @@ def build_html(cfg, brand, ev, m, work):
     relay_word = (f" and {'one short relay' if len(relays) == 1 else f'{len(relays)} short relays'}" if relays else "")
     st = m.get("site_type", "reserve")
     P_ = json.loads((HERE / "site_types.json").read_text())[st]
+    P_.update(cfg.get("wording", {}))  # optional per-study overrides, e.g. "site" instead of "lodge"
     bt = ev.get("by_type", {}).get(st, {})
     model = bt.get("model", ev["model"])
     named = ev["named"][0]
@@ -691,14 +694,14 @@ def build_html(cfg, brand, ev, m, work):
         full = u * fc["per_unit"] + (fc["small_camp_extra"] if u <= fc["small_camp_max_units"]
                                      else fc["main_areas"] + fc["back_of_house"] + fc["outdoor"])
         rule = EM["aps_today"].get(l.get("wifi_today", "unknown"), 3)
-        today = full if rule == "full" else min(rule, full)
+        aps_now = full if rule == "full" else min(rule, full)
         tier = next(t for t in EM["uplink_tiers_incl_vat"] if u <= t["max_units"])
-        wf = today * EM["per_ap_monthly_incl_vat"]
-        lo_tot += tier["low"] + wf; hi_tot += tier["high"] + wf; wifi_tot += wf; ap_tot += today; n_est += 1
-        est_md.append(f"| {l['name']} | {u} | {wifi_lbl.get(l.get('wifi_today', 'unknown'))} | {today} | {full} | "
+        wf = aps_now * EM["per_ap_monthly_incl_vat"]
+        lo_tot += tier["low"] + wf; hi_tot += tier["high"] + wf; wifi_tot += wf; ap_tot += aps_now; n_est += 1
+        est_md.append(f"| {l['name']} | {u} | {wifi_lbl.get(l.get('wifi_today', 'unknown'))} | {aps_now} | {full} | "
                       f"{tier['label']} | R{tier['low']:,}–{tier['high']:,} | R{wf:,} |")
         est_rows += (f"<tr><td>{e(l['name'])}</td><td class='num'>{u}</td><td>{wifi_lbl.get(l.get('wifi_today', 'unknown'))}</td>"
-                     f"<td class='num'>{today} <span class='dim'>/ {full}</span></td>"
+                     f"<td class='num'>{aps_now} <span class='dim'>/ {full}</span></td>"
                      f"<td class='num'>{R(tier['low'])}–{R(tier['high'])[1:]}</td><td class='num'>{R(wf)}</td></tr>")
     est_rows += (f"<tr class='tot'><td>Reserve total</td><td></td><td></td><td class='num'>{ap_tot}</td>"
                  f"<td class='num' colspan='2'>{R(lo_tot)}–{R(hi_tot)[1:]} a month</td></tr>")
@@ -760,12 +763,12 @@ def build_html(cfg, brand, ev, m, work):
         "N_HIGH": str(len(highs)), "N_RELAY": str(len(relays)),
         "SITES_PHRASE": site_word + relay_word,
         "HERO_RESULT": (f"{site_word + relay_word} reach {m['lodges_clear']} of the {m['lodges_total']} mapped substations and give line of sight to {m['turbines_clear']} of {m['turbines_total']} turbines"
-                        if m.get("turbines_total") else None) or (f"{site_word + relay_word} put {m['lodges_clear']} of the {m['lodges_total']} lodges we could locate on clear radio paths"
+                        if m.get("turbines_total") else None) or (f"{site_word + relay_word} put {m['lodges_clear']} of the {m['lodges_total']} {P_['sites_word']} we could locate on clear radio paths"
                         + (f" and give line of sight across {m['coverage_pct']:.0f}% of {area_label}" if m.get("area_mode") else "")
                         if m["lodges_total"] else
                         f"{site_word + relay_word} give line of sight across {m['coverage_pct']:.0f}% of {area_label}"),
         "STAT1_VALUE": (f"{m['turbines_clear']} of {m['turbines_total']}" if m.get("turbines_total") else None) or (f"{m['lodges_clear']} of {m['lodges_total']}" if m["lodges_total"] else f"{m['coverage_pct']:.0f}%"),
-        "STAT1_LABEL": ("turbines in line of sight of the standby backbone" if m.get("turbines_total") else None) or ("lodges on a clear, Fresnel-checked radio path" if m["lodges_total"] else f"of {area_label} in line of sight"),
+        "STAT1_LABEL": ("turbines in line of sight of the standby backbone" if m.get("turbines_total") else None) or (f"{P_['sites_word']} on a clear, Fresnel-checked radio path" if m["lodges_total"] else f"of {area_label} in line of sight"),
         "LODGE_FIG": (f'<figure class="fig"><img src="{b64(work / "profiles_lodges.png", "image/png")}" alt="Terrain profile for each site link"></figure>'
                       if (work / "profiles_lodges.png").exists() else ""),
         "UNLOCATED_NOTE": (f"<p class='caption'>Entries marked “position to confirm” have no published location. We add them to the model once you share a marked map or KMZ.</p>"
@@ -789,6 +792,7 @@ def build_html(cfg, brand, ev, m, work):
     }
     if m.get("boundary_mapped"):
         rep["T_STUDY_AREA"] = e(f"the mapped boundary of {area_label}" + (f", {scope_note}" if scope_note else ""))
+    rep["HERO_RESULT"] = rep["HERO_RESULT"][:1].upper() + rep["HERO_RESULT"][1:]  # it starts a sentence
     for k, v in rep.items():
         tpl = tpl.replace("{{" + k + "}}", str(v))
     left = re.findall(r"\{\{[A-Z0-9_]+\}\}", tpl)
