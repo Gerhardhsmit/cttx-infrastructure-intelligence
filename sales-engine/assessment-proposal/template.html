@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>$title</title>
+<style>
+$font_css
+  @page { size: A4; margin: 0; }
+  :root { --bg:$bg; --surface:$surface; --text:$text; --muted:$muted; --accent:$accent; --alert:$alert; --border:$border; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text); }
+  body { width: 210mm; height: 297mm; overflow: hidden; font: 9.2pt/1.45 "$font_body", Arial, sans-serif;
+         padding: 13mm 14mm 11mm; display: flex; flex-direction: column; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .mono { font-family: "$font_mono", monospace; letter-spacing: .06em; text-transform: uppercase; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 5mm; border-bottom: 1px solid var(--border); }
+  .brand { font: 800 20pt/1 "$font_display", sans-serif; color: var(--accent); letter-spacing: .02em; }
+  .brand small { display: block; font: 500 6.8pt/1.6 "$font_mono", monospace; color: var(--muted); letter-spacing: .12em; margin-top: 1.5mm; }
+  .for { text-align: right; font-size: 8pt; color: var(--muted); line-height: 1.5; }
+  .for b { color: var(--text); font-weight: 600; }
+  .eyebrow { font-size: 7pt; color: var(--accent); margin: 6mm 0 2mm; }
+  h1 { font: 700 21pt/1.12 "$font_display", sans-serif; letter-spacing: -.01em; }
+  h1 span { color: var(--muted); font-weight: 600; }
+  .lead { font-size: 10pt; line-height: 1.5; color: #E4E4E4; margin-top: 3.5mm; max-width: 172mm; }
+  h2 { font-size: 7pt; color: var(--accent); margin-bottom: 2.2mm; font-weight: 500; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin-top: 6mm; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 2mm; padding: 4mm 4.5mm; }
+  ul { list-style: none; }
+  li { position: relative; padding-left: 4mm; margin-bottom: 1.4mm; }
+  li::before { content: ""; position: absolute; left: 0; top: 1.9mm; width: 1.6mm; height: 1.6mm; background: var(--accent); }
+  .lenses { margin-top: 6mm; margin-bottom: 4mm; }
+  .lenses h3 { font: 700 12pt/1.2 "$font_display", sans-serif; margin-bottom: 3mm; }
+  table { width: 100%; border-collapse: collapse; font-size: 8.4pt; }
+  th { text-align: left; font: 500 6.8pt/1.3 "$font_mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0 3mm 1.8mm 0; border-bottom: 1px solid var(--border); }
+  th.c { color: var(--alert); } th.v { color: var(--accent); }
+  td { vertical-align: top; padding: 2.2mm 3mm 2.2mm 0; border-bottom: 1px solid var(--border); }
+  td.l { font-weight: 600; width: 34mm; }
+  td.c { color: #D8D8D8; width: 66mm; }
+  .proof { margin-top: 3mm; font-size: 8.2pt; color: var(--muted); }
+  .proof b { color: var(--text); font-weight: 600; }
+  .offer { margin-top: auto; display: grid; grid-template-columns: 62mm 1fr; gap: 6mm; align-items: stretch; }
+  .price { background: var(--accent); color: #0A0A0B; border-radius: 2mm; padding: 4.5mm; display: flex; flex-direction: column; justify-content: center; }
+  .price .amt { font: 800 22pt/1 "$font_display", sans-serif; }
+  .price .amt small { font: 600 9pt "$font_body", sans-serif; }
+  .price p { font-size: 8.2pt; line-height: 1.4; margin-top: 2mm; font-weight: 500; }
+  ol { list-style: none; counter-reset: s; }
+  ol li { counter-increment: s; padding-left: 7mm; }
+  ol li::before { content: counter(s); background: none; top: 0; width: auto; height: auto; font: 700 9pt "$font_mono", monospace; color: var(--accent); }
+  footer { margin-top: 5mm; padding-top: 3mm; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 7.6pt; color: var(--muted); }
+  footer b { color: var(--text); font-weight: 600; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">CTTX<small>WE DON'T CONNECT DEVICES. WE BUILD INFRASTRUCTURE.</small></div>
+  <div class="for">Prepared for <b>$contact</b>, $title_role<br><b>$company</b><br>$date</div>
+</header>
+
+<div class="eyebrow mono">Private Infrastructure Network Assessment</div>
+<h1>$short: <span>$headline</span></h1>
+<p class="lead">$situation</p>
+
+<div class="cols">
+  <div class="card">
+    <h2 class="mono">Half a day on site, with you</h2>
+    <ul>
+      <li>We walk $walk.</li>
+      <li>What you have today: links, routers, contracts and the systems that depend on them.</li>
+      <li>What fails, where and how often, from the people who deal with it.</li>
+      <li>What it costs you, taken from your own invoices.</li>
+      <li>Where a backbone can run and how a reliable uplink gets onto it: terrain, line of sight, high sites and power.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2 class="mono">What you get</h2>
+    <ul>
+      <li>A written report on the $site_word: today's network, the gaps and the systems at risk.</li>
+      <li>An owned network design: backbone, distribution and access, with standby paths.</li>
+      <li>Feasibility, checked against the terrain before anyone prices a build.</li>
+      <li>Indicative investment and payback, calculated from your own numbers.</li>$deliver_extra
+      <li>The report is yours to keep, whatever you decide.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="lenses">
+  <h3>Cost of Disconnection vs Value of Connected Operations</h3>
+  <table>
+    <tr><th></th><th class="c">Cost of disconnection</th><th class="v">Value of connected operations</th></tr>
+    $lens_rows
+  </table>
+  $proof
+</div>
+
+<div class="offer">
+  <div class="price">
+    <div class="amt">R3,500 <small>ex VAT</small></div>
+    <p>Half-day on-site assessment, credited in full against the build.</p>
+  </div>
+  <div class="card">
+    <h2 class="mono">Next steps</h2>
+    <ol>
+      <li>A 10-minute call to agree what matters most on the $site_word.</li>
+      <li>We book the half day at a time that suits your team.</li>
+      <li>You receive the report, then decide whether to build. No obligation beyond the assessment.</li>
+    </ol>
+  </div>
+</div>
+
+<footer>
+  <span><b>Gerhard Smit</b>, Director · CTTX Services (Pty) Ltd · Gqeberha</span>
+  <span>gerhard@cttx.co.za · 041 371 1089 · 084 550 3281 · www.cttx.co.za</span>
+</footer>
+</body>
+</html>

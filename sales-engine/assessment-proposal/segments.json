@@ -1,0 +1,59 @@
+{
+  "_note": "Wording per segment for the one-page assessment proposal. Words only: no rand amounts except the assessment fee, no invented facts about any prospect. A prospect can override any key in prospects.json.",
+  "farm": {
+    "site_word": "farm",
+    "walk": "the office, pump stations, irrigation blocks, packhouse and cold rooms, and where people work in the field",
+    "systems": "pumps, irrigation controllers, cold rooms, cameras and field staff",
+    "lenses": [
+      {"lens": "Avoided loss", "cost": "A pump, controller or cold-room alarm that reaches nobody shows up as a dry block, lost fruit or a warm room.", "value": "Alarms reach the right person, wherever they are on the farm."},
+      {"lens": "Operational efficiency", "cost": "Every check is a bakkie trip to the far end of the farm.", "value": "Pumps, tanks, meters and cameras visible from the office and the phone."},
+      {"lens": "Infrastructure ownership", "cost": "Several LTE routers and contracts, each its own point of failure.", "value": "One owned backbone that carries every system you add later."},
+      {"lens": "Executive risk reduction", "cost": "Problems are found late, by whoever drives past.", "value": "Management sees the whole operation, with a record of what happened and when."}
+    ]
+  },
+  "mine": {
+    "site_word": "site",
+    "walk": "the weighbridge, plant, pit or quarry face, offices, gates and camera positions",
+    "systems": "the weighbridge, CCTV, access control, plant telemetry and people away from the buildings",
+    "lenses": [
+      {"lens": "Avoided loss", "cost": "A weighbridge or camera offline is product, fuel or cable leaving without a record.", "value": "Weighbridge, CCTV and access control stay up, with a standby path when the main link fails."},
+      {"lens": "Operational efficiency", "cost": "Faults are found by driving out, and trucks queue while the weighbridge is down.", "value": "Engineering sees plant telemetry from anywhere on site."},
+      {"lens": "Infrastructure ownership", "cost": "A patchwork of links that grew site by site, each with its own supplier.", "value": "One owned, monitored network with one number to call when something drops."},
+      {"lens": "Executive risk reduction", "cost": "Incidents on site with no reliable way to reach people or evidence what happened.", "value": "Dependable communications for safety, incident response and audit."}
+    ]
+  },
+  "reserve": {
+    "site_word": "reserve",
+    "walk": "the lodges and camps, the gates, ranger and anti-poaching positions, and the high ground",
+    "systems": "guest Wi-Fi and payments, ranger and staff communications, gates and cameras",
+    "lenses": [
+      {"lens": "Avoided loss", "cost": "Gaps in coverage sit exactly where incidents happen: fences, gates and the far side of the reserve.", "value": "Cameras, gates and alarms report in, after hours as well."},
+      {"lens": "Operational efficiency", "cost": "Staff drive to find each other, and every fault needs a vehicle and a person.", "value": "Rangers, guides and maintenance teams reachable across the property."},
+      {"lens": "Infrastructure ownership", "cost": "Rented links per lodge, paid for month after month, still with gaps.", "value": "A reserve-owned backbone that carries guests, staff and security on one network."},
+      {"lens": "Executive risk reduction", "cost": "An incident after hours with no effective way to coordinate.", "value": "Dependable communications across the areas where an incident can happen."}
+    ],
+    "proof": "At Sandymount Safaris (30,000+ ha, three lodges) an owned backbone took daily provider callouts to zero and carries over 800 Mbps across the reserve."
+  },
+  "wind": {
+    "site_word": "site",
+    "walk": "the substation and control room, turbine strings, O&M buildings, perimeter cameras and existing fibre routes",
+    "systems": "SCADA, O&M crews, perimeter cameras and site offices",
+    "lenses": [
+      {"lens": "Avoided loss", "cost": "When the fibre is cut or stolen, SCADA and the perimeter cameras go dark together.", "value": "A standby wireless path that takes over automatically."},
+      {"lens": "Operational efficiency", "cost": "Crews lose time where cellular coverage is patchy.", "value": "Turbine data and reporting available across the site."},
+      {"lens": "Infrastructure ownership", "cost": "A single path with no owned fallback.", "value": "An owned, monitored standby network under your control."},
+      {"lens": "Executive risk reduction", "cost": "Lost visibility becomes an availability and reporting problem.", "value": "Evidence of resilience for the asset owner and the grid."}
+    ]
+  },
+  "forestry": {
+    "site_word": "plantations",
+    "walk": "the mills, fire lookout and camera positions, compartments where crews work, and the high ground",
+    "systems": "fire-detection cameras, crew safety in the compartments and the mills",
+    "lenses": [
+      {"lens": "Avoided loss", "cost": "In fire season, a camera or radio link that drops is a fire nobody sees in time.", "value": "Fire-detection cameras that stay connected."},
+      {"lens": "Operational efficiency", "cost": "Supervisors drive to check on crews and sites.", "value": "Crews, mills and cameras reachable across the plantations."},
+      {"lens": "Infrastructure ownership", "cost": "Coverage depends on whatever cellular signal reaches the compartment.", "value": "An owned network with coverage where the crews and the fire risk are."},
+      {"lens": "Executive risk reduction", "cost": "A crew in trouble that cannot call out.", "value": "Dependable communications for crew safety and incident response."}
+    ]
+  }
+}

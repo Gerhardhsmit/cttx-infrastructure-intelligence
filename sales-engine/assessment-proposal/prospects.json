@@ -1,0 +1,263 @@
+{
+ "_note": "One entry per prospect that gets the one-page assessment proposal. Contact, title and address from sales-engine/outreach-archive/2026-09-28-batch2/TRACKER_batch2.csv (Apollo verified 27 Sep 2026). 'situation' uses only what the covering email already says about the operation. 'source_eml' is the draft whose body, recipients and subject are kept unchanged.",
+ "date": "28 September 2026",
+ "prospects": [
+  {
+   "slug": "ppc",
+   "short": "PPC",
+   "company": "PPC",
+   "contact": "Johan Coetzee",
+   "title": "Engineering Manager",
+   "segment": "mine",
+   "headline": "the network on the site",
+   "situation": "Between the plant and the quarry, the network carries telemetry, CCTV, access control and the people working away from the buildings, and it usually grows as a patchwork. One owned, monitored network across the site gives engineering the same visibility everywhere, with a standby path when the main link fails.",
+   "walk": "the plant, the quarry, offices, gates and camera positions",
+   "source_eml": "D2 PPC - DRAFT_Johan_Coetzee_Assessment_20260928.eml"
+  },
+  {
+   "slug": "afrimat-eastern-cape",
+   "short": "Afrimat Eastern Cape",
+   "company": "Afrimat Construction Materials, Eastern Cape",
+   "contact": "Albert da Serra",
+   "title": "General Manager",
+   "segment": "mine",
+   "headline": "the network on site",
+   "situation": "On a quarry the network carries the weighbridge, CCTV, access control and plant telemetry, and it usually grows as a patchwork, site by site. Across several Eastern Cape operations, one owned and monitored network gives you the same visibility everywhere and one number to call when something drops.",
+   "walk": "one representative quarry: the weighbridge, plant, offices, gates and camera positions, and how it links to your other Eastern Cape sites",
+   "source_eml": "D2 Afrimat (Eastern Cape) - DRAFT_Albert_da_Serra_Assessment_20260928.eml"
+  },
+  {
+   "slug": "supacrush",
+   "short": "SupaCrush",
+   "company": "SupaCrush",
+   "contact": "Wiehann Steffens",
+   "title": "Mine Manager",
+   "segment": "mine",
+   "headline": "connectivity that moves with your sites",
+   "situation": "Mobile crushing means a new site every few months, often somewhere with no signal: the weighbridge, cameras, the site office and the crew still need to be connected from day one. CTTX deploys rapid, temporary site networks that move with the job, and permanent ones where a quarry stays.",
+   "walk": "a current crushing site and your yard: weighbridge, site office and camera positions",
+   "deliver_extra": "A deployable site kit: what goes on the truck and how fast it is up.",
+   "source_eml": "D2 SupaCrush - DRAFT_Wiehann_Steffens_Assessment_20260928.eml"
+  },
+  {
+   "slug": "swartkops-sea-salt",
+   "short": "Swartkops Sea Salt",
+   "company": "Swartkops Sea Salt",
+   "contact": "Chrisjan Joubert",
+   "title": "Mine Manager",
+   "segment": "mine",
+   "headline": "the network across the pans",
+   "situation": "Salt pans spread over a large area: pumps, sluices, security and the people out on the pans all need to be reachable, and the office rarely sees problems until someone drives out. A small owned network across the pans puts monitoring and cameras where the work is.",
+   "walk": "the office and works, the pumps and sluices, the pan perimeter and camera positions",
+   "site_word": "pans",
+   "source_eml": "D2 Swartkops Sea Salt - DRAFT_Chrisjan_Joubert_Assessment_20260928.eml"
+  },
+  {
+   "slug": "endulini-fruit",
+   "short": "Endulini",
+   "company": "Endulini Fruit",
+   "contact": "Theodor Ferreira",
+   "title": "Farm Manager",
+   "segment": "farm",
+   "headline": "the network on the farm",
+   "situation": "With micro-irrigation, packhouses and cold storage at Endulini, the places that most need monitoring are also the furthest from the office. When pumps, controllers and cold rooms ride on a patchwork of LTE routers, a failure shows up as a dry block or a warm cold room before anyone knows.",
+   "source_eml": "D2 Endulini Fruit - DRAFT_Theodor_Ferreira_Assessment_20260928.eml"
+  },
+  {
+   "slug": "number-two-piggeries",
+   "short": "Number Two Piggeries",
+   "company": "Number Two Piggeries",
+   "contact": "Theo Feuth",
+   "title": "CEO",
+   "segment": "farm",
+   "headline": "the network on the operation",
+   "situation": "With biosecure piggeries, dairies and grower farms spread across the region, every unnecessary vehicle trip is a biosecurity risk as well as a cost. Remote monitoring of houses, water and power over an owned network cuts both.",
+   "walk": "one representative unit: the houses, water and power systems, offices and camera positions, and how it links to the other units",
+   "site_word": "operation",
+   "lens_overrides": {
+    "Operational efficiency": {
+     "cost": "Every check is a vehicle trip, and every trip is a biosecurity risk.",
+     "value": "Houses, water and power monitored remotely, so fewer people go on site."
+    }
+   },
+   "source_eml": "D2 Number Two Piggeries - DRAFT_Theo_Feuth_Assessment_20260928.eml"
+  },
+  {
+   "slug": "sovereign-foods",
+   "short": "Sovereign",
+   "company": "Sovereign Foods",
+   "contact": "Gerald Walter",
+   "title": "Director",
+   "segment": "farm",
+   "headline": "the network on the grower farms",
+   "situation": "On poultry grower farms the stakes are high: a climate-control or power alarm that doesn't reach anyone in time costs a whole house. An owned, monitored network across the grower sites makes sure alarms arrive.",
+   "walk": "one representative grower farm: the houses, climate control and power systems, and the path back to your operations",
+   "site_word": "grower farms",
+   "lens_overrides": {
+    "Avoided loss": {
+     "cost": "A climate-control or power alarm that reaches nobody in time costs a whole house.",
+     "value": "Alarms from every house reach the right person, day and night."
+    }
+   },
+   "source_eml": "D2 Sovereign Foods - DRAFT_Gerald_Walter_Assessment_20260928.eml"
+  },
+  {
+   "slug": "sundays-river-citrus",
+   "short": "Sundays River Valley",
+   "company": "Sundays River Citrus Company",
+   "contact": "Greg Jones",
+   "title": "General Manager",
+   "cc_name": "Frikkie Olivier",
+   "segment": "farm",
+   "headline": "a shared farm network",
+   "situation": "Across the Sundays River Valley there is a bigger opportunity than one farm at a time: one owned backbone that many growers share, each farm connected at a fraction of what it would cost alone. Pumps, irrigation controllers, cold rooms and cameras all ride on it.",
+   "walk": "a small group of member farms and the valley's high ground: where a shared backbone can run and how each farm joins it",
+   "site_word": "valley",
+   "deliver_extra": "A shared-backbone outline for the valley: which high sites serve which farms, and how a farm joins.",
+   "lens_overrides": {
+    "Infrastructure ownership": {
+     "cost": "Every grower buys and maintains its own links.",
+     "value": "One shared, owned backbone across the valley, each farm connected at a fraction of the cost of going alone."
+    }
+   },
+   "source_eml": "D2 Sundays River Citrus Company - DRAFT_Greg_Jones_Assessment_20260928.eml"
+  },
+  {
+   "slug": "rotondo-walnuts",
+   "short": "Rotondo",
+   "company": "Rotondo Walnuts",
+   "contact": "Didier Botes",
+   "title": "General Manager",
+   "segment": "farm",
+   "headline": "the network on the farm",
+   "situation": "With irrigation scheduling across the orchards and cold storage on site, the places that most need monitoring are also the furthest from the office. When that rides on a patchwork of LTE routers, a failure shows up before anyone knows.",
+   "walk": "the office, pump stations, orchard irrigation blocks and cold storage",
+   "source_eml": "D3 Rotondo Walnuts - DRAFT_Didier_Botes_Assessment_20260928.eml"
+  },
+  {
+   "slug": "sab-hop-farms",
+   "short": "SAB Hop Farms",
+   "company": "SAB Hop Farms",
+   "contact": "Brenton Strauss",
+   "title": "Operations Manager",
+   "segment": "farm",
+   "headline": "the network on the farms",
+   "situation": "On a farm the network isn't for email; it carries the pumps, irrigation controllers, cold rooms, cameras and the people in the field. When that rides on a patchwork of LTE routers, a failure shows up as a dry block or a warm cold room before anyone knows.",
+   "walk": "one farm: the office, pump stations, irrigation blocks and processing, and how it links to the other farms",
+   "site_word": "farms",
+   "source_eml": "D3 SAB Hop Farms - DRAFT_Brenton_Strauss_Assessment_20260928.eml"
+  },
+  {
+   "slug": "redberry-farm",
+   "short": "Redberry Farm",
+   "company": "Redberry Farm",
+   "contact": "Mariska Landman",
+   "title": "Senior General Manager",
+   "segment": "farm",
+   "headline": "the network on the farm",
+   "situation": "With the farm, the restaurant, the farm shop and visitors across the property, you need guest Wi-Fi and payments that work everywhere, and operations that stay connected behind them. One owned network covers both instead of several separate connections.",
+   "walk": "the restaurant, farm shop and visitor areas, and the farming operation behind them",
+   "lens_overrides": {
+    "Avoided loss": {
+     "cost": "A card machine or guest Wi-Fi that drops on a busy day is lost sales and a poor review.",
+     "value": "Payments and guest Wi-Fi that work across the property."
+    }
+   },
+   "source_eml": "D3 Redberry Farm - DRAFT_Mariska_Landman_Assessment_20260928.eml"
+  },
+  {
+   "slug": "mto-forestry-south",
+   "short": "MTO South",
+   "company": "MTO Forestry",
+   "contact": "Jaco Oosthuizen",
+   "title": "General Manager, MTO South",
+   "segment": "forestry",
+   "headline": "the network across the plantations",
+   "situation": "Across plantations and mills the network carries fire-detection cameras, crew safety in the compartments, and the mills themselves. In fire season, a camera or radio link that drops is a real risk. An owned, monitored network across the plantations puts coverage where the crews and the fire risk are.",
+   "source_eml": "D3 MTO Forestry - DRAFT_Jaco_Oosthuizen_Assessment_20260928.eml"
+  },
+  {
+   "slug": "bergplaas-nature-reserve",
+   "short": "Bergplaas",
+   "company": "Bergplaas Nature Reserve",
+   "contact": "Wayne Maspero",
+   "title": "Reserve & Conservation Manager",
+   "segment": "reserve",
+   "headline": "the network on the reserve",
+   "situation": "With trail groups out in the Karoo, communications are a safety matter: if something happens on a trail, can the group reach you, and can you reach help? A small owned network with coverage over the main routes fixes that without relying on cellular signal.",
+   "walk": "the base, the main trail routes and the high ground that can see them",
+   "lens_overrides": {
+    "Executive risk reduction": {
+     "cost": "A trail group in trouble that cannot reach you, or help.",
+     "value": "Coverage over the main routes, independent of cellular signal."
+    }
+   },
+   "source_eml": "D3 Bergplaas Nature Reserve - DRAFT_Wayne_Maspero_Assessment_20260928.eml"
+  },
+  {
+   "slug": "botlierskop",
+   "short": "Botlierskop",
+   "company": "Botlierskop Private Game Reserve",
+   "contact": "Francina Terblanche",
+   "title": "General Manager",
+   "segment": "reserve",
+   "headline": "the network on the reserve",
+   "situation": "With villas, tented camps, horse and game activities spread across the reserve, guests expect to be connected everywhere and staff need to reach each other across the property. When each area has its own link, you pay for several connections and still have gaps. One owned, monitored backbone covers the lot, including the solar and power systems behind it.",
+   "walk": "the villas, tented camps, activity areas, gates and the high ground",
+   "source_eml": "D3 Botlierskop Private Game Reserve - DRAFT_Francina_Terblanche_Assessment_20260928.eml"
+  },
+  {
+   "slug": "garden-route-game-lodge",
+   "short": "Garden Route Game Lodge",
+   "company": "Garden Route Game Lodge",
+   "contact": "Anthony Doherty",
+   "title": "Managing Director",
+   "cc_name": "Amelia Strydom",
+   "segment": "reserve",
+   "headline": "the network on the reserve",
+   "situation": "On a Big 5 reserve the network carries more than guest Wi-Fi: rangers and guides in the field, gates and cameras, and the payments behind the lodge. When that rides on rented links and whatever signal reaches the lodge, the gaps show up exactly where incidents happen.",
+   "source_eml": "D3 Garden Route Game Lodge - DRAFT_Anthony_Doherty_Assessment_20260928.eml"
+  },
+  {
+   "slug": "engie-southern-africa",
+   "short": "ENGIE",
+   "company": "ENGIE Southern Africa",
+   "contact": "Siphosethu Sabani",
+   "title": "Plant Manager",
+   "segment": "wind",
+   "headline": "the network on the site",
+   "situation": "On a renewable plant the network question is resilience: when the fibre is cut or stolen, does SCADA stay up, can the O&M crews still work across the site, and are the perimeter cameras still reporting? A standby wireless path that takes over automatically costs far less than one day of lost visibility.",
+   "source_eml": "D3 ENGIE Southern Africa - DRAFT_Siphosethu_Sabani_Assessment_20260928.eml"
+  },
+  {
+   "slug": "enel-green-power",
+   "short": "Enel",
+   "company": "Enel Green Power",
+   "contact": "Sadao Chika",
+   "title": "Construction Site Manager",
+   "segment": "wind",
+   "headline": "construction-phase site connectivity",
+   "situation": "During construction a wind site needs connectivity long before the permanent fibre exists: site offices, cameras, access control and the teams on the ground. CTTX deploys rapid, temporary site networks for the construction phase and hands over to the permanent design, so the operating site isn't starting from nothing.",
+   "walk": "the construction camp and site offices, laydown areas, gates, camera positions and the planned turbine strings",
+   "deliver_extra": "A construction-phase network plan that hands over to the permanent operating design.",
+   "lens_overrides": {
+    "Avoided loss": {
+     "cost": "Laydown areas and gates without cameras or access control during construction.",
+     "value": "Cameras and access control live from the first weeks on site."
+    }
+   },
+   "source_eml": "D3 Enel Green Power - DRAFT_Sadao_Chika_Assessment_20260928.eml"
+  },
+  {
+   "slug": "suzlon-om",
+   "short": "Suzlon O&M",
+   "company": "Suzlon",
+   "contact": "Zongeziwe Nofuya",
+   "title": "OMS Manager",
+   "segment": "wind",
+   "headline": "connectivity for crews on site",
+   "situation": "For O&M crews the network is a working tool: reaching turbine data in the field, reporting from the nacelle, and staying reachable across the site. When the only option is patchy cellular, crews lose time and safety margin. CTTX builds owned site networks for exactly that, with a standby path for SCADA when the fibre fails.",
+   "source_eml": "D3 Suzlon - DRAFT_Zongeziwe_Nofuya_Assessment_20260928.eml"
+  }
+ ]
+}
