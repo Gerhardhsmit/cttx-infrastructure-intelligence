@@ -509,7 +509,7 @@
     <span class="section-num">05</span>
     <h2>The financial case</h2>
   </div>
-  <p class="lede">Once built, the lodge's monthly bill drops and stays down — while the current provider's would only keep climbing.</p>
+  <p class="lede">Over the 36-month agreement the lodge spends about the same as it would renting — and at the end of it, owns the network. Every month after that is money kept.</p>
 
   <div class="stat-grid">
     <div class="stat">
@@ -522,18 +522,18 @@
     </div>
     <div class="stat hero">
       <div class="label">Payback period</div>
-      <div class="value">1 yr, 1 mo</div>
+      <div class="value">2 yr, 10 mo</div>
     </div>
     <div class="stat hero">
       <div class="label">5-year ROI</div>
-      <div class="value">169%</div>
+      <div class="value">98%</div>
     </div>
   </div>
 
   <div class="chart-wrap">
     <svg viewBox="0 0 820 340" role="img" aria-labelledby="chart-title chart-desc">
       <title id="chart-title">Cumulative cost over 5 years</title>
-      <desc id="chart-desc">Current provider cumulative cost rises from R217,267 in year 0 to R1,593,857 in year 5. CTTX cumulative cost rises from R358,599 in year 0 to R988,601 in year 5, crossing below the current provider during year 2.</desc>
+      <desc id="chart-desc">Both paths start at year 0. Current provider cumulative cost rises from R0 to R1,274,620 by year 5. CTTX cumulative cost starts at the R358,599 upfront payment and rises to R921,999 by year 5. The CTTX line crosses below the current provider at 2 years 10 months; at the end of the 36-month term the CTTX path is R24,573 lower.</desc>
       <!-- gridlines -->
       <g stroke="rgba(255,255,255,0.08)" stroke-width="1">
         <line x1="70" y1="40" x2="70" y2="280"></line>
@@ -543,13 +543,13 @@
         <line x1="70" y1="100" x2="790" y2="100" stroke-dasharray="2,4"></line>
         <line x1="70" y1="40" x2="790" y2="40" stroke-dasharray="2,4"></line>
       </g>
-      <!-- y labels (R0 to R1.6m) -->
+      <!-- y labels (R0 to R1.4m) -->
       <g font-family="Roboto Mono, monospace" font-size="11" fill="#A1A1A1" text-anchor="end">
         <text x="60" y="284">R0</text>
-        <text x="60" y="224">R400k</text>
-        <text x="60" y="164">R800k</text>
-        <text x="60" y="104">R1.2m</text>
-        <text x="60" y="44">R1.6m</text>
+        <text x="60" y="224">R350k</text>
+        <text x="60" y="164">R700k</text>
+        <text x="60" y="104">R1.05m</text>
+        <text x="60" y="44">R1.4m</text>
       </g>
       <!-- x labels -->
       <g font-family="Roboto Mono, monospace" font-size="11" fill="#A1A1A1" text-anchor="middle">
@@ -561,19 +561,25 @@
         <text x="790" y="302">Y5</text>
       </g>
       <!--
-        Scale: x = 70 + year*144 ; y = 280 - (value/1650000)*240
-        Current provider: 217267, 451916, 705336, 979030, 1274620, 1593857
-        CTTX:    358599, 465987, 581966, 707223, 842501, 988601
+        Scale: x = 70 + year*144 ; y = 280 - (value/1400000)*240
+        Both paths start at year 0; monthly bills on both start in month 1.
+        Current provider (8% p.a. escalation from year 2): 0, 217267, 451916, 705336, 979030, 1274620
+        CTTX (R358,599 upfront; monthly locked for 36 months, then 8% p.a.): 358599, 465987, 573375, 680763, 796742, 921999
       -->
-      <polyline points="70,248.4 214,214.3 358,177.4 502,138.1 646,95.7 790,48.3"
+      <polyline points="70,280.0 214,242.8 358,202.5 502,159.1 646,112.2 790,61.5"
                 fill="none" stroke="#FF3B30" stroke-width="2.5" stroke-linejoin="round" />
-      <polyline points="70,227.8 214,212.2 358,195.4 502,177.1 646,157.5 790,136.2"
+      <polyline points="70,218.5 214,200.1 358,181.7 502,163.3 646,143.4 790,121.9"
                 fill="none" stroke="#CCFF00" stroke-width="2.5" stroke-linejoin="round" />
+      <!-- 36-month term marker -->
+      <line x1="502" y1="40" x2="502" y2="280" stroke="rgba(255,255,255,0.25)" stroke-width="1" stroke-dasharray="4,4"></line>
+      <text x="508" y="52" font-family="Roboto Mono, monospace" font-size="10.5" fill="#A1A1A1">36-month term ends</text>
       <!-- endpoint markers -->
-      <circle cx="790" cy="48.3" r="4" fill="#FF3B30"></circle>
-      <circle cx="790" cy="136.2" r="4" fill="#CCFF00"></circle>
-      <text x="775" y="38" font-family="Roboto Mono, monospace" font-size="11.5" fill="#FF3B30" text-anchor="end">R1.59m</text>
-      <text x="775" y="151" font-family="Roboto Mono, monospace" font-size="11.5" fill="#CCFF00" text-anchor="end">R0.99m</text>
+      <circle cx="70" cy="218.5" r="4" fill="#CCFF00"></circle>
+      <text x="82" y="204" font-family="Roboto Mono, monospace" font-size="10.5" fill="#CCFF00">R358,599 upfront</text>
+      <circle cx="790" cy="61.5" r="4" fill="#FF3B30"></circle>
+      <circle cx="790" cy="121.9" r="4" fill="#CCFF00"></circle>
+      <text x="775" y="51" font-family="Roboto Mono, monospace" font-size="11.5" fill="#FF3B30" text-anchor="end">R1.27m</text>
+      <text x="775" y="137" font-family="Roboto Mono, monospace" font-size="11.5" fill="#CCFF00" text-anchor="end">R0.92m</text>
     </svg>
     <div class="chart-legend">
       <span><span class="dot" style="background:#FF3B30"></span>Continue with current provider (cumulative cost)</span>
@@ -581,7 +587,8 @@
     </div>
   </div>
 
-  <p style="margin-top:24px; color:var(--muted); font-size:14px; max-width:640px;">This proposal is offered on a 36-month agreement, with pricing locked in for that term. The comparison above shows what continuing to rent would cost over the same horizon, assuming a typical 8% annual CPI-linked escalation. The build cost is paid once, up front; the connectivity fee is the only recurring cost for the length of the agreement.</p>
+  <p style="margin-top:24px; color:var(--muted); font-size:14px; max-width:640px;">How to read this: the CTTX line starts at the R358,599 paid up front (the R355,000 build plus the R3,599 connection fee). From month 1 both paths pay their monthly bills — R18,106 to the current provider, R8,949 on the CTTX path. The two lines cross at 2 years 10 months. By the end of the 36-month agreement the lodge has paid R680,763 on the CTTX path against R705,336 to continue renting — R24,573 less — and owns the mast, radios, Wi-Fi and power system outright. Over five years the difference is R352,621.</p>
+  <p style="margin-top:12px; color:var(--muted); font-size:14px; max-width:640px;">Assumptions, stated plainly: CTTX's monthly fee is fixed for the 36-month term and assumed to rise 8% a year after it. The current provider's bill is assumed to rise 8% a year from year two (a typical CPI-linked telecom escalation; not confirmed by them). With no escalation on either side, payback is 3 years 4 months. The full year-by-year workings are available as a spreadsheet on request.</p>
 </section>
 
 <section>

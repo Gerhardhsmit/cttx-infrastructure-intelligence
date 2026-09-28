@@ -254,3 +254,17 @@ Future implementation work must preserve these decisions across code, tests, map
 ## Change Control
 
 This document may be updated only when the business owner changes the product strategy, engineering doctrine, or platform rules. Updates should be deliberate and should preserve historical clarity by editing the relevant section rather than scattering contradictory rules elsewhere in the project.
+
+---
+
+## 16. Financial Case Integrity (added 28 Sept 2026, after the Barefoot Addo correction)
+
+A proposal's financial case will be read by a finance person. It must survive that reading.
+
+1. **Same clock.** Both paths (keep renting vs build) start at month 0. The upfront investment (build + carrier connection fee) is the CTTX line's starting point; neither path is charged any monthly bill in "year 0". Never charge the incumbent a year of bills before the build while giving the CTTX path none - that is how Barefoot's payback was wrongly shown as 1 yr 1 mo instead of 2 yr 10 mo.
+2. **Locked means locked.** If the proposal says CTTX pricing is fixed for the contract term, the model must hold it flat for that term. Escalate it only after the term, at the same rate applied to the incumbent.
+3. **State the escalation assumption and show the zero-escalation case.** The incumbent's escalation is an assumption unless their contract is in hand. Say so, and give the payback with 0% as well.
+4. **Show the contract-term view, not only 5 years.** Total paid over the agreement term on each path, the difference, and that the client owns the asset at the end.
+5. **Payback and ROI are computed from cumulative cost including the upfront.** ROI = cumulative saving ÷ total upfront cash out.
+
+Reference build: `proposals/Barefoot_5Year_Business_Case.xlsx` tab 4 (formulas), `proposals/Barefoot_Addo_Proposal.html` section 05.
