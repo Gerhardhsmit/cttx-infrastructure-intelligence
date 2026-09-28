@@ -339,6 +339,35 @@
   @media print {
     .print-btn { display: none; }
     body { background: var(--bg); }
+    .callout, .driver-card, .stat, .stat-grid, .avail-block, .chart-wrap, .scope-cat, .steps li, .section-head, .cover-inner {
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    .section-head { break-after: avoid; page-break-after: avoid; }
+    .lede, p { break-inside: avoid; page-break-inside: avoid; }
+    .lede { break-after: avoid; page-break-after: avoid; }
+    h3 { break-after: avoid; page-break-after: avoid; }
+    /* One numbered section per page; cover shares page 1 with section 01 */
+    .cover { padding: 44px 24px 30px; }
+    .wordmark { margin-bottom: 28px; }
+    .cover .sub { margin-bottom: 22px; }
+    section { break-before: page; page-break-before: always; padding: 36px 0 24px; border-bottom: none; }
+    section:first-of-type { break-before: auto; page-break-before: auto; padding-top: 32px; }
+    .page-break { break-before: page; page-break-before: always; padding-top: 12px; }
+    footer { padding: 20px 0 24px; break-inside: avoid; page-break-inside: avoid; }
+    .scope-grid { gap: 16px 24px; }
+    .scope-cat li { padding: 4px 0; font-size: 13px; }
+    .scope-cat h3 { margin-bottom: 8px; }
+    .stat-grid { margin: 20px 0; }
+    .stat { padding: 18px 18px; }
+    .callout { padding: 16px 20px; margin: 16px 0; }
+    .steps li { padding: 10px 0 10px 44px; }
+    .steps li::before { top: 8px; }
+    .steps .step-desc { font-size: 13.5px; }
+    .section-head { margin-bottom: 20px; }
+    footer { padding: 14px 0 18px; }
+    footer .name { font-size: 17px; }
+    footer .role { margin-bottom: 10px; }
+    footer .validity { margin-top: 14px; }
   }
 
   @media (max-width: 640px) {
@@ -357,9 +386,9 @@
       <span class="mark">CTTX<span>.</span></span>
       <span class="tag">Services</span>
     </div>
-    <p class="eyebrow">Private Network Proposal</p>
+    <p class="eyebrow">Hybrid Network Proposal</p>
     <h1>Own the network your lodge runs on.</h1>
-    <p class="sub">A carrier-grade wireless build for Barefoot Addo Elephant Lodge — engineered to turn a rising monthly rental into infrastructure the lodge owns, on its balance sheet, for the long term.</p>
+    <p class="sub">A carrier-grade Vodacom link, matched to a carrier-grade private network across the reserve — engineered for Barefoot Addo Elephant Lodge to turn a rising monthly rental into infrastructure it owns, on its balance sheet, for the long term.</p>
     <div class="cover-meta">
       <span><strong>Prepared for</strong><br>Barefoot Addo Elephant Lodge (Pty) Ltd</span>
       <span><strong>Prepared by</strong><br>Gerhard Smit, CTTX Services (Pty) Ltd</span>
@@ -383,8 +412,8 @@
     <p>The backhaul radios that carry the whole property's connectivity are mounted on a leaning gum pole — not an engineered structure. It has held so far. It is not something to plan a lodge's connectivity around.</p>
   </div>
   <div class="callout alert">
-    <span class="callout-label">A gap in coverage</span>
-    <p>The spa currently has no connectivity at all. It was never part of the original rollout, and extending the current rented setup to reach it would mean yet another monthly access-point fee stacked on top of an already contended network.</p>
+    <span class="callout-label">Where the current network falls short</span>
+    <p>The spa has no connectivity at all — it was never part of the original rollout. The furthest buildings, the staff village and the Director's House, sit 2.3–3 km out on the edge of a single 90° sector, which is where a rented network is weakest and least accountable. And every fix on the current model is the same answer: another rented access point, another monthly line item, on a shared connection that was never engineered for this property.</p>
   </div>
 </section>
 
@@ -525,7 +554,7 @@
   <p style="margin-top:24px; color:var(--muted); font-size:14px; max-width:640px;">How to read this: the CTTX line starts at the R358,599 paid up front (the R355,000 build plus the R3,599 connection fee). From month 1 both paths pay their monthly bills — R18,106 to the current provider, R8,949 on the CTTX path. The two lines cross at 2 years 10 months. By the end of the 36-month agreement the lodge has paid R680,763 on the CTTX path against R705,336 to continue renting — R24,573 less — and owns the mast, radios, Wi-Fi and power system outright. Over five years the difference is R352,621.</p>
   <p style="margin-top:12px; color:var(--muted); font-size:14px; max-width:640px;">Assumptions, stated plainly: CTTX's monthly fee is fixed for the 36-month term and assumed to rise 8% a year after it. The current provider's bill is assumed to rise 8% a year from year two (a typical CPI-linked telecom escalation; not confirmed by them). With no escalation on either side, payback is 3 years 4 months. The full year-by-year workings are available as a spreadsheet on request.</p>
 
-  <h3 style="font-size:18px; font-weight:700; margin:40px 0 6px;">What the chart doesn't show</h3>
+  <h3 class="page-break" style="font-size:18px; font-weight:700; margin:40px 0 6px;">What the chart doesn't show</h3>
   <p class="lede" style="margin-bottom:20px;">Three things the monthly comparison understates — all of them in the lodge's favour.</p>
   <div class="driver-grid">
     <div class="driver-card">
