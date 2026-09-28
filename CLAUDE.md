@@ -483,22 +483,25 @@ Not: research, not: ask questions, not: explain CTTX
 
 ---
 
-## MICROSOFT / OUTLOOK IDENTITY RULE (added 28 September 2026)
+## EMAIL & MICROSOFT IDENTITY RULE (permanent, issued by Gerhard 28 September 2026)
 
-**Authority:** `references/microsoft-identity-audit-2026-09-28.md`
+**Authority:** `references/CTTX_EMAIL_MICROSOFT_RULE.md` (full text, read it before any email work).
+**Evidence:** `references/microsoft-identity-audit-2026-09-28.md`
 
-1. **gerhard@cttx.co.za is an xneelo-hosted mailbox, not a Microsoft mailbox.** MX is
-   `mail.cttx.co.za`; it forwards to `gerhardcttx@gmail.com`. Outlook desktop reads it over IMAP/POP.
-2. **`gerhardSmit@CTTX.onmicrosoft.com` is NOT Gerhard's mailbox.** It is an unlicensed Entra user in tenant
-   `c0bb4ede-fab7-4806-8255-e1b51ae4fc34` with Exchange disabled. Never treat it as the CTTX mailbox, never
-   create drafts or search mail through it, and never propose re-licensing it as a way to "fix Outlook".
-3. **For any email task (search, draft, reply, read Sent/Drafts):** use the **Gmail connector**
-   (`gerhardcttx@gmail.com`), which holds all @cttx.co.za mail. Drafts only; never send.
-4. **If a Microsoft 365 / Outlook connector is present, check `get_me` first.** If it returns any
-   `@onmicrosoft.com` identity, or any identity other than `gerhard@cttx.co.za`, STOP, report the mismatch,
-   and do not perform the operation through it.
-5. **No new Microsoft infrastructure by default.** Do not create tenants, app registrations, Azure
-   subscriptions, mailboxes, aliases or domains. Moving gerhard@cttx.co.za into Microsoft 365 is a mailbox
-   migration (Option C in the audit) and needs Gerhard's explicit written approval.
-6. Routines that previously reported "M365 subscription cancelled, calendar/Teams down" must instead
-   report: "Microsoft is not the CTTX mail path; Gmail connector used."
+Summary, the full rule wins over this summary:
+
+1. Business identity is **gerhard@cttx.co.za**. Mailbox host is **xneelo**, forwarding to
+   **gerhardcttx@gmail.com**. Gmail is the authorised AI mail path.
+2. `gerhardSmit@cttx.onmicrosoft.com` is the obsolete, disabled tenant. Not the mailbox. Never use it.
+3. Verify the connector identity before any email work. Anything other than the authorised Gmail
+   account: STOP and report the mismatch. Never fix a mismatch by creating infrastructure.
+4. Customer-facing From identity is gerhard@cttx.co.za wherever technically supported. Never silently
+   substitute gerhardcttx@gmail.com as the CTTX contact address.
+5. Drafts only, never send. Verify the draft exists in Gmail before declaring done. If it cannot be
+   verified, report EMAIL INTEGRATION NOT VERIFIED.
+6. Outlook is a client of the xneelo mailbox, not the authority. Gmail drafts do not appear in Outlook
+   unless Outlook is given the Gmail account.
+7. Loop-breaker: any path toward Microsoft 365 Business, Entra, Azure, Exchange, tenant, licence or
+   domain verification: STOP and check whether Gmail/xneelo can do the job.
+8. No passwords, MFA codes, recovery codes, secrets or tokens. Gerhard enters credentials himself.
+9. Migration to Microsoft 365 is a separate project needing the documented checklist and explicit approval.
