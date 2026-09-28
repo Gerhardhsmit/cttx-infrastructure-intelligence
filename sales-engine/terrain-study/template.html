@@ -118,8 +118,8 @@ tr.tot td{font-weight:700;color:var(--accent);border-top:1px solid var(--border-
 <div class="cover">
   <div class="cover-inner">
     <div class="wordmark"><span class="mark">CTTX<span>.</span></span><span class="tag">Services</span></div>
-    <p class="eyebrow">Reserve Network Study</p>
-    <h1>One network across the whole reserve.</h1>
+    <p class="eyebrow">{{T_EYEBROW}}</p>
+    <h1>{{T_H1}}</h1>
     <p class="sub">We modelled {{SHORT}}'s terrain from satellite elevation data and checked every radio path against it. <em>{{HERO_RESULT}}</em>, fed from a carrier uplink on {{UPLABEL}}.</p>
     <div class="cover-meta">
       <span><strong>Prepared for</strong><br>{{PREPARED_FOR}}</span>
@@ -131,21 +131,21 @@ tr.tot td{font-weight:700;color:var(--accent);border-top:1px solid var(--border-
 
 <div class="wrap">
   <figure class="mapfig">
-    <img src="{{MAP}}" alt="Satellite image of {{RESERVE}} with the candidate carrier uplink, proposed high sites and links to each lodge, over a radio-coverage overlay">
+    <img src="{{MAP}}" alt="Satellite image of {{RESERVE}} with the candidate carrier uplink, proposed high sites and links, over a radio-coverage overlay">
     <div class="legend">
       <span><i class="dash"></i>Carrier uplink</span>
       <span><i></i>Private backbone</span>
-      <span><i class="thin"></i>Lodge link</span>
+      <span><i class="thin"></i>{{T_LEGEND_LINK}}</span>{{TURBINE_LEGEND}}
       <span><i class="cov"></i>Clear line of sight for a 3&nbsp;m field terminal</span>
     </div>
-    <p class="caption">Sentinel-2 imagery, {{IMG_DATE}}. The dotted outline is the study area around the lodges. Site positions are desktop candidates, to be confirmed on a site visit.</p>
+    <p class="caption">Sentinel-2 imagery, {{IMG_DATE}}. The dotted outline is {{T_STUDY_AREA}}. Site positions are desktop candidates, to be confirmed on a site visit.</p>
   </figure>
 
   <div class="stat-grid">
     <div class="stat hero"><div class="value">{{STAT1_VALUE}}</div><div class="label">{{STAT1_LABEL}}</div></div>
     <div class="stat"><div class="value">{{N_HIGH}} + {{N_RELAY}}</div><div class="label">ridge high-sites plus short relays</div></div>
     <div class="stat"><div class="value">{{COV}}%</div><div class="label">of the {{AREA}} km² study area in line of sight</div></div>
-    <div class="stat"><div class="value">{{UPKM}} km</div><div class="label">clear carrier uplink into the reserve</div></div>
+    <div class="stat"><div class="value">{{UPKM}} km</div><div class="label">{{T_STAT4_LABEL}}</div></div>
   </div>
 
   <section>
@@ -156,13 +156,13 @@ tr.tot td{font-weight:700;color:var(--accent);border-top:1px solid var(--border-
 
   <section>
     <div class="section-head"><span class="section-num">02</span><h2>Carrier in, private network out</h2></div>
-    <p class="lede">Carrier connectivity comes into the reserve once. Everything past that point runs on infrastructure the reserve owns.</p>
+    <p class="lede">{{T_S02_LEDE}}</p>
     <div class="driver-grid">
-      <div class="driver-card"><div class="driver-label">Layer 1 · Carrier</div><h3>Uplink from {{UPLABEL}}</h3><p>An uncontended business-grade Vodacom service, delivered by CTTX over a {{UPKM}} km link to {{UPTO}}. LTE failover keeps the reserve connected if the carrier path drops.</p></div>
+      <div class="driver-card"><div class="driver-label">Layer 1 · Carrier</div><h3>Uplink from {{UPLABEL}}</h3><p>An uncontended business-grade Vodacom service, delivered by CTTX over a {{UPKM}} km link to {{UPTO}}. {{T_LAYER1_TAIL}}</p></div>
       <div class="driver-card"><div class="driver-label">Layer 2 · Backbone</div><h3>Ridge high-sites</h3><p>{{BACKBONE_TEXT}} Each site runs on solar and lithium storage with remote monitoring, so the network stays up through load-shedding.</p></div>
-      <div class="driver-card"><div class="driver-label">Layer 3 · Distribution</div><h3>Every lodge and ops site</h3><p>Sector radios reach the lodges, HQ, the anti-poaching base, ecology, the workshop and the gates. A LoRaWAN gateway is ready for fence, water-point, pump and fuel sensors.</p></div>
+      <div class="driver-card"><div class="driver-label">Layer 3 · Distribution</div><h3>{{T_LAYER3_H}}</h3><p>{{T_LAYER3_P}}</p></div>
     </div>
-    <div class="callout win"><span class="callout-label">Built for what comes next</span><p>Once the backbone covers the reserve, a new camera, sensor or lodge is an endpoint on a network that is already there. It is not a new infrastructure project or a new provider contract.</p></div>
+    <div class="callout win"><span class="callout-label">Built for what comes next</span><p>{{T_NEXT_P}}</p></div>
   </section>
 
   <section>
@@ -170,58 +170,52 @@ tr.tot td{font-weight:700;color:var(--accent);border-top:1px solid var(--border-
     <p class="lede">Each profile shows the ground between two sites, the radio path (lime line) and its Fresnel zone (lime band). We allow for earth curvature and require at least 60% of the zone to be clear at every point. A path that fails is not drawn.</p>
     <figure class="fig"><img src="{{PROF1}}" alt="Terrain profiles for the carrier uplink and backbone links"></figure>
     <div class="tablewrap"><table>
-      <thead><tr><th>Lodge</th><th>Served from</th><th>Path length</th><th>Line of sight</th></tr></thead>
+      <thead><tr><th>{{T_SITE_WORD_CAP}}</th><th>Served from</th><th>Path length</th><th>Line of sight</th></tr></thead>
       <tbody>{{ROWS}}</tbody>
     </table></div>
     {{LODGE_FIG}}
     {{UNLOCATED_NOTE}}
-    <p class="caption">5.8 GHz · k = 4/3 · uplink tower 30 m · high-site masts 18 m · lodge masts 8 m. Lodge positions come from published GPS coordinates.</p>
+    <p class="caption">{{T_PROF_CAPTION}}</p>
   </section>
 
   <section>
     <div class="section-head"><span class="section-num">04</span><h2>{{MODEL_HEAD}}</h2></div>
-    <p class="lede">A reserve network carries three loads at once. This design is built to hold all three on one backbone.</p>
+    <p class="lede">{{T_S04_LEDE}}</p>
     <div class="driver-grid">{{DRIVERS}}</div>
   </section>
 
   <section>
-    <div class="section-head"><span class="section-num">05</span><h2>What other properties got back</h2></div>
-    <div class="ref">{{PROOF_NAME}}<span>{{PROOF_SCALE}}</span></div>
-    <div class="ba">
-      <div class="callout alert"><span class="callout-label">Before</span><p>{{PROOF_BEFORE}}</p></div>
-      <div class="callout win"><span class="callout-label">After</span><p>{{PROOF_AFTER}}</p></div>
-    </div>
-    <div class="proof-grid">{{PROOF_ROWS}}</div>
-    {{UNNAMED}}
+    <div class="section-head"><span class="section-num">05</span><h2>{{T_S05_TITLE}}</h2></div>
+    {{PROOF_BLOCK}}
   </section>
 
   <section>
-    <div class="section-head"><span class="section-num">06</span><h2>What it pays back</h2></div>
-    <p class="lede">A reserve that replaces a separate rented connection and rented Wi-Fi at every lodge with one owned backbone typically recovers the investment in under three years on connectivity costs alone. The security, operations and guest-experience benefits come on top of that.</p>
-    <div class="callout win"><span class="callout-label">Your number, not ours</span><p>Send us each lodge's latest connectivity invoice, or just the monthly totals, and we will work out {{SHORT}}'s actual payback. It takes us a day.</p></div>
-    <div class="callout"><span class="callout-label">Built to be forwarded</span><p>If infrastructure decisions sit with someone else, please pass this on. Owners will find the payback and ownership case, the reserve manager the security and operations case, and lodge managers the guest experience case.</p></div>
+    <div class="section-head"><span class="section-num">06</span><h2>{{T_S06_TITLE}}</h2></div>
+    <p class="lede">{{T_S06_LEDE}}</p>
+    <div class="callout win"><span class="callout-label">{{T_S06_HOOK_LABEL}}</span><p>{{T_S06_HOOK}}</p></div>
+    <div class="callout"><span class="callout-label">Built to be forwarded</span><p>{{T_S06_FORWARD}}</p></div>
   </section>
 
   <section>
-    <div class="section-head"><span class="section-num">07</span><h2>What changes when the reserve owns it</h2></div>
+    <div class="section-head"><span class="section-num">07</span><h2>{{T_S07_TITLE}}</h2></div>
     <div class="compare">
       <div class="callout alert"><span class="callout-label">Today</span><ul>{{TODAY}}</ul></div>
-      <div class="callout win"><span class="callout-label">With a reserve backbone</span><ul><li>One uncontended carrier feed shared across the reserve</li><li>Lodges, HQ, the anti-poaching base and gates on one private network</li><li>Coverage out into the field, day and night</li><li>An owned asset that takes cameras and sensors without new towers</li></ul></div>
+      <div class="callout win"><span class="callout-label">{{T_WITH_LABEL}}</span><ul>{{T_WITH_LIST}}</ul></div>
     </div>
     <div class="lenses">
       <div class="lens"><h3>Avoided loss</h3><p>{{SECURITY_NOTE}}</p></div>
-      <div class="lens"><h3>Operational efficiency</h3><p>Water points, pumps and fuel tanks report their own status, so there are fewer vehicle trips just to check. Maintenance, ecology and lodges share one communications path.</p></div>
-      <div class="lens"><h3>Infrastructure ownership</h3><p>High sites, backbone and power belong to the reserve. The network grows with the reserve instead of depending on each lodge's separate provider.</p></div>
-      <div class="lens"><h3>Executive risk reduction</h3><p>Management gets live visibility of the network, cameras and sensors, and a record of operational diligence for owners, insurers and conservation partners.</p></div>
+      <div class="lens"><h3>Operational efficiency</h3><p>{{T_LENS_EFF}}</p></div>
+      <div class="lens"><h3>Infrastructure ownership</h3><p>{{T_LENS_OWN}}</p></div>
+      <div class="lens"><h3>Executive risk reduction</h3><p>{{T_LENS_EXEC}}</p></div>
     </div>
   </section>
 
   <section>
     <div class="section-head"><span class="section-num">08</span><h2>Next steps</h2></div>
     <ul class="steps">
-      <li><div class="step-title">30-minute call</div><div class="step-desc">Your lodges' current connectivity costs, your peak usage, the incidents that were hardest to coordinate, and what currently needs a vehicle trip to check.</div></li>
-      <li><div class="step-title">Confirm the sites</div><div class="step-desc">A marked map of HQ, the anti-poaching base and the gates. We add them to the model and rerun the link plan.</div></li>
-      <li><div class="step-title">One day on the reserve</div><div class="step-desc">We walk the high sites and relay points, and confirm the carrier uplink with Vodacom.</div></li>
+      <li><div class="step-title">30-minute call</div><div class="step-desc">{{T_STEP1}}</div></li>
+      <li><div class="step-title">Confirm the sites</div><div class="step-desc">{{T_STEP2}}</div></li>
+      <li><div class="step-title">{{T_STEP3_TITLE}}</div><div class="step-desc">{{T_STEP3}}</div></li>
       <li><div class="step-title">Design and proposal</div><div class="step-desc">A final design in Cambium LINKPlanner, with equipment, power, a phased plan and the investment case.</div></li>
     </ul>
     <div class="method">

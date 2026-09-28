@@ -116,6 +116,39 @@ def local_cloud(rgb):
     return float(bright[valid].mean()), float(valid.mean())
 
 
+# ---------------------------------------------------------------- OpenStreetMap infrastructure (via Overture)
+OVERTURE = "overturemaps-us-west-2/release/2026-09-23.1/theme=base/type=infrastructure/"
+
+
+def overture_infra(W, S, E, N, classes=("generator", "substation", "communication_tower")):
+    """Mapped turbines, substations and communication masts in a lat/lon box. Cached per box."""
+    key = CACHE / f"infra_{W:.3f}_{S:.3f}_{E:.3f}_{N:.3f}.json"
+    if key.exists():
+        return json.loads(key.read_text())
+    os.environ.setdefault("AWS_CA_BUNDLE", "/root/.ccr/ca-bundle.crt")
+    import pyarrow.fs as pafs, pyarrow.dataset as pds
+    from urllib.parse import urlparse
+    kw = dict(anonymous=True, region="us-west-2")
+    if os.environ.get("HTTPS_PROXY"):
+        u = urlparse(os.environ["HTTPS_PROXY"])
+        kw["proxy_options"] = {"scheme": "http", "host": u.hostname, "port": u.port}
+    d = pds.dataset(OVERTURE, filesystem=pafs.S3FileSystem(**kw), format="parquet")
+    f = ((pds.field("bbox", "xmin") > W) & (pds.field("bbox", "xmax") < E) & (pds.field("bbox", "ymin") > S)
+         & (pds.field("bbox", "ymax") < N) & (pds.field("class").isin(list(classes))))
+    rows = d.to_table(columns=["class", "bbox", "names", "source_tags"], filter=f).to_pylist()
+    out = [dict(cls=r["class"], lat=(r["bbox"]["ymin"] + r["bbox"]["ymax"]) / 2, lon=(r["bbox"]["xmin"] + r["bbox"]["xmax"]) / 2,
+                tags=dict(r["source_tags"] or {}), name=(r["names"] or {}).get("primary") if r["names"] else None) for r in rows]
+    CACHE.mkdir(parents=True, exist_ok=True)
+    key.write_text(json.dumps(out))
+    return out
+
+
+def hav_km(la1, lo1, la2, lo2):
+    p = math.pi / 180
+    a = math.sin((la2 - la1) * p / 2) ** 2 + math.cos(la1 * p) * math.cos(la2 * p) * math.sin((lo2 - lo1) * p / 2) ** 2
+    return 12742 * math.asin(math.sqrt(a))
+
+
 # ---------------------------------------------------------------- geometry
 class Terrain:
     def __init__(self, dem, b):
@@ -155,15 +188,51 @@ def run(cfg_path):
     work = out / "terrain-study"
     work.mkdir(parents=True, exist_ok=True)
 
-    lodges = cfg["lodges"]
+    st = cfg.get("site_type", "reserve")
+    lodges = list(cfg["lodges"])
+    turbines = []
+    ot = cfg.get("osm_turbines")
+    if ot:
+        print("· OpenStreetMap turbines and substations")
+        fl = [f_["lat"] for f_ in ot["farms"]]; fo = [f_["lon"] for f_ in ot["farms"]]
+        infra = overture_infra(min(fo) - .15, min(fl) - .15, max(fo) + .15, max(fl) + .15)
+        pool = [r for r in infra if r["cls"] == "generator" and r["tags"].get("generator:source") == "wind"
+                and r["tags"].get("operator") not in set(ot.get("exclude_operators", []))]
+        taken = set()
+        for f_ in ot["farms"]:  # nearest N mapped turbines to each farm's published location
+            near = sorted((hav_km(f_["lat"], f_["lon"], r["lat"], r["lon"]), i) for i, r in enumerate(pool) if i not in taken)
+            near = [(dkm, i) for dkm, i in near if dkm <= ot.get("radius_km", 8)][: f_["turbines"]]
+            for n_, (dkm, i) in enumerate(near, 1):
+                taken.add(i)
+                turbines.append(dict(name=f"{f_['name']} WTG {n_}", lat=pool[i]["lat"], lon=pool[i]["lon"], farm=f_["name"]))
+            subs = sorted((hav_km(f_["lat"], f_["lon"], r["lat"], r["lon"]), r) for r in infra if r["cls"] == "substation")
+            if ot.get("substations", True) and subs and subs[0][0] <= 6:
+                r = subs[0][1]
+                lodges.append(dict(name=f"{f_['name']} substation", lat=r["lat"], lon=r["lon"], coord_source="OpenStreetMap substation"))
+            print(f"  {f_['name']}: {len(near)} of {f_['turbines']} turbines found on the map")
+        if turbines:
+            tl = [t_["lat"] for t_ in turbines]; to = [t_["lon"] for t_ in turbines]
+            cla, clo = float(np.mean(tl)), float(np.mean(to))
+            rad = max(hav_km(cla, clo, a, o) for a, o in zip(tl, to)) + 1.0
+            cfg["area"] = {"lat": cla, "lon": clo, "radius_km": rad, "source": "extent of the mapped turbines"}
     located = [l for l in lodges if l.get("lat") is not None and l.get("lon") is not None]
     unlocated = [l["name"] for l in lodges if l not in located]
-    ar = cfg.get("area")  # {"lat","lon","radius_km","source"}: reserve extent when lodges lack positions
+    ar = cfg.get("area")  # {"lat","lon","radius_km","source"}: reserve extent when lodges lack positions (or turbine extent)
     if not located and not ar:
         sys.exit("No lodge positions and no 'area' in the config. Add published coordinates or the reserve area.")
     up = cfg["uplink"]
     lats = [l["lat"] for l in located] + [up["lat"]]
     lons = [l["lon"] for l in located] + [up["lon"]]
+    # Candidate uplinks: mapped communication masts near the property, plus the town high ground.
+    towers = []
+    if up.get("mode") in ("auto", "mapped_tower"):
+        c_la = float(np.mean(lats[:-1] or [up["lat"]] if not ar else [ar["lat"]]))
+        c_lo = float(np.mean(lons[:-1] or [up["lon"]] if not ar else [ar["lon"]]))
+        infra_t = overture_infra(c_lo - .3, c_la - .3, c_lo + .3, c_la + .3, classes=("communication_tower",))
+        near_t = sorted((hav_km(c_la, c_lo, r["lat"], r["lon"]), r) for r in infra_t if r["cls"] == "communication_tower")
+        towers = [r for dkm, r in near_t if dkm <= up.get("tower_radius_km", 25)][:6]
+        lats += [r["lat"] for r in towers]; lons += [r["lon"] for r in towers]
+        print(f"  {len(towers)} mapped communication mast(s) within {up.get('tower_radius_km', 25)} km")
     if ar:
         dlat = ar["radius_km"] / 111.0
         dlon = ar["radius_km"] / (111.0 * math.cos(math.radians(ar["lat"])))
@@ -221,6 +290,10 @@ def run(cfg_path):
     from shapely.geometry import Point
     from shapely.ops import unary_union
     area_poly = Point(*xy(ar["lat"], ar["lon"])).buffer(ar["radius_km"] * 1000) if ar else None
+    upopts = []  # (label, (x, y)) in order of preference
+    for r in towers:
+        op = r["tags"].get("operator")
+        upopts.append((f"mapped mast, {op}" if op else "mapped mast, operator not tagged", xy(r["lat"], r["lon"])))
     if up.get("mode") == "known_site":
         U = xy(up["lat"], up["lon"])
         up_label = up.get("label", "Carrier site")
@@ -231,6 +304,7 @@ def run(cfg_path):
         k = np.argmax(np.where(np.hypot(X - px, Y - py) < up.get("radius_m", 2500), dem, -1))
         U = (float(X.flat[k]), float(Y.flat[k]))
         up_label = f"{up['town']} high ground"
+    upopts.append((up_label, U))
 
     # high-site candidates: local maxima inside the lodge footprint
     print("· link planning")
@@ -249,11 +323,22 @@ def run(cfg_path):
     served = {i: {k for k, p in LX.items()
                   if np.hypot(p[0] - c[1], p[1] - c[2]) < MAX_LODGE_KM * 1000
                   and tr.profile((c[1], c[2]), p, MAST, CPE)["clear"]} for i, c in enumerate(cands)}
-    upclear = {i: tr.profile(U, (c[1], c[2]), UPLINK_H, MAST)["clear"] for i, c in enumerate(cands)}
+    # For each candidate, the closest uplink option with a clear path (mapped masts first, then high ground).
+    upbest = {}
+    for i, c in enumerate(cands):
+        ok = [(np.hypot(p[0] - c[1], p[1] - c[2]), k) for k, (lbl, p) in enumerate(upopts)
+              if tr.profile(p, (c[1], c[2]), UPLINK_H, MAST)["clear"]]
+        upbest[i] = min(ok)[1] if ok else None
+    upclear = {i: upbest[i] is not None for i in upbest}
 
     # coverage of the reserve area per candidate (area mode): sample points, LOS for a 3 m terminal
     areacov = {i: set() for i in range(len(cands))}
-    if area_poly is not None:
+    TX = [xy(t_["lat"], t_["lon"]) for t_ in turbines]
+    if TX:
+        pts = TX  # wind farm: score high sites by the turbines they can see
+        for i, c in enumerate(cands):
+            areacov[i] = {j for j, pnt in enumerate(pts) if tr.profile((c[1], c[2]), pnt, MAST, FIELD_H)["clear"]}
+    elif area_poly is not None:
         minx, miny, maxx, maxy = area_poly.bounds
         gxs, gys = np.meshgrid(np.linspace(minx, maxx, 14), np.linspace(miny, maxy, 14))
         pts = [(x, y) for x, y in zip(gxs.ravel(), gys.ravel()) if area_poly.contains(Point(x, y))]
@@ -277,10 +362,16 @@ def run(cfg_path):
     if best is None:
         sys.exit("No high site has a clear path to the uplink. Choose a different uplink in the config.")
     hs = [cands[i] for i in best[1]]
-    names = ["High Site"] if len(hs) == 1 else (
-        ["High Site South", "High Site North"] if hs[0][2] < hs[1][2] else ["High Site North", "High Site South"])
+    if len(hs) == 1:
+        names = ["High Site"]
+    elif abs(hs[0][1] - hs[1][1]) > 1.5 * abs(hs[0][2] - hs[1][2]):  # mostly east-west apart
+        names = ["High Site West", "High Site East"] if hs[0][1] < hs[1][1] else ["High Site East", "High Site West"]
+    else:
+        names = ["High Site South", "High Site North"] if hs[0][2] < hs[1][2] else ["High Site North", "High Site South"]
     sites = [dict(name=n, elev=s[0], p=(s[1], s[2]), kind="high") for n, s in zip(names, hs)]
-    up_to = min([s for s, i in zip(sites, best[1]) if upclear[i]], key=lambda s: np.hypot(s["p"][0] - U[0], s["p"][1] - U[1]))
+    up_i = min([i for i in best[1] if upclear[i]], key=lambda i: np.hypot(upopts[upbest[i]][1][0] - cands[i][1], upopts[upbest[i]][1][1] - cands[i][2]))
+    up_to = sites[best[1].index(up_i)]
+    up_label, U = upopts[upbest[up_i]]
 
     # relays for lodges no high site can see
     covered = set().union(set(), *[served[i] for i in best[1]])
@@ -345,6 +436,8 @@ def run(cfg_path):
     hp = MPath(np.array(hull.exterior.coords))
     fm = hp.contains_points(np.c_[GX.ravel(), GY.ravel()]).reshape(GX.shape)
     cov_pct = float(cov[fm].mean() * 100)
+    turb_clear = sum(1 for p in TX if any(np.hypot(p[0] - s_["p"][0], p[1] - s_["p"][1]) < MAX_LODGE_KM * 1000
+                                          and tr.profile(s_["p"], p, MAST, FIELD_H)["clear"] for s_ in sites))
     area = float(fm.sum() * (step * RES) ** 2 / 1e6)
 
     # ------------------------------------------------------------ images
@@ -390,6 +483,8 @@ def run(cfg_path):
         big = s["kind"] == "high"
         ax.scatter(*s["p"], marker="^", s=190 if big else 110, c=M["link"], edgecolors=M["halo"], linewidths=1.5, zorder=9)
         lab(s["p"], f"{s['name']}  {s['elev']:.0f} m" if big else s["name"], 10, 6 if big else -12, 11 if big else 9.5, True, M["link"])
+    if TX:
+        ax.scatter([p[0] for p in TX], [p[1] for p in TX], marker="P", s=34, c="white", edgecolors=M["halo"], linewidths=.8, zorder=7)
     ax.scatter(*U, marker="s", s=120, c=M["link"], edgecolors=M["halo"], zorder=9)
     lab(U, f"Candidate carrier uplink\n({up_label})", 10, -4, 10.5, True, M["link"])
     if up.get("town"):
@@ -442,7 +537,7 @@ def run(cfg_path):
     # ------------------------------------------------------------ metrics
     ll = lambda p: tuple(round(v, 5) for v in Ti.transform(*p)[::-1])
     n_clear = sum(1 for v in lodge_links.values() if v)
-    metrics = dict(
+    metrics = dict(site_type=st, turbines_total=len(TX), turbines_clear=turb_clear,
         reserve=cfg["reserve"], date=cfg["date"], imagery_date=img_date, epsg=epsg,
         coverage_pct=cov_pct, area_km2=area, lodges_total=len(LX), lodges_clear=n_clear, unlocated=unlocated,
         area_mode=bool(ar),
@@ -464,7 +559,8 @@ def run(cfg_path):
     if money:
         sys.exit(f"Refusing to build: the customer-facing study contains cost figures {sorted(set(money))[:5]}. "
                  "Costs belong in INTERNAL_* files only.")
-    stem = re.sub(r"[^A-Za-z0-9]+", "_", cfg["short"]).strip("_") + "_Reserve_Network_CTTX"
+    kind = {"wind": "Wind_Farm", "farm": "Farm"}.get(cfg.get("site_type", "reserve"), "Reserve")
+    stem = re.sub(r"[^A-Za-z0-9]+", "_", cfg["short"]).strip("_") + f"_{kind}_Network_CTTX"
     standalone = to_standalone(page, brand)
     (out / f"{stem}.html").write_text(standalone)
     (work / "artifact.html").write_text(page)
@@ -517,11 +613,27 @@ def build_html(cfg, brand, ev, m, work):
         backbone_text += " " + " ".join(f"A short {r['name']} serves a lodge the ridges cannot see." for r in relays)
     site_word = f"{'two' if len(highs) == 2 else 'one'} ridge high-site{'s' if len(highs) == 2 else ''}"
     relay_word = (f" and {'one short relay' if len(relays) == 1 else f'{len(relays)} short relays'}" if relays else "")
+    st = m.get("site_type", "reserve")
+    P_ = json.loads((HERE / "site_types.json").read_text())[st]
+    bt = ev.get("by_type", {}).get(st, {})
+    model = bt.get("model", ev["model"])
     named = ev["named"][0]
     proof_rows = "".join(f"<div class='proof'><span class='tag'>{e(o['driver'])}</span><p>{e(o['text'])}</p></div>" for o in named["outcomes"])
     unnamed = "".join(f"<div class='callout {e(u.get('kind', 'win'))}'><span class='callout-label'>{e(u.get('title', u['label']))}</span>"
                       f"<p>{e(u['text'])}</p><cite>{e(u['label'])}</cite></div>" for u in ev["unnamed"])
-    drivers = "".join(f"<div class='driver-card'><div class='driver-label'>{e(d['name'])}</div><p>{e(d['text'])}</p></div>" for d in ev["model"]["drivers"])
+    drivers = "".join(f"<div class='driver-card'><div class='driver-label'>{e(d['name'])}</div><p>{e(d['text'])}</p></div>" for d in model["drivers"])
+    def proof_named(grid=True):
+        return (f"<div class='ref'>{e(named['name'])}<span>{e(named['scale'])}</span></div>"
+                f"<div class='ba'><div class='callout alert'><span class='callout-label'>Before</span><p>{e(named['before'])}</p></div>"
+                f"<div class='callout win'><span class='callout-label'>After</span><p>{e(named['after'])}</p></div></div>"
+                + (f"<div class='proof-grid'>{proof_rows}</div>" if grid else ""))
+    if st == "reserve":
+        proof_block = proof_named() + unnamed
+    elif st == "wind":
+        proof_block = (f"<div class='callout win'><span class='callout-label'>CTTX experience</span><p>{e(bt.get('experience', ''))}</p></div>"
+                       f"<p class='lede'>The same engineering runs an owned backbone on a 30,000 ha reserve:</p>" + proof_named(grid=False))
+    else:
+        proof_block = "<p class='lede'>The same engineering runs an owned backbone on a 30,000 ha reserve:</p>" + proof_named(grid=False)
     today = "".join(f"<li>{e(t)}</li>" for t in cfg.get("today", []))
     pm = json.loads((HERE / "payback_model.json").read_text())
     pay_head = "".join(f"<th>R{v:,} / lodge / month<small>{e(l)}</small></th>".replace(",", " ")
@@ -610,7 +722,7 @@ def build_html(cfg, brand, ev, m, work):
         ]) + "\n", encoding="utf-8")
     positions = "; ".join(f"{s['name']} {s['latlon'][0]:.5f}, {s['latlon'][1]:.5f}" for s in sites)
     rep = {
-        "TITLE": f"{e(cfg['short'])} Reserve Network",
+        "TITLE": f"{e(cfg['short'])} {'Reserve' if st == 'reserve' else ('Wind Farm' if st == 'wind' else 'Farm')} Network",
         "FONT_CSS": brand["fonts"]["google_css"],
         "LIGHT": css_tokens(brand["tokens"]),
         "F_DISPLAY": brand["fonts"]["display"], "F_BODY": brand["fonts"]["body"], "F_MONO": brand["fonts"]["mono"],
@@ -621,15 +733,16 @@ def build_html(cfg, brand, ev, m, work):
         "N_CLEAR": str(m["lodges_clear"]), "N_TOTAL": str(m["lodges_total"]),
         "N_HIGH": str(len(highs)), "N_RELAY": str(len(relays)),
         "SITES_PHRASE": site_word + relay_word,
-        "HERO_RESULT": (f"{site_word + relay_word} put {m['lodges_clear']} of the {m['lodges_total']} lodges we could locate on clear radio paths"
+        "HERO_RESULT": (f"{site_word + relay_word} reach {m['lodges_clear']} of the {m['lodges_total']} mapped substations and give line of sight to {m['turbines_clear']} of {m['turbines_total']} turbines"
+                        if m.get("turbines_total") else None) or (f"{site_word + relay_word} put {m['lodges_clear']} of the {m['lodges_total']} lodges we could locate on clear radio paths"
                         + (f" and give line of sight across {m['coverage_pct']:.0f}% of the reserve" if m.get("area_mode") else "")
                         if m["lodges_total"] else
                         f"{site_word + relay_word} give line of sight across {m['coverage_pct']:.0f}% of the reserve"),
-        "STAT1_VALUE": (f"{m['lodges_clear']} of {m['lodges_total']}" if m["lodges_total"] else f"{m['coverage_pct']:.0f}%"),
-        "STAT1_LABEL": ("lodges on a clear, Fresnel-checked radio path" if m["lodges_total"] else "of the reserve area in line of sight"),
-        "LODGE_FIG": (f'<figure class="fig"><img src="{b64(work / "profiles_lodges.png", "image/png")}" alt="Terrain profile for each lodge link"></figure>'
+        "STAT1_VALUE": (f"{m['turbines_clear']} of {m['turbines_total']}" if m.get("turbines_total") else None) or (f"{m['lodges_clear']} of {m['lodges_total']}" if m["lodges_total"] else f"{m['coverage_pct']:.0f}%"),
+        "STAT1_LABEL": ("turbines in line of sight of the standby backbone" if m.get("turbines_total") else None) or ("lodges on a clear, Fresnel-checked radio path" if m["lodges_total"] else "of the reserve area in line of sight"),
+        "LODGE_FIG": (f'<figure class="fig"><img src="{b64(work / "profiles_lodges.png", "image/png")}" alt="Terrain profile for each site link"></figure>'
                       if (work / "profiles_lodges.png").exists() else ""),
-        "UNLOCATED_NOTE": (f"<p class='caption'>Lodges marked “position to confirm” have no published location. We add them to the model once you share a marked map or KMZ.</p>"
+        "UNLOCATED_NOTE": (f"<p class='caption'>Entries marked “position to confirm” have no published location. We add them to the model once you share a marked map or KMZ.</p>"
                            if m.get("unlocated") else ""),
         "COV": f"{m['coverage_pct']:.0f}", "AREA": f"{m['area_km2']:.0f}",
         "UPKM": f"{m['uplink']['km']:.1f}", "UPLABEL": e(m["uplink"]["label"]), "UPTO": e(m["uplink"]["to"]),
@@ -640,6 +753,11 @@ def build_html(cfg, brand, ev, m, work):
         "PROOF_BEFORE": e(named["before"]), "PROOF_AFTER": e(named["after"]), "PROOF_ROWS": proof_rows,
         "UNNAMED": unnamed, "MODEL_HEAD": e(ev["model"]["headline"]), "MODEL_PRINCIPLE": e(ev["model"]["principle"]),
         "DRIVERS": drivers, "PAY_HEAD": pay_head, "PAY_ROWS": pay_rows, "EST_BLOCK": est_block, "POSITIONS": e(positions), "UPLL": f"{m['uplink']['latlon'][0]:.5f}, {m['uplink']['latlon'][1]:.5f}",
+        "PROOF_BLOCK": proof_block,
+        "MODEL_HEAD": e(model["headline"]),
+        "TURBINE_LEGEND": ("<span><i class='cov' style='background:#fff;opacity:1;width:10px;height:10px;border-radius:2px'></i>Mapped turbine</span>" if m.get("turbines_total") else ""),
+        **{f"T_{k.upper()}": (e(v.replace("{SHORT}", cfg["short"])) if isinstance(v, str) else "".join(f"<li>{e(x)}</li>" for x in v))
+           for k, v in P_.items() if k not in ("area_word", "site_word", "sites_word")},
         "CO_NAME": e(brand["company"]["name"]), "CO_CONTACT": e(brand["company"]["contact"]),
         "CO_EMAIL": e(brand["company"]["email"]), "CO_PHONE": e(brand["company"]["phone"]), "CO_WEB": e(brand["company"].get("web", "")),
     }

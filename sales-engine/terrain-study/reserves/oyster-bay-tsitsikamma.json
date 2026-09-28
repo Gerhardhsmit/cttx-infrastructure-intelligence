@@ -1,0 +1,49 @@
+{
+ "site_type": "wind",
+ "date": "2026-09-28",
+ "lodges": [],
+ "uplink": {
+  "mode": "auto",
+  "town": "Humansdorp",
+  "lat": -34.0333,
+  "lon": 24.7667,
+  "radius_m": 2500,
+  "tower_radius_km": 25
+ },
+ "slug": "oyster-bay-tsitsikamma-wind-farms",
+ "reserve": "Oyster Bay and Tsitsikamma Community Wind Farms",
+ "short": "Oyster Bay and Tsitsikamma",
+ "prepared_for": "Melumzi Gxekwa, 3Energy Renewables",
+ "osm_turbines": {
+  "farms": [
+   {
+    "name": "Oyster Bay",
+    "lat": -34.1111,
+    "lon": 24.6297,
+    "turbines": 41
+   },
+   {
+    "name": "Tsitsikamma",
+    "lat": -34.0756,
+    "lon": 24.503,
+    "turbines": 31
+   }
+  ],
+  "exclude_operators": [
+   "Red Cap"
+  ],
+  "radius_km": 8
+ },
+ "today": [
+  "Oyster Bay: 41 turbines; Tsitsikamma Community Wind Farm: 31 Vestas turbines, south of the N2 west of Humansdorp",
+  "SCADA, crew communications and cameras on both sites depend on fibre",
+  "The public record describes no standby path for SCADA if the fibre is cut or stolen"
+ ],
+ "context": "Oyster Bay and Tsitsikamma Community Wind Farm sit about 12 km apart on the same coastal ridge. One owned standby wireless network can cover both, keeping SCADA, crews and cameras connected when the fibre is cut or stolen.",
+ "security_note": "Cable and fibre theft can take out SCADA and the cameras in the same incident. A standby path keeps both reporting while the fibre is repaired.",
+ "sources": [
+  "en.wikipedia.org/wiki/Oyster_Bay_Wind_Power_Station (34.111 S 24.630 E, 41 turbines)",
+  "thewindpower.net / cennergi.com (Tsitsikamma 34.0756 S 24.5030 E, 31 Vestas)",
+  "OpenStreetMap turbines and substations via Overture 2026-09-23.1"
+ ]
+}

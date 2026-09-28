@@ -1,0 +1,74 @@
+{
+ "site_type": "wind",
+ "turbines_total": 72,
+ "turbines_clear": 68,
+ "reserve": "Oyster Bay and Tsitsikamma Community Wind Farms",
+ "date": "2026-09-28",
+ "imagery_date": "3 May 2026",
+ "epsg": 32735,
+ "coverage_pct": 49.64510343782364,
+ "area_km2": 320.6709,
+ "lodges_total": 2,
+ "lodges_clear": 2,
+ "unlocated": [],
+ "area_mode": true,
+ "uplink": {
+  "label": "mapped mast, operator not tagged",
+  "latlon": [
+   -33.98789,
+   24.65482
+  ],
+  "to": "High Site East",
+  "km": 14.098650253016421
+ },
+ "sites": [
+  {
+   "name": "High Site East",
+   "kind": "high",
+   "elev": 184.40811157226562,
+   "latlon": [
+    -34.11493,
+    24.65888
+   ],
+   "feed": null
+  },
+  {
+   "name": "High Site West",
+   "kind": "high",
+   "elev": 182.1549835205078,
+   "latlon": [
+    -34.14787,
+    24.51841
+   ],
+   "feed": null
+  }
+ ],
+ "links": [
+  {
+   "a": "Carrier uplink",
+   "b": "High Site East",
+   "kind": "uplink",
+   "km": 14.098650253016421,
+   "fresnel_ratio": 6.752040377501694
+  },
+  {
+   "a": "High Site West",
+   "b": "High Site East",
+   "kind": "backbone",
+   "km": 13.465455803648089,
+   "fresnel_ratio": 3.189497085333172
+  }
+ ],
+ "lodges": {
+  "Oyster Bay substation": {
+   "frm": "High Site East",
+   "km": 1.3833298436939119,
+   "fresnel_ratio": 1.3837394524990465
+  },
+  "Tsitsikamma substation": {
+   "frm": "High Site West",
+   "km": 8.36507861157418,
+   "fresnel_ratio": 4.058127461290759
+  }
+ }
+}

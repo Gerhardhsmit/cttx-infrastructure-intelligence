@@ -1,0 +1,69 @@
+{
+ "site_type": "wind",
+ "turbines_total": 60,
+ "turbines_clear": 59,
+ "reserve": "Jeffreys Bay Wind Farm",
+ "date": "2026-09-28",
+ "imagery_date": "3 May 2026",
+ "epsg": 32735,
+ "coverage_pct": 75.90292375310528,
+ "area_km2": 84.7746,
+ "lodges_total": 1,
+ "lodges_clear": 1,
+ "unlocated": [],
+ "area_mode": true,
+ "uplink": {
+  "label": "mapped mast, operator not tagged",
+  "latlon": [
+   -33.99558,
+   24.80685
+  ],
+  "to": "High Site West",
+  "km": 1.9927109358824435
+ },
+ "sites": [
+  {
+   "name": "High Site West",
+   "kind": "high",
+   "elev": 382.98504638671875,
+   "latlon": [
+    -33.978,
+    24.80245
+   ],
+   "feed": null
+  },
+  {
+   "name": "High Site East",
+   "kind": "high",
+   "elev": 173.7972869873047,
+   "latlon": [
+    -34.01445,
+    24.8759
+   ],
+   "feed": null
+  }
+ ],
+ "links": [
+  {
+   "a": "Carrier uplink",
+   "b": "High Site West",
+   "kind": "uplink",
+   "km": 1.9927109358824435,
+   "fresnel_ratio": 14.637874995118272
+  },
+  {
+   "a": "High Site East",
+   "b": "High Site West",
+   "kind": "backbone",
+   "km": 7.899803795031874,
+   "fresnel_ratio": 6.0464557512307096
+  }
+ ],
+ "lodges": {
+  "Jeffreys Bay substation": {
+   "frm": "High Site East",
+   "km": 3.5854216968356707,
+   "fresnel_ratio": 1.8220895816710676
+  }
+ }
+}

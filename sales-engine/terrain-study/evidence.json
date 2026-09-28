@@ -59,5 +59,49 @@
       }
     ],
     "principle": "Carrier connectivity comes in once. Everything on the property runs over infrastructure the reserve owns. New cameras, sensors and lodges plug in without a new provider contract."
+  },
+  "by_type": {
+    "wind": {
+      "model": {
+        "headline": "One standby path for every critical load",
+        "drivers": [
+          {
+            "name": "SCADA continuity",
+            "text": "An automatic second path keeps turbines and the substation visible to the control room when the fibre is cut or stolen."
+          },
+          {
+            "name": "Crew communication",
+            "text": "O&M crews reachable across the site, at the turbines and in the substation, on one monitored network."
+          },
+          {
+            "name": "Security",
+            "text": "Perimeter and substation cameras keep reporting during exactly the incidents that cut the fibre."
+          }
+        ],
+        "principle": "The fibre stays the primary path. The owned wireless path is independent of the fibre route and monitored remotely."
+      },
+      "experience": "CTTX has delivered this kind of work at Oya Wind Farm and Eskom Medupi.",
+      "experience_source": "Gerhard's own outreach drafts, 28 Sep 2026"
+    },
+    "farm": {
+      "model": {
+        "headline": "One backbone for every driver of the farm",
+        "drivers": [
+          {
+            "name": "Water and power",
+            "text": "Pump stations, dams and boreholes report their status, so problems are found before a block goes dry."
+          },
+          {
+            "name": "Staff communication",
+            "text": "Office, packhouse, workshops and field teams on one network, day and night."
+          },
+          {
+            "name": "Security",
+            "text": "Cameras and alarms on the same backbone, covering the theft of copper, diesel and equipment."
+          }
+        ],
+        "principle": "Carrier connectivity comes in once. Everything on the farm runs over infrastructure the farm owns."
+      }
+    }
   }
 }
