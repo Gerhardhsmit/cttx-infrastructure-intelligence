@@ -242,7 +242,7 @@ Total upfront (infrastructure R334,066.26 + Vodacom NRC R3,599.00) = **R337,665.
 |------|-----------|--------|------------|
 | Long-range links (1.7-3.0km to Villas/Directors House/Staff Village) sit at the edge-of-range for the sector serving them — may not sustain full 100 Mbps symmetrical at that distance | Medium | Medium-High | Link budget verification required per link before final commissioning; monitor actual throughput on longest hops post-install |
 | Vodacom feasibility delay/rejection at this specific site | Low–Medium | High | Feasibility check submitted early in process; fallback options assessed if declined |
-| ePMP Force 4525L stock delay (ETA mid-Nov 2026) | Confirmed | Medium | Installation phased — mast/cabinet/solar/switches proceed first; subscriber modules follow on confirmed ETA |
+| ePMP Force 4525L stock | Superseded — in stock with supplier and secured (Gerhard, 28 Sep 2026); allocation cannot be held indefinitely, seasonal demand high | Low while the deposit lands promptly; rises with every week of delay | Deposit on order releases the allocation; if it lapses, re-quote against then-current stock and price |
 | Cable run distances differ from 40m estimate | Medium | Low–Medium | Confirmed on-site survey; cable line item adjusted before final invoice if materially different |
 | Power system undersized for load (28 APs + backhaul, 2 sector radios on one mast) | Low | High | Solar/battery sizing validated during design phase against actual measured load |
 | No managed retainer taken — issues go undetected | Medium | Medium–High | Recommended as add-on; lodge to confirm decision before go-live |
@@ -267,7 +267,7 @@ Total upfront (infrastructure R334,066.26 + Vodacom NRC R3,599.00) = **R337,665.
 - **Validity:** 30 days from quote date
 - **Payment:** 50% deposit on order / 50% on commissioning sign-off
 - **Warranty:** 24 months hardware, 12 months installation
-- **Lead time:** 10–15 working days from deposit (subject to ePMP Force 4525L stock ETA — see Risk Table)
+- **Lead time:** 10–15 working days from deposit (equipment in stock and secured as at 28 Sep 2026 — see Risk Table)
 
 ---
 
