@@ -222,6 +222,21 @@ The basis for this claim: CTTX resells and builds on Vodacom's national carrier 
 
 > **Decision rule:** Never let a proposal imply CTTX's service area is limited to the Eastern Cape. National reach, via the Vodacom carrier relationship, is a standing fact to state plainly, not a stretch to justify.
 
+## 15. Client Correspondence Always From gerhard@cttx.co.za
+
+Every client-facing email, draft, quote cover note, and proposal goes out from **gerhard@cttx.co.za**, and it must land in Gerhard's own Outlook (the gerhard@cttx.co.za mailbox) where he actually works. This is a hard rule, not a preference.
+
+What this rules out, learned on the Barefoot Addo deal (28 Sept 2026):
+
+| Route | Why it fails |
+|---|---|
+| Gmail connector (gerhardcttx@gmail.com) | Receives copies of the cttx.co.za mail, so searches work — but a draft made there is invisible in Gerhard's Outlook and would send from the wrong address. |
+| Microsoft 365 connector | Signed in as gerhardSmit@CTTX.onmicrosoft.com, a tenant mailbox that does not hold the cttx.co.za mail. Every search returns empty, and a draft made there lands in a Drafts folder Gerhard never opens. |
+
+The gerhard@cttx.co.za mailbox is hosted on host-h (IMAP); Outlook desktop is the client. No connector currently reaches it.
+
+> **Decision rule:** Until a connector is signed into gerhard@cttx.co.za itself, deliver client drafts as a ready-to-open `.eml` (From: gerhard@cttx.co.za, attachment included, `X-Unsent: 1`) that Gerhard double-clicks in Outlook and sends. Never create the client draft in Gmail or the onmicrosoft tenant, and never send anything on Gerhard's behalf.
+
 ## Implementation Guardrails
 
 Future implementation work must preserve these decisions across code, tests, map behavior, report output, intake wording, scoring logic, and UI design. If a feature proposal conflicts with this file, the conflict should be called out explicitly before code is changed.
