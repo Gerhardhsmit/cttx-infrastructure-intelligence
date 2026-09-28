@@ -480,3 +480,25 @@ Not: research, not: ask questions, not: explain CTTX
 **END CLAUDE.MD**
 
 *This is the source of record for CTTX Claude Code permanent context. Loads automatically in every session.*
+
+---
+
+## MICROSOFT / OUTLOOK IDENTITY RULE (added 28 September 2026)
+
+**Authority:** `references/microsoft-identity-audit-2026-09-28.md`
+
+1. **gerhard@cttx.co.za is an xneelo-hosted mailbox, not a Microsoft mailbox.** MX is
+   `mail.cttx.co.za`; it forwards to `gerhardcttx@gmail.com`. Outlook desktop reads it over IMAP/POP.
+2. **`gerhardSmit@CTTX.onmicrosoft.com` is NOT Gerhard's mailbox.** It is an unlicensed Entra user in tenant
+   `c0bb4ede-fab7-4806-8255-e1b51ae4fc34` with Exchange disabled. Never treat it as the CTTX mailbox, never
+   create drafts or search mail through it, and never propose re-licensing it as a way to "fix Outlook".
+3. **For any email task (search, draft, reply, read Sent/Drafts):** use the **Gmail connector**
+   (`gerhardcttx@gmail.com`), which holds all @cttx.co.za mail. Drafts only; never send.
+4. **If a Microsoft 365 / Outlook connector is present, check `get_me` first.** If it returns any
+   `@onmicrosoft.com` identity, or any identity other than `gerhard@cttx.co.za`, STOP, report the mismatch,
+   and do not perform the operation through it.
+5. **No new Microsoft infrastructure by default.** Do not create tenants, app registrations, Azure
+   subscriptions, mailboxes, aliases or domains. Moving gerhard@cttx.co.za into Microsoft 365 is a mailbox
+   migration (Option C in the audit) and needs Gerhard's explicit written approval.
+6. Routines that previously reported "M365 subscription cancelled, calendar/Teams down" must instead
+   report: "Microsoft is not the CTTX mail path; Gmail connector used."
