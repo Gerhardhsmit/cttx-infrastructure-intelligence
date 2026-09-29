@@ -1,0 +1,34 @@
+{
+  "customer": {
+    "name": "Endalweni Private Game Reserve",
+    "type": "Boutique Reserve / Country House",
+    "location": "Kei Mouth, Eastern Cape (11km via R349, ~45min from East London)",
+    "segment": "Reserve/Lodge",
+    "industry": "Hospitality & Conservation"
+  },
+  "opportunity": {
+    "type": "Hybrid Infrastructure",
+    "carrier": "Vodacom (Great Kei municipality investment confirmed publicly; per-site feasibility not yet confirmed with Duane Forlee)",
+    "status": "Active — Property Intelligence Brief complete, outreach drafted, awaiting Gerhard send decision",
+    "created": "2026-09-29",
+    "contact_status": "GENERIC CONTACT — DECISION MAKER UNVERIFIED",
+    "contact_email": "info@endalweni.co.za",
+    "contact_phone": "+27 43 841 1526"
+  },
+  "infrastructure": {
+    "design_supplied": false,
+    "gis_data_available": false,
+    "gis_blocker": "Nominatim/Overpass blocked by this coding session's network egress policy (403, confirmed policy denial). Not evidence the data is unavailable to CTTX's own Link Planner tool run outside this sandbox.",
+    "hypothesis_only": true
+  },
+  "resources_exhausted_for_contact": [
+    "Apollo.io (org + people search, zero results)",
+    "Notion (no prior record)",
+    "Gmail (no thread)",
+    "Outlook/M365 (infrastructure fault, not data gap - AADSTS500014)",
+    "Google Drive (no files)",
+    "Web search (no verified name; one unverified AI-search lead discarded)",
+    "Direct site/social fetch (blocked/DNS failure)"
+  ],
+  "next_action": "Gerhard reviews and sends CTTX_Endalweni_Outreach.eml, or edits first. No further research required to advance this."
+}
