@@ -45,26 +45,29 @@ Abel's changes: 6m tower (was 9m), 2x 120° sectors, 25 subscriber radios (was 2
 | Vodacom Business Connect MRC at the updated Sept 2026 reseller rate (Duane, 14 Sep AAG) - every R500/mo off the client MRC = R18,000 over the term | n/a (recurring) | None - this is the single biggest ROI lever and costs CTTX nothing | Need the AAG sheet |
 
 **If every lever lands:** cost ≈ **R220,657** → sells at **R305,059 incl VAT** at the same GP. That is the honest floor for the full build with our margin intact. Going below it means cutting GP, and GP is already 14.5% on a R300k+ project.
-## 4. ROI per option (incl VAT; current bill R18,105.60; 8% escalation on the current provider from year 2; CTTX monthly locked 36 months)
+## 4. ROI per option - AT THE SEPTEMBER 2026 VODACOM RATE (incl VAT; current bill R18,105.60; 8% escalation on the current provider from year 2; CTTX monthly locked 36 months)
+
+Vodacom Business Connect 100 Mbps, 36-month, from Duane's AAG of 14 Sep 2026: cost R4,152.04 ex VAT (was R5,235.36). At 20% markup the client MRC is **R5,729.82 incl VAT** (was R7,224) - R1,494/month less, R53,790 over the term, at no cost to CTTX. NRC unchanged at R3,599 incl. New monthly to the lodge: R5,730 + R1,725 retainer = **R7,455**, saving **R10,651/month** against today.
 
 | Option | Upfront | New monthly | Saving/mo | Payback | 36-month net | 5-year net |
 |---|---:|---:|---:|---:|---:|---:|
-| A1 - As proposed (R355,000) | R358,599 | R8,949 | R9,157 | 3.3 yrs | R-28,961 | R+352,621 |
-| A2 - Abel's revised BOM, sold at the same GP | R352,599 | R8,949 | R9,157 | 3.2 yrs | R-22,961 | R+358,621 |
-| A3 - Revised BOM after all challenge levers land | R308,599 | R8,949 | R9,157 | 2.8 yrs | R+21,039 | R+402,621 |
-| A4 - A3 plus Vodacom MRC R500/mo lower (illustrative until AAG confirmed) | R308,599 | R8,449 | R9,657 | 2.7 yrs | R+39,039 | R+434,099 |
-| B - Phase 1 only: build, keep the current link (no Vodacom dependency) | R305,000 | R13,431 | R4,675 | 5.4 yrs | R-136,709 | R+124,057 |
+| A1 - As proposed (R355,000) | R358,599 | R7,455 | R10,651 | 2.8 yrs | R+24,829 | R+446,690 |
+| A2 - Abel's revised BOM at the same GP (~R349,000) | R352,599 | R7,455 | R10,651 | 2.8 yrs | R+30,829 | R+452,690 |
+| A3 - Revised BOM after all challenge levers land (~R305,000) | R308,599 | R7,455 | R10,651 | 2.4 yrs | R+74,829 | R+496,690 |
 
-**Option C - rent-to-own (zero upfront):** the lodge pays a fixed monthly for 36 months and owns the network at month 36. At R305,000 spread over 36 months with no finance cost (illustrative only) that is R8,472 + R8,949 = **R17,421/month vs R18,106 today**, then R8,949/month from month 37. Cash-neutral for the lodge from day one, R305,000 of infrastructure on their balance sheet at the end. For CTTX this only works if a finance partner funds the build (you said cash deal) - the financed rate must come from them, not from me. This is the only option that answers "upfront too high" head-on.
+**Option C - rent-to-own (zero upfront):** at R305,000 over 36 months with no finance cost (illustrative) = R8,472 + R7,455 = **R15,927/month vs R18,106 today** - R2,179/month *cheaper than now* from day one, network owned at month 36, then R7,455/month. Even at R355,000 it is R17,316/month, still under today's bill. A finance partner's rate would sit on top; get it before quoting.
 
-**Option B (phase 1, keep the current link):** payback is poor on its own because the link saving (R4,482/mo) never happens - the build's ROI depends on the Vodacom swap. B is a risk-mitigation story, not a savings story. Don't lead with it.
+**Option B (phase 1, keep the current link):** still poor on its own (the link saving is the engine). Keep it only as the fallback clause if Vodacom feasibility fails.
+
+**Note on the AAG:** "Pricing based on Vodacom infrastructure. 3rd party infrastructure will incur additional cost." Duane's 16 Sep note says Olifants Nek is a Telkom site. Confirm with Duane that the R4,152 rate holds for this site before it goes in a client document.
+
 ## 5. The Vodacom objection - fix the sequence, not the price
 
 Duane's own note (16 Sep): "Only option would be Olifants Nek which is non-R1 AND beyond Radwin range (so SIAE). Also a Telkom site just for added complexity. So in short, to even be considered, would have to be a high bandwidth link." Shelley's worry is legitimate.
 
 Abel sent Duane the 6m mast coordinates (33.31005S, 025.73183E) this morning. The answer to the client is: **Vodacom desktop feasibility is obtained before any order is placed**, and the order is conditional on it. If Vodacom cannot deliver 100 Mbps at that mast, the lodge keeps its current link and still owns the distribution network - the AP-rental saving (R6,400/mo) does not depend on Vodacom. Put that in writing.
 
-**Vodacom pricing:** Duane sent an updated At-a-Glance ("Fixed Services AAG 092026.xlsx", 14 Sep: "Business Connect - bandwidth and installation costing updated") and on 16 Sep said to compare old vs new and re-cost. I can see the email but the Gmail mirror won't give me the attachment. **The R7,224 in the proposal is the June rate book - it may already be wrong.**
+**Vodacom pricing:** Duane sent an updated At-a-Glance ("Fixed Services AAG 092026.xlsx", 14 Sep: "Business Connect - bandwidth and installation costing updated") and on 16 Sep said to compare old vs new and re-cost. I can see the email but the Gmail mirror won't give me the attachment. **Resolved 29 Sep: AAG received; the proposal's R7,224 was the June rate book - the 36-month rate is now R5,730 incl at 20%.**
 ## 6. What I recommend we send Shelley
 
 1. **Itemized proposal** (she asked for it): line items with quantities and a price per section (backbone & mast / distribution radios / Wi-Fi / power / installation), not per unit - we still don't expose unit cost.
@@ -76,7 +79,8 @@ Abel sent Duane the 6m mast coordinates (33.31005S, 025.73183E) this morning. Th
 
 | Missing | Why it matters | Proposed |
 |---|---|---|
-| Duane's 14 Sep email with **Fixed Services AAG 092026.xlsx** | It is the new reseller cost; the proposal MRC and every ROI line depend on it | Drag the .msg from Outlook into this chat (subject "Fixed Services AAG - Updated") |
+| ~~Duane's AAG~~ | Received 29 Sep - applied above and to the Notion rate card | Done |
+| Duane: does the R4,152 BC100 36m rate hold at Olifants Nek (Telkom site - "3rd party infrastructure will incur additional cost")? | If a 3rd-party surcharge applies the MRC and ROI move again | Ask Duane with the 6m coordinates already sent |
 | Abel: cost of 6m mast installed, bare outdoor cabinet, 4U wall boxes, unmanaged switches, extended warranties, TP-Link AP prices from Pinnacle | Five TBC lines = ~R40k of my estimate | Abel to reply with numbers; I'll swap them in |
 | Abel: is 6m enough for LOS to the 3 km staff village AND to Olifants Nek? Can the 10 staff houses be clustered on 3 radios + LAN? | Height cut and clustering are the two engineering savings; both carry link risk | Abel confirms from the survey; Duane confirms Vodacom LOS at 6m |
 | Your call on Option C (rent-to-own via a finance partner) | It is the only option that removes the upfront objection | Yes/no, and who the finance partner is |
