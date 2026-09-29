@@ -1,0 +1,30 @@
+From: Gerhard Smit <gerhard@cttx.co.za>
+To: Abel Ringisai <abel@cttx.co.za>
+Cc: gerhard@cttx.co.za
+Subject: RE: Barefoot Elephant Lodge - five costs and three answers I need for the re-quote
+Date: Tue, 29 Sep 2026 16:05:00 +0200
+X-Unsent: 1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+X-CTTX-Note: Internal brief to Abel following his revised BOM (29 Sep 12:37) and the Herholdt's solar quote. Not client-facing.
+
+Abel
+
+Thanks for the revised BOM and the Herholdt's quote. The client has come back: R355k is too much against the 36-month saving, and they want an itemised, more modest option. I have costed your revision and it only takes about R5k off - the 25 outdoor APs (R1,885 each) cost more than the 28 indoor ones (R1,025) they replace, so the saving from fewer radios and switches disappears. Before I re-quote I need the following from you, today if possible:
+
+COSTS (ex VAT, from actual stock or supplier quotes - no estimates)
+1. 6m mast with plinth, installed - our cost from stock.
+2. Bare outdoor cabinet (MPPT, battery and inverter now come from the Herholdt's kit).
+3. 4U wall boxes x4.
+4. Unmanaged 6-port PoE switches x2.
+5. Extended warranties (4500L x2, 4525L x25) - price, and whether you think we need them, or offer them as an option. Also the TP-Link indoor/outdoor AP prices from Pinnacle if you have them.
+
+ENGINEERING (from the survey, please be straight about the risk)
+A. Is 6m enough for clear LOS to the staff village (2.3-3 km) AND for Vodacom from Olifants Nek? If 9m is the safe answer, say so - I would rather pay for the height than lose the link.
+B. Which buildings genuinely need an OUTDOOR AP? My assumption is the villa, main lodge and boma (say 4); indoor ceiling APs everywhere else. Confirm or correct.
+C. The 10 staff houses at 3 km: can they run on 3 subscriber radios with LAN cable between clustered houses instead of 10 radios? If yes, roughly what cable length and trenching are we talking about?
+
+Also: cabling. The quote carries 40m total at R12/m. With 25 sites that is not right - I am moving it to 40m per site. If you have real run lengths from the survey, send them.
+
+Thanks
+Gerhard
