@@ -15,6 +15,8 @@
 **Market:** Rural/remote reserve and farm infrastructure (South Africa)  
 **Core Positioning:** Trusted infrastructure advisor, NOT a commodity connectivity reseller
 
+**PERMANENT RULE — Outreach channel:** ALL customer-facing/business correspondence (outreach emails, quotes, proposals, replies to prospects or customers) is sent from **Outlook only** — `gerhard@cttx.co.za` on the `CTTX.onmicrosoft.com` tenant. NEVER draft or send business correspondence via Gmail (`gerhardcttx@gmail.com` is a personal/session-identifying address only, never a sending address for CTTX business). If the live Outlook/M365 connector is unavailable, use the `.eml` file fallback (draft as a `.eml`, Gerhard opens and sends from Outlook manually) — do not substitute Gmail as a workaround under any circumstance.
+
 **Primary Business Model: CTTX Hybrid Infrastructure**
 
 CTTX does NOT merely resell connectivity.
