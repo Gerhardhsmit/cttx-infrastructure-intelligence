@@ -329,6 +329,14 @@ as current (corroborated by real deal evidence — see COMMERCIAL_RULES.md
 Part 1) but flag the discrepancy rather than silently picking one, and note
 it to the director for cleanup.
 
+**SEPTEMBER 2026 UPDATE (29 Sep):** Vodacom issued a new Fixed Services At-a-Glance
+("Fixed Services AAG 092026.xlsx", Duane Forlee, 14 Sep 2026). It is loaded at the TOP of the
+💰 Vodacom Products & Pricing page and SUPERSEDES both older tables. Business Connect costs dropped
+26-46% (e.g. BC 100 Mbps 36-month cost R4,152.04 ex VAT; client R5,729.82 incl at 20%). Business
+Connect now has 12/24/36/48/60-month terms; a new FWA (5G/LTE) table replaces "Business Internet 5G".
+Caveat on every BC quote: "pricing based on Vodacom infrastructure; 3rd-party infrastructure incurs
+additional cost" - confirm per site with Duane before quoting.
+
 **Full retrieved detail, cross-checks, and the specific numbers used for
 Elephant Barefoot Lodge are in `sales-engine/COMMERCIAL_RULES.md` Part 1.**
 Retrieve fresh from Notion each time rather than trusting a stale copy —
