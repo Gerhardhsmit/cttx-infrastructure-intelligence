@@ -85,3 +85,18 @@ Abel sent Duane the 6m mast coordinates (33.31005S, 025.73183E) this morning. Th
 | Abel: is 6m enough for LOS to the 3 km staff village AND to Olifants Nek? Can the 10 staff houses be clustered on 3 radios + LAN? | Height cut and clustering are the two engineering savings; both carry link risk | Abel confirms from the survey; Duane confirms Vodacom LOS at 6m |
 | Your call on Option C (rent-to-own via a finance partner) | It is the only option that removes the upfront objection | Yes/no, and who the finance partner is |
 | Your call on GP floor | Every rand off the price below the challenged floor comes out of margin | Confirm 14.5% holds, or set a new floor |
+
+## 8. UPDATE 1 Oct 2026 — Vodacom feasibility at Olifants Nek (Duane Forlee, "Barefoot Addo")
+
+EAS feedback: because of (a) distance and (b) 3rd-party infrastructure (Telkom), the **minimum service is Business Connect 300 Mbps** — R6,510.46 ex VAT / R7,487.03 incl, 36 months, "based on the old costing in order to meet the rand value criteria". 100 Mbps is not available at this site.
+
+Effect at 20% markup: client MRC **R8,984.43 incl** (was R5,729.82). New monthly R10,709 (with R1,725 retainer), saving **R7,396/month** (was R10,651). At R335,000 the 36-month net goes to **−R72,337**; payback 3.8 years. The ROI case no longer closes inside the contract term on price alone.
+
+| Scenario | Monthly | Saving | Payback | 36-mo net |
+|---|---:|---:|---:|---:|
+| R335k, 20%, retainer R1,500 | R10,709 | R7,396 | 3.8 y | −R72,337 |
+| R335k, 20%, retainer R1,000 | R10,134 | R7,971 | 3.5 y | −R51,637 |
+| R305k, 20%, retainer R1,500 | R10,709 | R7,396 | 3.5 y | −R42,337 |
+| R305k, 15%, retainer R1,000 | R9,760 | R8,346 | 3.1 y | −R8,160 |
+
+What the client gets for it: 300 Mbps uncontended symmetrical — three times the bandwidth of today's shared 100 Mbps. The case has to be made on five years, ownership, and bandwidth, not on 36-month cash. Alternatively: Business Internet Wireless 80 Mbps (R3,390 cost) or a fibre FNO if any reaches the site — ask Duane whether either is feasible here before conceding.
