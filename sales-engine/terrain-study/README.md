@@ -7,7 +7,7 @@ Every reserve CTTX identifies as a potential client gets this study as the **fir
 - **Link planning:** a terrain profile for every link (Copernicus 30 m DEM, 5.8 GHz, k = 4/3, ≥60% first-Fresnel clearance). Blocked paths are never drawn (CTTX_CRITICAL_DECISIONS.md).
 - **One backbone for every driver:** guest experience, staff communication, and security and operations, with named customer proof from `evidence.json`.
 - **Ownership case:** today versus owned backbone, plus the four ROI lenses in words, then next steps.
-- Output: `sales-engine/customers/<slug>/<Short>_Reserve_Network_CTTX.pdf` + `.html`, and `terrain-study/` (map, profiles, metrics, config, artifact page).
+- Output: `sales-engine/customers/<slug>/<Short>_Reserve_Network_CTTX.pdf` + `.html`, **`<Short>_Reserve_Network_CTTX_3D.kmz` (Google Earth: masts at modelled height, radio paths mast-top to mast-top at true altitude, fly-through tour)**, and `terrain-study/` (map, profiles, metrics, config, artifact page).
 
 ## Run it
 ```bash
@@ -27,6 +27,10 @@ Set `site_type` in the config: `reserve` (default), `wind` or `farm`. The wordin
 - **Clouds:** imagery is built from the clearest passes in the last 12 months, judged over the study area itself. A pass is used only if its local cloud is 1% or less, and gaps are filled pass by pass until the whole window is covered.
 - **Cost figures:** the engine refuses to build if a rand amount appears in the study.
 - **Filenames:** made safe (letters, digits and `_` only).
+
+## Optional config
+- `area.high_sites_inside: true` keeps candidate high sites inside the mapped boundary (tenure).
+- `wording`: per-study overrides of `site_types.json` keys (e.g. `"site_word": "site"` when the sites are not all lodges).
 
 ## Reserve config
 | Field | Meaning |

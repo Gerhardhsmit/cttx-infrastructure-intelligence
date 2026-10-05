@@ -14,6 +14,9 @@
 5. **Config.** Write `sales-engine/terrain-study/reserves/<slug>.json`. The `today`, `context` and `security_note` fields come from evidence, never invented scenarios.
 6. **Run.** `python3 sales-engine/terrain-study/engine.py sales-engine/terrain-study/reserves/<slug>.json`. If a lodge shows "Needs survey", say so rather than forcing a link.
 7. **Look once.** Check the map and the lodge table. Publish `terrain-study/artifact.html` as a private artifact for Gerhard.
+   - **Google Earth 3D (every study, Gerhard 5 Oct 2026):** the engine also writes `<Short>_<Kind>_Network_CTTX_3D.kmz` next to the PDF. Masts are extruded to modelled height, each radio path is drawn mast-top to mast-top at true altitude, every site is clickable, and a "▶ Fly the network" tour is included. Give Gerhard this file to fly around before any site visit; a screenshot is not enough. If files sent in chat don't open for him, upload the KMZ to his Google Drive (Drive connector, `contentMimeType: application/vnd.google-earth.kmz`, `disableConversionToGoogleType: true`) and give him the link. Google Earth web and the phone app open it from Drive.
+   - **Before a survey,** send the KMZ plus a LINKPlanner site/link CSV to Abel (abel@cttx.co.za) as an Outlook draft.
+   - **The repo is PUBLIC.** Never commit CTTX mast-dataset layers, carrier site IDs (EAS_…) or carrier site names. Keep those in chat/Drive only.
 8. **Email.** Follow the `outlook-outreach-drafts` skill and outreach rules on branch `claude/elegant-pascal-1jsjwa` exactly:
    - The email is a plain-text `.eml` for Gerhard's Outlook (From: Gerhard Smit <gerhard@cttx.co.za>, Cc: gerhard@cttx.co.za, X-Unsent: 1). The filename contains `_Assessment_`. Save it under `sales-engine/outreach/<date>/` on that branch, with the study PDF alongside to attach.
    - **Never Gmail, never the Microsoft 365 connector, never send.** Gmail is only a read-only check for prior contact.

@@ -593,6 +593,99 @@ def run(cfg_path):
     print(r.stderr.decode().strip().splitlines()[-1] if r.stderr else "")
     print(json.dumps({k: metrics[k] for k in ("lodges_clear", "lodges_total", "coverage_pct", "area_km2")}))
     print(f"✓ {out / (stem + '.pdf')}")
+    write_kmz(cfg, metrics, boundary_ll, out / f"{stem}_3D.kmz")  # Google Earth fly-around, every study
+
+
+# ---------------------------------------------------------------- Google Earth 3D (KMZ)
+def write_kmz(cfg, m, boundary_ll, path):
+    """3D Google Earth file for every study: masts extruded to their modelled height, each radio
+    path drawn mast-top to mast-top at true altitude (so it can be seen clearing the ridges),
+    click-through details, and a guided fly-through tour. Engine results only, no third-party data."""
+    import zipfile
+    import rasterio
+    from xml.sax.saxutils import escape as x
+    pts = [tuple(s["latlon"]) for s in m["sites"]] + [tuple(m["uplink"]["latlon"])]
+    pts += [(l["lat"], l["lon"]) for l in cfg["lodges"] if l.get("lat") is not None]
+    las, los = [p[0] for p in pts], [p[1] for p in pts]
+    srcs = [rasterio.open(t) for t in dem_tiles(min(los) - .05, min(las) - .05, max(los) + .05, max(las) + .05)]
+
+    def elev(la, lo):
+        for d in srcs:
+            b = d.bounds
+            if b.left <= lo <= b.right and b.bottom <= la <= b.top:
+                return float(next(d.sample([(lo, la)]))[0])
+        return 0.0
+
+    def look(la, lo, rng=2500, tilt=65, head=0):
+        return (f"<LookAt><longitude>{lo}</longitude><latitude>{la}</latitude><altitude>0</altitude><heading>{head:.0f}</heading>"
+                f"<tilt>{tilt}</tilt><range>{rng:.0f}</range><altitudeMode>relativeToGround</altitudeMode></LookAt>")
+
+    def tower(name, la, lo, h, style, desc):
+        return (f"<Placemark><name>{x(name)}</name><description>{x(desc)}</description>{look(la, lo)}<styleUrl>#{style}</styleUrl>"
+                f"<Point><extrude>1</extrude><altitudeMode>relativeToGround</altitudeMode><coordinates>{lo},{la},{h}</coordinates></Point></Placemark>")
+
+    def radio(name, a, ha, b, hb, style, desc):
+        dy, dx = (b[0] - a[0]) * 111.0, (b[1] - a[1]) * 111.0 * math.cos(math.radians(a[0]))
+        head = (math.degrees(math.atan2(dx, dy)) + 90) % 360
+        return (f"<Placemark><name>{x(name)}</name><description>{x(desc)}</description>"
+                f"{look((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, max(3000, 1400 * math.hypot(dx, dy)), 70, head)}<styleUrl>#{style}</styleUrl>"
+                f"<LineString><altitudeMode>absolute</altitudeMode><coordinates>{a[1]},{a[0]},{elev(*a) + ha:.0f} "
+                f"{b[1]},{b[0]},{elev(*b) + hb:.0f}</coordinates></LineString></Placemark>")
+
+    icon = lambda c, sc, shape: (f"<IconStyle><color>{c}</color><scale>{sc}</scale><Icon><href>http://maps.google.com/mapfiles/kml/shapes/{shape}.png</href></Icon></IconStyle>"
+                                 f"<LineStyle><color>{c}</color><width>3</width></LineStyle>")
+    styles = (f'<Style id="site">{icon("ffffffff", .9, "homegardenbusiness")}</Style>'
+              f'<Style id="high">{icon("ff00ffcc", 1.4, "triangle")}<LabelStyle><color>ff00ffcc</color></LabelStyle></Style>'
+              f'<Style id="relay">{icon("ff00ccff", 1.2, "triangle")}</Style>'
+              f'<Style id="mast">{icon("ff0000ff", 1.2, "target")}</Style>'
+              '<Style id="uplink"><LineStyle><color>ff0000ff</color><width>5</width></LineStyle></Style>'
+              '<Style id="backbone"><LineStyle><color>ff00ffcc</color><width>6</width></LineStyle></Style>'
+              '<Style id="dist"><LineStyle><color>ccffffff</color><width>2.5</width></LineStyle></Style>'
+              '<Style id="weak"><LineStyle><color>ff00a5ff</color><width>4</width></LineStyle></Style>'
+              '<Style id="bnd"><LineStyle><color>ffffffff</color><width>2</width></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>')
+    cla, clo = sum(las) / len(las), sum(los) / len(los)
+    span = max(8000, 1.6 * 1000 * max(hav_km(cla, clo, la, lo) for la, lo in pts))
+    parts = []
+    if boundary_ll:
+        ring = " ".join(f"{lo},{la},0" for lo, la in boundary_ll)
+        parts.append(f"<Folder><name>Boundary</name><Placemark><name>{x(cfg['reserve'])} boundary</name><styleUrl>#bnd</styleUrl>"
+                     f"<Polygon><tessellate>1</tessellate><outerBoundaryIs><LinearRing><coordinates>{ring}</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark></Folder>")
+    P = {s["name"]: (tuple(s["latlon"]), MAST) for s in m["sites"]}
+    P["Carrier uplink"] = (tuple(m["uplink"]["latlon"]), UPLINK_H)
+    located = [l for l in cfg["lodges"] if l.get("lat") is not None]
+    for l in located:
+        P[l["name"]] = ((l["lat"], l["lon"]), CPE)
+    parts.append("<Folder><name>Sites</name>" + "".join(
+        tower(l["name"], l["lat"], l["lon"], CPE, "site", f"{l.get('coord_source', 'Published position')}. Ground {elev(l['lat'], l['lon']):.0f} m ASL. "
+              f"Site mast {CPE} m (modelled). Desktop position: confirm on survey.") for l in located) + "</Folder>")
+    net = [tower(f"Carrier uplink: {m['uplink']['label']} ({UPLINK_H} m)", *m["uplink"]["latlon"], UPLINK_H, "mast",
+                 "Candidate carrier uplink. Operator and mounting to be confirmed with Vodacom.")]
+    for s_ in m["sites"]:
+        net.append(tower(f"{s_['name']} ({MAST} m)", *s_["latlon"], MAST, "high" if s_["kind"] == "high" else "relay",
+                         f"Candidate {s_['kind']} site, ground {s_['elev']:.0f} m ASL, {MAST} m mast modelled. Desktop candidate: walk on survey."))
+    weak = lambda r: r < 0.65
+    for L in m["links"]:
+        (a, ha), (b, hb) = P[L["a"]], P[L["b"]]
+        st_ = "uplink" if L["kind"] == "uplink" else ("weak" if weak(L["fresnel_ratio"]) else "backbone")
+        net.append(radio(f"{L['a']} → {L['b']}  {L['km']:.1f} km", a, ha, b, hb, st_,
+                         f"{L['kind']} · Fresnel clearance ratio {L['fresnel_ratio']:.2f} (minimum {FRESNEL_CLEAR:.2f}) · {F_GHZ} GHz, k = 4/3 · drawn mast-top to mast-top at true altitude"))
+    for k, v in m["lodges"].items():
+        if v:
+            (a, ha), (b, hb) = P[v["frm"]], P[k]
+            net.append(radio(f"{v['frm']} → {k}  {v['km']:.1f} km", a, ha, b, hb, "weak" if weak(v["fresnel_ratio"]) else "dist",
+                             f"distribution · Fresnel clearance ratio {v['fresnel_ratio']:.2f}"))
+    parts.append(f"<Folder><name>Provisional network design</name><open>1</open>{''.join(net)}</Folder>")
+    stops = [tuple(m["uplink"]["latlon"])] + [tuple(s_["latlon"]) for s_ in m["sites"]] + [(l["lat"], l["lon"]) for l in located[:6]]
+    fly = "".join(f"<gx:FlyTo><gx:duration>6</gx:duration><gx:flyToMode>smooth</gx:flyToMode>{look(la, lo, 2200, 70, i * 55 % 360)}</gx:FlyTo>"
+                  f"<gx:Wait><gx:duration>3</gx:duration></gx:Wait>" for i, (la, lo) in enumerate(stops))
+    tour = (f"<gx:Tour><name>▶ Fly the network</name><gx:Playlist><gx:FlyTo><gx:duration>4</gx:duration>{look(cla, clo, span, 50, 20)}</gx:FlyTo>"
+            f"{fly}<gx:FlyTo><gx:duration>6</gx:duration>{look(cla, clo, span, 55, 200)}</gx:FlyTo></gx:Playlist></gx:Tour>")
+    kml = ('<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2"><Document>'
+           f"<name>{x(cfg['reserve'])}: CTTX provisional network design (3D, desktop {x(cfg['date'])})</name><open>1</open>"
+           f"{look(cla, clo, span, 55, 20)}{styles}{tour}{''.join(parts)}</Document></kml>")
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
+        z.writestr("doc.kml", kml)
+    print(f"✓ {path}")
 
 
 # ---------------------------------------------------------------- HTML
