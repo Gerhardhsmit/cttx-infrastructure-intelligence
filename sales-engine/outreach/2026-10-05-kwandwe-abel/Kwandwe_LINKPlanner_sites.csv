@@ -1,0 +1,25 @@
+option,type,name,latitude,longitude,ground_m_asl,proposed_height_m,note
+both,site,Great Fish River Lodge,-33.0911,26.57404,295,8,"Mapped building named 'Great Fish River Lodge' (OpenStreetMap via Overture Maps release 2026-09-23.1), 657 m² footprint"
+both,site,Ecca Lodge,-33.11025,26.52672,329,8,Places point 'Kwandwe Ecca Lodge' and three mapped buildings within 60 m (Overture Maps release 2026-09-23.1)
+both,site,Uplands Homestead,-33.12837,26.47247,316,8,Places point only (Overture Maps release 2026-09-23.1); no mapped building at this point. Nearest building group is 2.2 km east. Confirm on site
+both,site,Heatherton Towers,-33.14654,26.52542,318,8,"Mapped building named 'Heatherton Towers' (OpenStreetMap via Overture Maps release 2026-09-23.1), 865 m²"
+both,site,Airstrip,-33.1338,26.57912,305,8,"Mapped aerodrome 'Kwandwe Airport', ICAO FAKG, 2,060 m runway (OpenStreetMap via Overture Maps release 2026-09-23.1)"
+both,site,East complex,-33.10005,26.60772,285,8,"10 mapped buildings, ~1,160 m² total, unnamed (Google/Microsoft footprints via Overture Maps release 2026-09-23.1). Use to confirm"
+both,site,West of GFR Lodge,-33.09499,26.5688,340,8,"One mapped building, 406 m², unnamed (OpenStreetMap via Overture Maps release 2026-09-23.1)"
+both,site,East of Ecca Lodge,-33.10491,26.5394,305,8,"Three mapped buildings, unnamed (OpenStreetMap via Overture Maps release 2026-09-23.1)"
+both,site,North-west of GFR Lodge,-33.08667,26.55751,303,8,"Two building footprints, unnamed (Overture Maps release 2026-09-23.1)"
+both,site,Dam buildings,-33.12336,26.50785,313,8,"Two building footprints near a mapped dam, unnamed (Overture Maps release 2026-09-23.1)"
+both,site,East of Uplands,-33.12802,26.49573,320,8,"Two building footprints, unnamed (Overture Maps release 2026-09-23.1)"
+both,site,South-west outpost,-33.1553,26.49129,334,8,"Four small structures, unnamed (Overture Maps release 2026-09-23.1)"
+both,site,North boundary,-33.05932,26.53818,606,8,"Two building footprints on the mapped boundary, unnamed (Overture Maps release 2026-09-23.1)"
+both,site,North ridge farmstead,-33.05559,26.51873,655,8,Eight mapped buildings 30 m outside the mapped boundary; may be Kwandwe land (Overture Maps release 2026-09-23.1)
+both,site,R67 edge buildings,-33.12827,26.61345,254,8,Three building footprints on the eastern boundary by the R67; possible gate (Overture Maps release 2026-09-23.1)
+both,site,Melton Manor,,,,8,position unknown — get on survey
+B,uplink,"Candidate carrier site NE (historical dataset point)",-33.05467,26.63644,443,30,historical carrier site — confirm with Vodacom
+B,high,High Site North,-33.06987,26.59363,479,18,desktop candidate
+B,high,High Site South,-33.14605,26.48552,422,18,desktop candidate
+B,relay,East ridge relay (R67),-33.10025,26.61599,357,18,desktop candidate
+A,uplink,"Candidate carrier site Makhanda ridge (mapped mast)",-33.28428,26.70253,841,30,historical carrier site — confirm with Vodacom
+A,high,High Site North,-33.05981,26.54515,613,18,desktop candidate
+A,high,High Site South,-33.1001,26.61599,356,18,desktop candidate
+A,relay,Great Fish River Lodge relay,-33.08835,26.58036,349,18,desktop candidate

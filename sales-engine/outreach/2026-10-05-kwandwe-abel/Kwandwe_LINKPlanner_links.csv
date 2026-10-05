@@ -1,0 +1,37 @@
+option,kind,from,from_lat,from_lon,to,to_lat,to_lon,km,fresnel_ratio_min_0.60
+OPTION B (recommended),uplink,Carrier uplink,-33.05467,26.63644,High Site North,-33.06987,26.59363,4.34,7.75
+OPTION B (recommended),backbone,High Site South,-33.14605,26.48552,High Site North,-33.06987,26.59363,13.16,6.68
+OPTION B (recommended),backbone,R67 edge buildings relay,-33.10025,26.61599,High Site North,-33.06987,26.59363,3.96,11.22
+OPTION B (recommended),distribution,High Site North,-33.06987,26.59363,Great Fish River Lodge,-33.0911,26.57404,2.98,4.73
+OPTION B (recommended),distribution,High Site North,-33.06987,26.59363,Ecca Lodge,-33.11025,26.52672,7.68,0.66
+OPTION B (recommended),distribution,High Site South,-33.14605,26.48552,Uplands Homestead,-33.12837,26.47247,2.31,4.42
+OPTION B (recommended),distribution,High Site South,-33.14605,26.48552,Heatherton Towers,-33.14654,26.52542,3.72,3.06
+OPTION B (recommended),distribution,R67 edge buildings relay,-33.10025,26.61599,Airstrip,-33.1338,26.57912,5.07,3.41
+OPTION B (recommended),distribution,R67 edge buildings relay,-33.10025,26.61599,East complex,-33.10005,26.60772,0.77,4.55
+OPTION B (recommended),distribution,High Site North,-33.06987,26.59363,West of GFR Lodge,-33.09499,26.5688,3.62,6.4
+OPTION B (recommended),distribution,High Site North,-33.06987,26.59363,East of Ecca Lodge,-33.10491,26.5394,6.38,1.27
+OPTION B (recommended),distribution,High Site South,-33.14605,26.48552,North-west of GFR Lodge,-33.08667,26.55751,9.4,1.17
+OPTION B (recommended),distribution,High Site South,-33.14605,26.48552,Dam buildings,-33.12336,26.50785,3.27,0.76
+OPTION B (recommended),distribution,High Site North,-33.06987,26.59363,East of Uplands,-33.12802,26.49573,11.18,1.09
+OPTION B (recommended),distribution,High Site South,-33.14605,26.48552,South-west outpost,-33.1553,26.49129,1.16,6.92
+OPTION B (recommended),distribution,R67 edge buildings relay,-33.10025,26.61599,North boundary,-33.05932,26.53818,8.56,0.7
+OPTION B (recommended),distribution,R67 edge buildings relay,-33.10025,26.61599,North ridge farmstead,-33.05559,26.51873,10.34,0.79
+OPTION B (recommended),distribution,R67 edge buildings relay,-33.10025,26.61599,R67 edge buildings,-33.12827,26.61345,3.12,0.91
+OPTION A (fallback),uplink,Carrier uplink,-33.28428,26.70253,High Site South,-33.1001,26.61599,21.95,9.17
+OPTION A (fallback),backbone,High Site South,-33.1001,26.61599,High Site North,-33.05981,26.54515,7.98,3.17
+OPTION A (fallback),backbone,Great Fish River Lodge relay,-33.08835,26.58036,High Site North,-33.05981,26.54515,4.56,0.6
+OPTION A (fallback),distribution,Great Fish River Lodge relay,-33.08835,26.58036,Great Fish River Lodge,-33.0911,26.57404,0.66,9.65
+OPTION A (fallback),distribution,High Site North,-33.05981,26.54515,Ecca Lodge,-33.11025,26.52672,5.85,4.82
+OPTION A (fallback),distribution,High Site North,-33.05981,26.54515,Uplands Homestead,-33.12837,26.47247,10.19,3.83
+OPTION A (fallback),distribution,High Site North,-33.05981,26.54515,Heatherton Towers,-33.14654,26.52542,9.79,4.94
+OPTION A (fallback),distribution,High Site South,-33.1001,26.61599,Airstrip,-33.1338,26.57912,5.08,3.38
+OPTION A (fallback),distribution,High Site South,-33.1001,26.61599,East complex,-33.10005,26.60772,0.77,4.32
+OPTION A (fallback),distribution,Great Fish River Lodge relay,-33.08835,26.58036,West of GFR Lodge,-33.09499,26.5688,1.31,5.49
+OPTION A (fallback),distribution,High Site North,-33.05981,26.54515,East of Ecca Lodge,-33.10491,26.5394,5.03,5.6
+OPTION A (fallback),distribution,Great Fish River Lodge relay,-33.08835,26.58036,North-west of GFR Lodge,-33.08667,26.55751,2.14,4.21
+OPTION A (fallback),distribution,High Site North,-33.05981,26.54515,Dam buildings,-33.12336,26.50785,7.86,5.36
+OPTION A (fallback),distribution,High Site North,-33.05981,26.54515,East of Uplands,-33.12802,26.49573,8.86,4.3
+OPTION A (fallback),distribution,High Site North,-33.05981,26.54515,South-west outpost,-33.1553,26.49129,11.72,1.52
+OPTION A (fallback),distribution,High Site North,-33.05981,26.54515,North boundary,-33.05932,26.53818,0.65,4.06
+OPTION A (fallback),distribution,High Site North,-33.05981,26.54515,North ridge farmstead,-33.05559,26.51873,2.51,0.68
+OPTION A (fallback),distribution,High Site South,-33.1001,26.61599,R67 edge buildings,-33.12827,26.61345,3.13,1.01
